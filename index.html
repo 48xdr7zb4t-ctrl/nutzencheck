@@ -1,0 +1,4952 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nutzen-Check – Grundgerüst</title>
+  <style>
+/* ===========================
+   0) Design Tokens / Globals
+=========================== */
+:root{
+  --bg:#0b0f17;
+  --panel:#121a2a;
+  --panel2:#0f1625;
+  --text:#e8eefc;
+  --muted:#9fb0d0;
+  --line:rgba(255,255,255,.10);
+  --accent:#6aa6ff;
+
+  --good:#2ecc71;
+  --warn:#f1c40f;
+  --bad:#e74c3c;
+  --darkbad:#7f1d1d;
+
+  --shadow: 0 12px 40px rgba(0,0,0,.45);
+  --r:16px;
+  --r2:22px;
+
+  --overlayZ:1001;
+  --backdropZ:1000;
+
+  --maxw:1200px;
+}
+
+/* ===========================
+   1) Base / Layout
+=========================== */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(106,166,255,.22), transparent 60%),
+    radial-gradient(900px 700px at 90% 30%, rgba(46,204,113,.18), transparent 55%),
+    var(--bg);
+}
+
+a{ color:inherit; }
+
+.wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:20px;
+}
+
+/* ===========================
+   2) Header / Navigation
+=========================== */
+header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:var(--r2);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow:var(--shadow);
+}
+
+.brand{ display:flex; gap:12px; align-items:center; }
+.logo{
+  width:40px;height:40px;border-radius:14px;
+  background:linear-gradient(135deg, rgba(106,166,255,.9), rgba(46,204,113,.75));
+  box-shadow:0 10px 30px rgba(106,166,255,.18);
+}
+.brand h1{ font-size:16px; margin:0; }
+.brand p{ margin:0; font-size:12px; color:var(--muted); }
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+/* ===========================
+   3) Buttons / Inputs
+=========================== */
+.btn{
+  appearance:none;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:.15s transform,.15s background,.15s border-color;
+  font-weight:600;
+  font-size:13px;
+}
+.btn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.05);
+  border-color:rgba(255,255,255,.18);
+}
+.btn.primary{
+  border-color:rgba(106,166,255,.35);
+  background:rgba(106,166,255,.10);
+}
+
+label{
+  font-size:12px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+}
+
+select, input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.18);
+  color:var(--text);
+  outline:none;
+}
+
+/* ===========================
+   4) Grid / Cards / Utilities
+=========================== */
+.grid{
+  display:grid;
+  grid-template-columns:1.4fr .9fr;
+  gap:14px;
+  margin-top:14px;
+}
+
+.card{
+  border:1px solid var(--line);
+  border-radius:var(--r2);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.card h2{
+  margin:0;
+  padding:14px 16px;
+  font-size:14px;
+  letter-spacing:.2px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:rgba(0,0,0,.08);
+}
+.card .body{ padding:14px 16px; }
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.field{ flex:1; min-width:200px; }
+
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.muted{ color:var(--muted); }
+
+@media (max-width:980px){
+  .grid{ grid-template-columns:1fr; }
+  .nav{ justify-content:flex-start; }
+  .split{ grid-template-columns:1fr; }
+}
+
+/* ===========================
+   5) Chips / Dots
+=========================== */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(0,0,0,.16);
+  font-size:12px;
+  color:var(--muted);
+}
+
+.dot{
+  width:10px;height:10px;border-radius:999px;
+  background:var(--accent);
+}
+.dot.good{ background:var(--good); }
+.dot.warn{ background:var(--warn); }
+.dot.bad{ background:var(--bad); }
+.dot.darkbad{ background:var(--darkbad); }
+
+
+/* ===========================
+   6) Table
+=========================== */
+.tableWrap{
+  overflow:auto;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.18);
+}
+table{ width:100%; border-collapse:collapse; min-width:900px; }
+th,td{
+  padding:10px;
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+  vertical-align:top;
+}
+th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  text-align:left;
+  background:rgba(15,22,37,.95);
+}
+td{ color:rgba(232,238,252,.92); }
+tr:hover td{ background:rgba(255,255,255,.03); }
+
+/* ===========================
+   7) Pages
+=========================== */
+.page{ display:none; }
+.page.isActive{ display:block; }
+
+/* ===========================
+   8) Role/Stress “Why” Blocks
+=========================== */
+#nutzenRoleWhyBase{
+  max-height:520px;
+  overflow:auto;
+  padding-right:6px;
+}
+
+.whyRoleBlock{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:10px;
+  background:rgba(0,0,0,.10);
+}
+
+.whyRoleHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.whyRoleTitle{ font-weight:700; font-size:13px; }
+
+.whyRoleMeta{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.whyCols{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.whyColTitle{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.whyLine{
+  font-size:12.5px;
+  line-height:1.55;
+  margin:2px 0;
+}
+
+@media (max-width:980px){
+  .whyCols{ grid-template-columns:1fr; }
+}
+
+/* ===========================
+   9) Overlay (clean + single source of truth)
+   - Entfernt doppelte Regeln & !important-Spam
+   - Backdrop + Overlay per .isOpen sichtbar
+=========================== */
+.backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  z-index:var(--backdropZ);
+}
+.backdrop.isOpen{ display:block; }
+
+.overlay{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+
+  width:min(980px, calc(100% - 24px));
+  max-height:calc(100vh - 48px);
+  overflow:auto;
+
+  background:linear-gradient(180deg, rgba(18,26,42,.96), rgba(15,22,37,.98));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r2);
+  box-shadow:var(--shadow);
+  padding:14px;
+
+  display:none;
+  z-index:var(--overlayZ);
+}
+.overlay.isOpen{ display:block; }
+
+.overlayTop{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  padding:4px 6px 10px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(18,26,42,.98), rgba(15,22,37,.92));
+  backdrop-filter:blur(6px);
+}
+.overlayTop strong{ font-size:13px; }
+
+.overlayGrid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:12px;
+  padding-top:12px;
+}
+
+.overlaySpan2{ grid-column:1 / -1; }
+
+@media (max-width:980px){
+  .overlayGrid{ grid-template-columns:1fr; }
+  .overlaySpan2{ grid-column:1 / 2; }
+}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Nutzen-Check</h1>
+          <p class="muted">Grundgerüst: Header-Sets · Rollen · Stress-Flag · Buy-Bands · Erklärungen</p>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Seiten Navigation">
+        <button class="btn" onclick="goPage('home')">Home</button>
+        <button class="btn" onclick="goPage('table')">Tabelle</button>
+        <button class="btn" onclick="goPage('roles')">Rollen</button>
+        <button class="btn" onclick="goPage('stress')">Stress</button>
+        <button class="btn primary" onclick="openNutzenOverlay()">Nutzen Overlay</button>
+      </nav>
+    </header>
+
+    <!-- ===== PAGES ===== -->
+    <main class="grid">
+
+      <!-- LEFT: Main content -->
+      <section class="card">
+
+        <div id="page-home" class="page isActive">
+          <h2>
+            <span>Home</span>
+          </h2>
+          <div class="body">
+            <div class="split">
+              <div class="card" style="box-shadow:none">
+                <h2>Quick Controls</h2>
+                <div class="body">
+                  <div class="row">
+                    <div class="field">
+                      <label for="nutzenHeaderSet">Header-Set</label>
+                      <select id="nutzenHeaderSet">
+                        <option value="standard">Standard</option>
+                        <option value="banks">Banks</option>
+                        <option value="reits">REITs</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="brokers">Brokers / Asset Manager</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="commodities">Commodities</option>
+                      </select>
+                    </div>
+
+                    <div class="field">
+                      <label for="nutzenCagrYear">CAGR Jahr</label>
+                      <select id="nutzenCagrYear">
+                        <option value="1">1Y</option>
+                        <option value="2">2Y</option>
+                        <option value="3">3Y</option>
+                        <option value="4" selected>4Y</option>
+                      </select>
+                    </div>
+
+                    <div class="field">
+                      <label for="nutzenVolYear">Vol Jahr</label>
+                      <select id="nutzenVolYear">
+                        <option value="1" selected>1Y</option>
+                        <option value="5">5Y</option>
+                        <option value="10">10Y</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <button class="btn" id="nutzenBtnRecalc">Recalc</button>
+                    <button class="btn" id="nutzenBtnExport">Export</button>
+                    <button class="btn" onclick="goPage('table')">Zur Tabelle</button>
+                  </div>
+
+                
+                </div>
+              </div>
+
+            
+            </div>
+          </div>
+        </div>
+
+
+        <div style="margin-top:14px">
+  <div class="muted" style="font-size:12px;margin-bottom:6px">Excel Paste (Copy → Paste)</div>
+  <textarea id="excelPaste"
+    placeholder="Excel markieren → Cmd+C → hier einfügen (Tab-getrennt)"
+    style="width:100%;min-height:140px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20);color:var(--text);outline:none;resize:vertical"></textarea>
+
+  <div class="row" style="margin-top:10px">
+    <button class="btn primary" id="btnParseExcel" style="flex:1">In Tabelle übernehmen</button>
+    <button class="btn" id="btnClearExcel">Leeren</button>
+  </div>
+
+  <p class="muted" style="margin:10px 0 0 0;font-size:12px;line-height:1.4">
+    Unterstützt 2 Formate:<br>
+    (A) 2 Spalten: <span class="muted">Header | Wert</span><br>
+    (B) 2 Zeilen: <span class="muted">Header-Zeile</span> + <span class="muted">Wert-Zeile</span>
+  </p>
+</div>
+
+
+
+        <div id="page-table" class="page">
+          <h2>
+            <span>Tabelle</span>
+            <span class="chip"><span class="dot"></span> Header-Reihenfolge egal (Mapping über Namen)</span>
+          </h2>
+          <div class="body">
+            <div class="tableWrap" aria-label="Nutzen Tabelle">
+              <table id="nutzenTable">
+                <thead>
+                  <tr id="nutzenTableHeadRow">
+                    <!-- JS füllt THs passend zum Header-Set -->
+                    <th>Header</th>
+                    <th>Wert</th>
+                    <th class="muted">Notizen</th>
+                  </tr>
+                </thead>
+                <tbody id="nutzenTableBody">
+                  <!-- JS füllt Zeilen (oder du nutzt ein 2D Array / Map) -->
+                  <tr>
+                    <td class="muted">Revenue (FY)</td>
+                    <td>–</td>
+                    <td class="muted">Placeholder</td>
+                  </tr>
+                  <tr>
+                    <td class="muted">FCF Conversion</td>
+                    <td>–</td>
+                    <td class="muted">calc (FCF / Net Income)</td>
+                  </tr>
+                  <tr>
+                    <td class="muted">Profit Margin 1Y</td>
+                    <td>–</td>
+                    <td class="muted">calc (Net Income / Revenue)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <span class="chip"><span class="dot"></span> Visible-Indices: CAGR/Vol Filter</span>
+              <span class="chip"><span class="dot"></span> Missing-Handling: “– / n/a”</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-roles" class="page">
+          <h2>
+            <span>Rollen</span>
+            <span class="chip"><span class="dot"></span> Base + Health</span>
+          </h2>
+          <div class="body">
+            <div class="split">
+              <div class="card" style="box-shadow:none">
+                <h2>Aktive Rollen</h2>
+                <div class="body">
+                  <ul id="nutzenRolesActive" style="margin:0;padding-left:18px;line-height:1.6">
+                    <li>–</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="card" style="box-shadow:none">
+                <h2>Warum (Erklärungen)</h2>
+                <div class="body">
+                  <div class="muted" style="font-size:12px;margin-bottom:6px">Base</div>
+                  <div id="nutzenRoleWhyBase">–</div>
+                  <div class="muted" style="font-size:12px;margin:12px 0 6px">Health</div>
+                  <div id="nutzenRoleWhyHealth">–</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<div id="page-stress" class="page">
+
+  <div class="body">
+    <div class="split">
+
+      <!-- Card 1: aktueller Stress + Warum -->
+      <div class="card" style="box-shadow:none">
+        <h2>Aktueller Stress</h2>
+        <div class="body">
+
+          <div class="row" style="gap:8px">
+            <span class="chip">
+              <span class="dot" id="stressPageDot"></span>
+              <span id="stressPageLabel">Stress: –</span>
+            </span>
+          </div>
+
+          <div class="muted" style="font-size:12px;margin:12px 0 6px">Warum diese Farbe?</div>
+          <div id="stressWhyNow">–</div>
+
+        </div>
+      </div>
+
+      <!-- Card 2: Farben-Erklärung (immer alle Farben + Base/Health) -->
+      <div class="card" style="box-shadow:none">
+        <h2>Farben Erklärung</h2>
+        <div class="body">
+          <div id="stressLegendAll">–</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+      </section>
+
+      <!-- RIGHT: Side panel -->
+      <aside class="card">
+        <h2>
+          <span>Inputs & Status</span>
+          <span class="chip"><span class="dot"></span> IDs ready</span>
+        </h2>
+        <div class="body">
+          <div class="row">
+            <div class="field">
+              <label for="nutzenTicker">Ticker / Company</label>
+              <input id="nutzenTicker" placeholder="z.B. KO / AAPL / MSFT" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label for="nutzenFairValue">Fair Value</label>
+              <input id="nutzenFairValue" placeholder="z.B. 120.50" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <span class="chip"><span class="dot"></span> Overlay: Erklärungen</span>
+            <span class="chip"><span class="dot"></span> Table: Mapping</span>
+          </div>
+
+          <div style="margin-top:14px">
+            <button class="btn primary" style="width:100%" onclick="openNutzenOverlay()">Overlay öffnen</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="muted" style="font-size:12px;margin-bottom:6px">Debug / Output</div>
+            <pre id="nutzenDebug" style="margin:0;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20);overflow:auto;max-height:240px">{
+  "headerset": "standard",
+  "stress": "green",
+  "roles": []
+}</pre>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+<!-- ===== OVERLAY ===== -->
+<div id="nutzenOverlayBackdrop"
+     class="backdrop"
+     aria-hidden="true"
+     onclick="closeNutzenOverlay()"></div>
+
+<div id="nutzenOverlay" class="overlay" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="overlayTop">
+    <strong>Nutzen Overlay</strong>
+    <button class="btn" type="button" onclick="closeNutzenOverlay()">Schließen</button>
+  </div>
+
+  <div class="overlayGrid overlayGridNew">
+    <!-- Preis-Ranges: volle Breite -->
+    <div class="card overlaySpan2" style="box-shadow:none">
+      <h2>Preis Ranges</h2>
+      <div class="body">
+        <div class="row" style="gap:10px;flex-wrap:wrap">
+          <div class="field" style="min-width:160px">
+            <label for="ovFair">Fair Value (Override)</label>
+            <input id="ovFair" placeholder="leer = aus Tabelle" />
+          </div>
+          <div class="field" style="min-width:120px">
+            <label for="ovStrongBuyMult">Strong Buy</label>
+            <input id="ovStrongBuyMult" placeholder="0,75" />
+          </div>
+          <div class="field" style="min-width:120px">
+            <label for="ovBuyMult">Buy</label>
+            <input id="ovBuyMult" placeholder="0,90" />
+          </div>
+          <div class="field" style="min-width:120px">
+            <label for="ovHoldMult">Hold</label>
+            <input id="ovHoldMult" placeholder="1,10" />
+          </div>
+          <div class="field" style="min-width:120px">
+            <label for="ovExpensiveMult">Expensive</label>
+            <input id="ovExpensiveMult" placeholder="1,25" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="ovBuyReset" type="button">Reset</button>
+        </div>
+
+        <div style="margin-top:10px" id="nutzenOverlayBuyExplain">–</div>
+        <div style="margin-top:8px" id="nutzenOverlayBuyDecision" class="chip">
+          <span class="dot"></span> Aktion: –
+        </div>
+      </div>
+    </div>
+
+    <!-- Stress -->
+    <div class="card" style="box-shadow:none">
+      <h2>Stress Flag</h2>
+      <div class="body">
+        <div id="nutzenOverlayStressExplain">–</div>
+      </div>
+    </div>
+
+    <!-- Rollen -->
+    <div class="card" style="box-shadow:none">
+      <h2>Rollen</h2>
+      <div class="body">
+        <div id="nutzenOverlayRolesExplain">–</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    // --- Overlay ---
+    function openNutzenOverlay(){
+       console.log("openNutzenOverlay()");
+      const ov = document.getElementById("nutzenOverlay");
+      const bd = document.getElementById("nutzenOverlayBackdrop");
+      if(ov) ov.classList.add("isOpen");
+      if(bd) bd.classList.add("isOpen");
+      if(ov) ov.setAttribute("aria-hidden", "false");
+      if(bd) bd.setAttribute("aria-hidden", "false");
+    }
+    function closeNutzenOverlay(){
+      const ov = document.getElementById("nutzenOverlay");
+      const bd = document.getElementById("nutzenOverlayBackdrop");
+      if(ov) ov.classList.remove("isOpen");
+      if(bd) bd.classList.remove("isOpen");
+      if(ov) ov.setAttribute("aria-hidden", "true");
+      if(bd) bd.setAttribute("aria-hidden", "true");
+    }
+
+    // --- Seiten Navigation ---
+    function goPage(page){
+      closeNutzenOverlay(); // verhindert "unsichtbares Overlay blockt Klicks"
+      const pages = document.querySelectorAll(".page");
+      pages.forEach(p => p.classList.remove("isActive"));
+      const el = document.getElementById("page-" + page);
+      if(el) el.classList.add("isActive");
+    }
+
+    // Mini-UX: Recalc Button placeholder
+    document.getElementById("nutzenBtnRecalc")?.addEventListener("click", () => {
+      const hs = document.getElementById("nutzenHeaderSet")?.value || "standard";
+      const cagr = document.getElementById("nutzenCagrYear")?.value || "4";
+      const vol = document.getElementById("nutzenVolYear")?.value || "1";
+      const dbg = {
+        headerset: hs,
+        cagrYear: cagr,
+        volYear: vol,
+        stress: "green",
+        roles: []
+      };
+      const pre = document.getElementById("nutzenDebug");
+      if(pre) pre.textContent = JSON.stringify(dbg, null, 2);
+    });
+
+
+
+
+
+    // 1) Rollen-Liste (wie von dir)
+const NUTZEN_ROLES = [
+  "Dividenden Aristokrat",
+  "Dividendenwachstum",
+  "Value",
+  "Wachstum",
+  "Quality",
+  "GARP",
+  "Turnaround",
+  "Zykliker",
+  "Spekulation",
+  "Krisenfall",
+  "Defensiv",
+  "stabil Defensiv",
+  "Pricing Power",
+  "Abo Modell/ Recurring Revenue",
+  "Balance Sheet Strong",
+  "Schuldenlastig/ Leveraged",
+  "Small Cap",
+  "Mid Cap",
+  "Large Cap",
+  "Mega Cap",
+];
+
+// 2) Sektoren
+const NUTZEN_SECTORS = [
+  { key:"standard", label:"Standard" },
+  { key:"banks", label:"Banken" },
+  { key:"insurance", label:"Versicherer" },
+  { key:"reits", label:"REITS/ Immobilien" },
+  { key:"utilities", label:"Utilities/ Versorger" },
+  { key:"brokers", label:"Broker/Asset Manager" },
+  { key:"commodities", label:"Rohstoffe/ Exploration" },
+];
+
+// 3) Kriterien je Sektor (nur Beispiel-Start; hier später deine echten Listen rein)
+const NUTZEN_HEADERS_BY_SECTOR = {
+  standard: [
+    "Revenue (FY)",
+    "Revenue 4Y (CAGR)",
+    "Revenue Growth 1Y (YoY)",
+    "Interest Expense 1Y",
+    "Net Income 1Y",
+    "Net Income positiv (Ja/Nein)",
+    "EPS 1Y (Diluted, FY)",
+    "EPS Growth 4Y (CAGR)",
+    "Operating Margin 4Y pp (CAGR)",
+    "Operating Margin 1Y",
+    "Profit Margin 1Y",
+    "EBITDA 1Y",
+    "EBITDA Margin 1Y",
+    "Dividende (DPS) 4Y (CAGR)",
+    "Gross Margin 1Y",
+    "Cash & Short-Term Investments 1Y",
+    "Beta",
+    "52-Week Range",
+    "KGV target",
+    "Fairer Preis",
+    "Operating Cash Flow 1Y",
+    "Capital Expenditures 1Y",
+    "Repurchase of Common Stock 1Y",
+    "FCF 1Y",
+    "FCF Conversion",
+    "FCF-Marge 1Y",
+    "FCF positiv (Ja/Nein)",
+    "FCF-Payout",
+    "Free Cash Flow per Share 1Y",
+    "Enterprise Value 1Y",
+    "KGV (PE Ratio) 1Y",
+    "P/FCF Ratio 1Y",
+    "EV/EBITDA Ratio 1Y",
+    "EV/FCF Ratio",
+    "Debt / FCF Ratio",
+    "Net Debt / EBITDA Ratio 1Y",
+    "Quick Ratio 1Y",
+    "Current Ratio 1Y",
+    "ROE 1Y",
+    "ROIC 1Y",
+    "ROCE 1Y",
+    "FCF Yield 1Y",
+    "Payout Ratio 1Y",
+    "Zinsdeckung 1Y (Interest Coverage)",
+    "Shares Outstanding 1Y",
+    "Marktkapitalisierung",
+    "Shares Change (YoY)",
+    "Dividende (p.a.)",
+    "Div.-Frequency",
+    "Div.-Rendite aktuell (%)",
+    "Dividend Growth years",
+    "Dividend Growth",
+    "Buyback Yield",
+    "Shareholder Yield",
+    "Kurs aktuell",
+    "Kurs 4Y (CAGR)",
+    "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
+  ],
+
+
+  banks: [
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+  "Beta",
+  "52-Week Range",
+  "Marktkapitalisierung",
+  "Enterprise Value 1Y",
+
+  // ===== Fair Value / Bewertung =====
+  "Fairer Preis",
+  "KGV (PE Ratio) 1Y",
+  "P/B",
+  "P/TBV",
+
+  // ===== Dividende & Shareholder Returns (Pflicht) =====
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== Ertragskraft (Bank-spezifisch, falls vorhanden) =====
+  "Net Interest Income 1Y",
+  "NII 1Y (YoY)",
+  "Non-Interest Income 1Y",
+  "Non-Interest Income (YoY)",
+
+  // ===== Profitabilität (meist vorhanden) =====
+  "Net Income 1Y",
+  "Net Income 1Y (YoY)",
+  "EPS 1Y (Diluted, FY)",
+  "EPS Growth 4Y (CAGR)",
+  "ROE 1Y",
+  "ROA 1Y",
+  "Profit Margin 1Y",
+
+  // ===== Bilanz / Kapitalstärke-Proxies =====
+  "Total Assets 1Y",
+  "Total Liabilities 1Y",
+  "Equity 1Y",
+  "Book Value per Share 1Y",
+  "Cash & Short-Term Investments 1Y",
+  "Total Debt 1Y"
+
+  ],
+
+
+  insurance: [
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
+
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  "Marktkapitalisierung",
+  "Fairer Preis",
+  "Beta",
+  "52-Week Range",
+
+  "Dividende (DPS) 4Y (CAGR)",
+
+    "Insurance Net Premiums Written (NWP)",
+  "Insurance Net Premiums Written Growth (YoY)",
+  "Combined Ratio",
+  "Loss Ratio",
+  "Expense Ratio",
+
+  // Ertrag / Profitabilität
+  "Net Income 1Y",
+  "Net Income 1Y (YoY)",
+  "EPS 1Y (Diluted, FY)",
+  "ROE 1Y",
+
+    "Equity (Book Value)",
+  "Book Value / Share",
+  "P/B Ratio",
+
+  "Enterprise Value 1Y",        // falls du EV drin haben willst
+  "KGV (PE Ratio) 1Y",   // optional bei Insurern ok
+  "Payout Ratio 1Y",
+   "Revenue (FY)",
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+
+  // Liquidität (bei Finanzwerten nicht immer so aussagekräftig wie bei Industrials)
+  "Cash & Short-Term Investments 1Y",
+
+  // Verschuldung / Zinslast (je nach Datenlage)
+  "Interest Expense 1Y",
+  "Zinsdeckung 1Y (Interest Coverage)",
+
+  // Margen (nicht Kern für Insurer, eher optional)
+  "Profit Margin 1Y",
+  "Operating Margin 1Y",
+
+
+  ],
+
+
+  reits: [
+      "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+  "Marktkapitalisierung",
+  "Fairer Preis",
+  "Beta",
+  "52-Week Range",
+
+  // ===== Dividende & Shareholder Return (Pflicht + sinnvoll) =====
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== REIT-Kern (statt EPS-Fokus) =====
+  "FFO (TTM)",
+  "FFO (FY)",
+  "FFO per Share (TTM)",
+  "FFO per Share (FY)",
+  "AFFO (TTM)",
+  "AFFO (FY)",
+  "AFFO per Share (TTM)",
+  "AFFO per Share (FY)",
+
+  // ===== Bewertung (REIT-typisch) =====
+  "Price/FFO",
+  "Price/AFFO",
+  "Enterprise Value 1Y",
+  "EV/ EBITDA Ratio",
+  "Payout Ratio 1Y",
+  "Fairer Preis",
+
+
+  ],
+
+
+  utilities: [
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+  "Beta",
+  "52-Week Range",
+  "Marktkapitalisierung",
+  "Fairer Preis",
+
+  // ===== Dividende / Shareholder Returns (deine Pflicht) =====
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== Profitabilität / Stabilität =====
+  "Revenue (FY)",
+  "Revenue Growth 1Y (YoY)",
+  "EBITDA 1Y",
+  "EBITDA Margin 1Y",
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+
+  // ===== Cashflow / Capex (wichtig bei Versorgern) =====
+  "Operating Cash Flow 1Y",
+  "Capital Expenditures 1Y",
+  "FCF 1Y",
+  "FCF positiv (Ja/Nein)",
+  "FCF-Marge 1Y",
+  "FCF Conversion",
+
+  // ===== Verschuldung / Zinslast =====
+  "Total Debt 1Y",
+  "Net Debt 1Y",
+  "Net Debt / EBITDA",
+  "Interest Coverage",
+
+  // ===== Bewertung (Utilities oft über CF/EV) =====
+  "Enterprise Value 1Y",
+  "KGV (PE Ratio) 1Y",
+  "P/FCF Ratio 1Y",
+  "EV/ EBITDA Ratio",
+
+  ],
+
+
+  brokers: [
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+  "Beta",
+  "52-Week Range",
+
+  // ===== Shareholder Return (Dividende & Buybacks) =====
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== Size & Pricing =====
+  "Marktkapitalisierung",
+  "Fairer Preis",
+
+  // ===== Optional: Wachstum & Ertragskraft (falls in deiner Tabelle vorhanden) =====
+  "Revenue (FY)",
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+  "Net Income 1Y",
+  "Net income positiv (Ja/Nein)",
+  "EPS 1Y (Diluted, FY)",
+  "EPS Growth 4Y (CAGR)",
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+
+  // ===== Optional: Cashflow / Kapitalrückführung (falls vorhanden) =====
+  "Operating Cash Flow 1Y",
+  "Capital Expenditures 1Y",
+  "FCF 1Y",
+  "FCF positiv (Ja/Nein)",
+
+  // ===== Optional: Bewertung (falls du sie nutzt) =====
+  "KGV (PE Ratio) 1Y",
+  "P/FCF Ratio 1Y",
+  "EV/ EBITDA Ratio",
+  "Enterprise Value 1Y",
+
+  ],
+
+
+  commodities: [
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+  "Beta",
+  "52-Week Range",
+
+  // --- Bewertung / Größe ---
+  "Marktkapitalisierung",
+  "Enterprise Value 1Y",
+  "Fairer Preis",
+
+  // --- Dividende & Shareholder Return ---
+  "Dividende (p.a.)",
+  "Div.-Frequency",
+  "Div.-Rendite aktuell (%)",
+  "Dividend Growth years",
+  "Dividend Growth",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // --- Profitabilität & Margen ---
+  "Revenue (FY)",
+  "Revenue Growth 1Y (YoY)",
+  "Gross Margin 1Y",
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+  "EBITDA 1Y",
+  "EBITDA Margin 1Y",
+  "Net Income 1Y",
+  "Net Income positiv (Ja/Nein)",
+  "EPS 1Y (Diluted, FY)",
+
+  // --- Cashflow ---
+  "Operating Cash Flow 1Y",
+  "Capital Expenditures 1Y",
+  "FCF 1Y",
+  "FCF-Marge 1Y",
+  "FCF positiv (Ja/Nein)",
+  "FCF Conversion",
+
+  // --- Verschuldung / Zinsrisiko (oft wichtig bei Minern/Oil&Gas) ---
+  "Total Debt 1Y",
+  "Net Cash 1Y",
+  "Net Debt/EBITDA",
+  "Interest Coverage",
+
+  // --- Multiples (zyklisch, aber als Kontext hilfreich) ---
+  "KGV (PE Ratio) 1Y",
+  "P/FCF Ratio 1Y",
+  "EV/ EBITDA Ratio",
+  ],
+};
+
+// 4) Welche CAGR- und Vola-Jahre pro Sektor “erlaubt” sind (alles möglich)
+const NUTZEN_YEARS_BY_SECTOR = {
+  standard:   { cagr:[1,2,3,4], vol:[1,5,10] },
+  banks:      { cagr:[1,2,3,4], vol:[1,5,10] },
+  insurance:  { cagr:[1,2,3,4], vol:[1,5,10] },
+  reits:      { cagr:[1,2,3,4], vol:[1,5,10] },
+  utilities:  { cagr:[1,2,3,4], vol:[1,5,10] },
+  brokers:    { cagr:[1,2,3,4], vol:[1,5,10] },
+  commodities:{ cagr:[1,2,3,4], vol:[1,5,10] },
+};
+
+
+
+function normKey(s){
+  return String(s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[()]/g, "")
+    .replace(/[–—]/g, "-")
+    .trim();
+}
+
+// =============================
+// 1) Missing / NA Tokens
+// =============================
+const NA_TOKENS = new Set([
+  "", " ", "–", "-", "—",
+  "n/a", "na", "n.a.", "n.a",
+  "k.a.", "k.a",
+  "null", "none", "undefined"
+]);
+
+function nzStr(v){
+  if(v === null || v === undefined) return "";
+  return String(v).trim();
+}
+
+function isMissing(v){
+  const s = nzStr(v).toLowerCase();
+  return NA_TOKENS.has(s);
+}
+
+// =============================
+// Parser: nzNum + nzPct01 (ersetzen)
+// - unterstützt DE/EN Zahlen + K/M/B/T
+// - nzPct01 gibt IMMER 0..1 zurück
+// =============================
+function nzNum(v){
+  if(isMissing(v)) return NaN;
+
+  let s = nzStr(v).replace(/\s/g, "");
+  if(!s) return NaN;
+
+  // Prozentzeichen für nzNum ignorieren (nzPct01 macht daraus ratio)
+  s = s.replace("%", "");
+
+  // K/M/B/T suffix (z.B. 2.3B, 150M, 12k)
+  const mm = s.match(/^([-+]?[\d.,]+)([kmbt])$/i);
+  if(mm){
+    let n = mm[1];
+    const suf = mm[2].toLowerCase();
+
+    // DE -> EN
+    if(n.includes(",") && n.includes(".")){
+      n = n.replace(/\./g, "").replace(",", ".");
+    } else if(n.includes(",")){
+      n = n.replace(",", ".");
+    }
+
+    let val = Number(n);
+    if(!Number.isFinite(val)) return NaN;
+
+    const mult = suf === "k" ? 1e3 :
+                 suf === "m" ? 1e6 :
+                 suf === "b" ? 1e9 :
+                 suf === "t" ? 1e12 : 1;
+    return val * mult;
+  }
+
+  // DE -> EN
+  if(s.includes(",") && s.includes(".")){
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else if(s.includes(",")){
+    s = s.replace(",", ".");
+  }
+
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function nzPct01(v){
+  const n = nzNum(v);
+  if(!Number.isFinite(n)) return NaN;
+  // Heuristik: 12 => 12% => 0.12, 0.12 bleibt 0.12
+  return (Math.abs(n) > 1.5) ? (n / 100) : n;
+}
+
+function el(id){ return document.getElementById(id); }
+
+function fmtNum(n){
+  if(!Number.isFinite(n)) return "–";
+  // DE-Format (optional)
+  return n.toLocaleString("de-DE", { maximumFractionDigits: 2 });
+}
+
+
+
+
+
+
+ // --- Helpers ---
+
+
+
+
+
+
+function syncOvFairDefaultFromData(m){
+  const ov = el("ovFair");
+  if(!ov) return;
+
+  // ✅ Wenn User gerade tippt: NIEMALS auto-überschreiben
+  if(document.activeElement === ov) return;
+
+  // ✅ Wenn schon Wert drin: nicht überschreiben
+  if(nzStr(ov.value).trim().length > 0) return;
+
+  const fairFromTable = nzNum(mGet(m, "Fairer Preis"));
+  const fairFromInput = nzNum(el("nutzenFairValue")?.value);
+
+  const fair = Number.isFinite(fairFromInput) ? fairFromInput : fairFromTable;
+
+  if(Number.isFinite(fair) && fair > 0){
+    ov.value = String(fair).replace(".", ","); // optional DE
+  }
+}
+
+
+
+ function setDot(dotEl, mode){
+  if(!dotEl) return;
+  dotEl.classList.remove("good","warn","bad","darkbad");
+  if(mode) dotEl.classList.add(mode);
+}
+
+function fmtDE(n){
+  return Number.isFinite(n) ? n.toLocaleString("de-DE",{maximumFractionDigits:2}) : "–";
+}
+
+function renderAktuellerZustand({ roles, st, buy }){
+  // ---- Stress Chip ----
+  setDot(el("dotStress"), st?.mode);
+  const tStress = el("txtStress");
+  if(tStress) tStress.textContent = `Stress: ${st?.label ?? "–"}`;
+
+  // ---- Rollen: ALLE aktiven Rollen ----
+  const act = (roles || []).filter(r => r.active);
+  const rolesText = act.length ? act.map(r => r.role).join(", ") : "–";
+  setDot(el("dotRole"), act.length ? "good" : "warn");
+  const tRoleChip = el("txtRole");
+  if(tRoleChip) tRoleChip.textContent = `Rolle(n): ${act.length ? act.length : "–"}`;
+
+  const tRolesAll = el("txtRolesAll");
+  if(tRolesAll) tRolesAll.textContent = rolesText;
+
+  // ---- Price Ranges + Buy Chip ----
+  const dec = computeBuyDecision(buy?.priceNow, buy?.fair, buy?.bands);
+  setDot(el("dotBuy"), dec?.mode);
+  const tBuy = el("txtBuy");
+  if(tBuy) tBuy.textContent = `Buy: ${dec?.label ?? "–"}`;
+
+  const tRanges = el("txtRanges");
+  if(tRanges){
+    const b = buy?.bands;
+    tRanges.textContent = b
+      ? `Kurs: ${fmtDE(buy.priceNow)} | Fair: ${fmtDE(buy.fair)} | Strong Buy ≤ ${fmtDE(b.strongBuyMax)} | Buy ≤ ${fmtDE(b.buyMax)} | Hold ≤ ${fmtDE(b.holdMax)} | Expensive > ${fmtDE(b.expensiveMax)}`
+      : `Kurs: ${fmtDE(buy?.priceNow)} | Fair: ${fmtDE(buy?.fair)} | Buy-Bands: –`;
+  }
+}
+
+
+
+
+function summarizeRolesAll(evRoles){
+  const act = (evRoles || []).filter(r => r.active).map(r => r.role);
+  return act.length ? act.join(", ") : "–";
+}
+
+
+  function updateNutzenTableFromMap(valMap){
+    const tbody = document.getElementById("nutzenTableBody");
+    if(!tbody) return;
+
+    // bestehende Tabellenzeilen auslesen: 1. Spalte = Header
+    const trs = Array.from(tbody.querySelectorAll("tr"));
+
+    // wenn du willst: fehlende Header aus dem Paste automatisch ergänzen
+    // (standardmäßig: wir updaten nur vorhandene Zeilen)
+    const allowAppendMissing = true;
+
+    const seen = new Set();
+
+    // 1) vorhandene Zeilen updaten
+    for(const tr of trs){
+      const tds = tr.querySelectorAll("td");
+      if(tds.length < 2) continue;
+
+      const headerText = (tds[0].textContent || "").trim();
+      const key = normKey(headerText);
+
+      if(valMap.has(key)){
+        tds[1].textContent = valMap.get(key);
+        // optional Notiz löschen/setzen
+        if(tds[2]) tds[2].textContent = "";
+        seen.add(key);
+      }
+    }
+
+    // 2) fehlende Headers aus dem Paste anhängen (optional)
+    if(allowAppendMissing){
+      for(const [k,v] of valMap.entries()){
+        if(seen.has(k)) continue;
+
+        // Original Header-Text rekonstruieren geht nicht perfekt,
+        // daher nehmen wir den Key "schön" formatiert:
+        const pretty = k.replace(/\b\w/g, m => m.toUpperCase());
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="muted">${pretty}</td>
+          <td>${v}</td>
+          <td class="muted">eingefügt</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+  }
+
+
+function renderOverlaySummary(summary){
+  // Rollen kurz
+  const rEl = el("nutzenOverlayRolesExplain");
+  if(rEl) rEl.textContent = `Rollen: ${summary.rolesText}`;
+
+  // Stress kurz
+  const sEl = el("nutzenOverlayStressExplain");
+  if(sEl) sEl.textContent = `Stress: ${summary.stressLabel}`;
+
+  // Price Bands kurz
+const bEl = el("nutzenOverlayBuyExplain");
+if(bEl){
+  // unterstützt beide Varianten:
+  // - wenn du summary benutzt: summary.fair + summary.bands
+  // - wenn du direkt bands/fair hast: fair + bands
+  const _fair  = (typeof summary !== "undefined" && summary && Number.isFinite(summary.fair)) ? summary.fair : fair;
+  const _bands = (typeof summary !== "undefined" && summary && summary.bands) ? summary.bands : bands;
+
+  const fmt = (n) => Number.isFinite(n)
+    ? n.toLocaleString("de-DE", { maximumFractionDigits: 2 })
+    : "–";
+
+  // einzeilige Ausgabe (wie bei dir, inkl. .replace)
+  const line = _bands
+    ? `Fair: ${fmt(_fair)} | Strong Buy ≤ ${fmt(_bands.strongBuyMax)}
+       Buy ≤ ${fmt(_bands.buyMax)} | Hold ≤ ${fmt(_bands.holdMax)} | Expensive > ${fmt(_bands.expensiveMax)}`
+        .replace(/\s+/g, " ")
+    : `Fair: ${fmt(_fair)} | Buy-Bands: –`;
+
+  bEl.textContent = line;
+}
+}
+
+
+
+// liest "0,75" oder "0.75" -> Number
+function nzNumInput(v){
+  const s = nzStr(v).replace(/\s/g,"");
+  if(!s) return NaN;
+  return nzNum(s); // nutzt deinen vorhandenen nzNum (kann Komma/DE)
+}
+
+
+
+
+function computeBuyBandsFromFair(fair, bands){
+  if(!Number.isFinite(fair) || fair <= 0) return null;
+  return {
+    strongBuyMax: fair * (bands.strongBuy ?? 0.75),
+    buyMax:       fair * (bands.buy ?? 0.90),
+    holdMax:      fair * (bands.hold ?? 1.10),
+    expensiveMax: fair * (bands.expensive ?? 1.25),
+  };
+}
+
+function computeBuyDecision(priceNow, fair, bands){
+  if(!Number.isFinite(priceNow) || !Number.isFinite(fair) || !bands) return { label:"–", mode:"" };
+
+  if(priceNow <= bands.strongBuyMax) return { label:"Strong Buy", mode:"good" };
+  if(priceNow <= bands.buyMax)       return { label:"Buy",       mode:"good" };
+  if(priceNow <= bands.holdMax)      return { label:"Hold",      mode:"warn" };
+  if(priceNow <= bands.expensiveMax) return { label:"Expensive", mode:"bad" };
+  return { label:"Very Expensive", mode:"darkbad" };
+}
+
+
+
+
+function wireOverlayBuyInputs(){
+  const ovFair = el("ovFair");
+  const sb = el("ovStrongBuyMult");
+  const b  = el("ovBuyMult");
+  const h  = el("ovHoldMult");
+  const ex = el("ovExpensiveMult");
+  const reset = el("ovBuyReset");
+
+  if(!sb || !b || !h || !ex) return;
+
+  // Inputs initial befüllen
+  function syncInputsFromState(){
+    sb.value = String(NUTZEN_STATE.buyBands.strongBuy ?? 0.75);
+    b.value  = String(NUTZEN_STATE.buyBands.buy ?? 0.90);
+    h.value  = String(NUTZEN_STATE.buyBands.hold ?? 1.10);
+    ex.value = String(NUTZEN_STATE.buyBands.expensive ?? 1.25);
+  }
+  syncInputsFromState();
+
+  // Helper: clamp + order (damit ranges logisch bleiben)
+  function normalizeBands(obj){
+    const clamp = (x,min,max)=>Math.max(min, Math.min(max, x));
+    let strongBuy = clamp(obj.strongBuy, 0.10, 2.00);
+    let buy       = clamp(obj.buy,       0.10, 2.50);
+    let hold      = clamp(obj.hold,      0.10, 3.00);
+    let expensive = clamp(obj.expensive, 0.10, 4.00);
+
+    // Ordnung erzwingen: strongBuy <= buy <= hold <= expensive
+    buy = Math.max(buy, strongBuy);
+    hold = Math.max(hold, buy);
+    expensive = Math.max(expensive, hold);
+
+    return { strongBuy, buy, hold, expensive };
+  }
+
+  function onAnyChange(){
+    const next = normalizeBands({
+      strongBuy: nzNumInput(sb.value),
+      buy:       nzNumInput(b.value),
+      hold:      nzNumInput(h.value),
+      expensive: nzNumInput(ex.value),
+    });
+
+    // wenn jemand Unsinn tippt (NaN), nicht überschreiben
+    if([next.strongBuy,next.buy,next.hold,next.expensive].some(x => !Number.isFinite(x))) return;
+
+    NUTZEN_STATE.buyBands = next;
+
+    // Inputs ggf. korrigiert zurückschreiben (Ordering/Clamp)
+    sb.value = String(next.strongBuy);
+    b.value  = String(next.buy);
+    h.value  = String(next.hold);
+    ex.value = String(next.expensive);
+
+    runAllCalcs();
+  }
+
+  // Listener (input = live)
+  sb.addEventListener("input", onAnyChange);
+  b.addEventListener("input",  onAnyChange);
+  h.addEventListener("input",  onAnyChange);
+  ex.addEventListener("input", onAnyChange);
+
+  // Fair override triggert auch Recalc
+  ovFair?.addEventListener("input", () => runAllCalcs());
+
+  reset?.addEventListener("click", () => {
+   
+    syncInputsFromState();
+    if(ovFair) ovFair.value = "";
+    runAllCalcs();
+  });
+}
+
+
+let NUTZEN_STATE = {
+  sector: "standard",
+  buyBands: { strongBuy:0.75, buy:0.90, hold:1.10, expensive:1.25 }
+};
+
+
+
+  /* ===========================
+   0) State
+=========================== */
+
+/* ===========================
+   1) Render: Sector Dropdown
+=========================== */
+function renderSectorSelect(){
+  const sel = el("nutzenHeaderSet");
+  if(!sel) return;
+
+  sel.innerHTML = "";
+  for(const s of NUTZEN_SECTORS){
+    const opt = document.createElement("option");
+    opt.value = s.key;
+    opt.textContent = s.label;
+    if(s.key === NUTZEN_STATE.sector) opt.selected = true;
+    sel.appendChild(opt);
+  }
+
+  sel.addEventListener("change", () => {
+    setSector(sel.value);
+  });
+}
+
+/* ===========================
+   2) Render: Year Dropdowns
+=========================== */
+function renderYearSelects(){
+  const cagrSel = el("nutzenCagrYear");
+  const volSel  = el("nutzenVolYear");
+  const cfg = NUTZEN_YEARS_BY_SECTOR[NUTZEN_STATE.sector] || { cagr:[1,2,3,4], vol:[1,5,10] };
+
+  if(cagrSel){
+    const cur = Number(cagrSel.value) || 4;
+    cagrSel.innerHTML = "";
+    for(const y of cfg.cagr){
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = `${y}Y`;
+      cagrSel.appendChild(opt);
+    }
+    // keep if possible else default last
+    cagrSel.value = cfg.cagr.includes(cur) ? String(cur) : String(cfg.cagr[cfg.cagr.length-1] || 4);
+  }
+
+  if(volSel){
+    const cur = Number(volSel.value) || 1;
+    volSel.innerHTML = "";
+    for(const y of cfg.vol){
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = `${y}Y`;
+      volSel.appendChild(opt);
+    }
+    volSel.value = cfg.vol.includes(cur) ? String(cur) : String(cfg.vol[0] || 1);
+  }
+}
+
+/* ===========================
+   3) Render: Table from Headers
+   - nimmt die Kriterien aus NUTZEN_HEADERS_BY_SECTOR[sector]
+   - entfernt Duplikate
+=========================== */
+function uniq(arr){
+  const seen = new Set();
+  const out = [];
+  for(const x of (arr || [])){
+    const k = normKey(x);
+    if(!k) continue;
+    if(seen.has(k)) continue;
+    seen.add(k);
+    out.push(x);
+  }
+  return out;
+}
+
+function renderNutzenTable(){
+  const tbody = el("nutzenTableBody");
+  if(!tbody) return;
+
+  const headersRaw = NUTZEN_HEADERS_BY_SECTOR[NUTZEN_STATE.sector] || [];
+  const headers = uniq(headersRaw);
+
+  tbody.innerHTML = "";
+  for(const h of headers){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="muted">${h}</td>
+      <td data-nutzen-key="${normKey(h)}" contenteditable="true" class="nutzenVal">–</td>
+      <td class="muted"></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+/* ===========================
+   4) Render: Roles (simple list)
+   Optional: später kannst du daraus Checkboxes machen
+=========================== */
+function renderRolesList(){
+  const ul = el("nutzenRolesActive");
+  if(!ul) return;
+  ul.innerHTML = "";
+  for(const r of NUTZEN_ROLES){
+    const li = document.createElement("li");
+    li.textContent = r;
+    ul.appendChild(li);
+  }
+
+  // Overlay Rollen-Explain Platzhalter
+  const rolesExplain = el("nutzenOverlayRolesExplain");
+  if(rolesExplain){
+    rolesExplain.textContent = "Rollen sind geladen. (Base/Health Why kommt aus deinen Role Rules.)";
+  }
+}
+
+/* ===========================
+   5) Paste Import -> Tabelle befüllen
+   - nutzt deine parseExcelTSV Logik (Header|Value oder HeaderRow+ValueRow)
+   - setzt Werte in die 2. Spalte anhand data-nutzen-key
+=========================== */
+function setTableValueByHeaderMap(valMap){
+  const tbody = el("nutzenTableBody");
+  if(!tbody) return;
+
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  let hits = 0;
+
+  for(const tr of rows){
+    const tds = tr.querySelectorAll("td");
+    if(tds.length < 2) continue;
+
+    const headerText = (tds[0].textContent || "").trim();
+    const key = normKey(headerText);
+
+    if(valMap.has(key)){
+      tds[1].textContent = valMap.get(key);
+      hits++;
+    }
+  }
+  // Debug
+  const pre = el("nutzenDebug");
+  if(pre){
+    pre.textContent = JSON.stringify({
+      sector: NUTZEN_STATE.sector,
+      mappedFields: valMap.size,
+      updatedCells: hits
+    }, null, 2);
+  }
+}
+
+
+
+function parseValuesOnly(raw){
+  const s = String(raw || "").replace(/\r/g, "").trim();
+  if(!s) return [];
+
+  // Wenn Tabs vorhanden: TSV ist am sichersten
+  if(s.includes("\t")){
+    return s.split("\t").map(x => x.trim());
+  }
+
+  // Wenn mehrere Zeilen: 1 Wert pro Zeile
+  if(s.includes("\n")){
+    const lines = s.split("\n").map(x => x.trim()).filter(Boolean);
+    // Falls Zeilen trotzdem Trennzeichen enthalten, splitten wir weiter
+    const out = [];
+    for(const line of lines){
+      if(line.includes("\t")) out.push(...line.split("\t").map(x=>x.trim()));
+      else if(line.includes(";")) out.push(...line.split(";").map(x=>x.trim()));
+      else if(line.includes(",")) out.push(...line.split(",").map(x=>x.trim()));
+      else out.push(line);
+    }
+    return out.filter(Boolean);
+  }
+
+  // Fallback: Semikolon oder Komma
+  if(s.includes(";")) return s.split(";").map(x => x.trim()).filter(Boolean);
+  if(s.includes(",")) return s.split(",").map(x => x.trim()).filter(Boolean);
+
+  // Ein einzelner Wert
+  return [s];
+}
+
+
+function fillTableByOrder(values){
+  console.log("fillTableByOrder()", { valuesLen: values.length });
+  const tbody = document.getElementById("nutzenTableBody");
+  if(!tbody) return;
+
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  let hits = 0;
+
+  for(let i=0; i<rows.length; i++){
+    const tr = rows[i];
+    const tds = tr.querySelectorAll("td");
+    if(tds.length < 2) continue;
+
+    const v = values[i];
+    if(v === undefined) break; // keine Werte mehr
+
+    tds[1].textContent = v;
+    hits++;
+  }
+
+  // Debug
+  const pre = document.getElementById("nutzenDebug");
+  if(pre){
+    pre.textContent = JSON.stringify({
+      mode: "values-only",
+      pastedValues: values.length,
+      tableRows: rows.length,
+      writtenCells: hits,
+      leftoverValues: Math.max(0, values.length - hits)
+    }, null, 2);
+  }
+}
+
+
+
+
+
+function parseExcelTSV(input){
+  const text = String(input || "").replace(/\r/g, "").trim();
+  const map = new Map();
+  if(!text) return map;
+
+  const lines = text
+    .split("\n")
+    .map(l => l.trimEnd())
+    .filter(l => l.trim().length);
+
+  // Helper: split a single line into [header, value] with common separators
+  function splitLine(line){
+    // 1) TSV
+    if(line.includes("\t")){
+      const parts = line.split("\t");
+      if(parts.length >= 2) return [parts[0], parts.slice(1).join("\t")];
+    }
+    // 2) Header: Value
+    const colonIdx = line.indexOf(":");
+    if(colonIdx > 0) return [line.slice(0, colonIdx), line.slice(colonIdx + 1)];
+    // 3) Header | Value
+    if(line.includes("|")){
+      const parts = line.split("|");
+      if(parts.length >= 2) return [parts[0], parts.slice(1).join("|")];
+    }
+    // 4) Header ; Value
+    if(line.includes(";")){
+      const parts = line.split(";");
+      if(parts.length >= 2) return [parts[0], parts.slice(1).join(";")];
+    }
+    return null;
+  }
+
+  // Format B (2 rows): header row + value row (TSV)
+  const firstHasTab = lines[0].includes("\t");
+  if(lines.length >= 2 && firstHasTab && lines[1].includes("\t")){
+    const headers = lines[0].split("\t").map(x => x.trim());
+    const values  = lines[1].split("\t").map(x => x.trim());
+    for(let i=0;i<headers.length;i++){
+      const h = headers[i];
+      const v = values[i] ?? "";
+      if(h && h.trim()) map.set(normKey(h), v);
+    }
+    return map;
+  }
+
+  // Format A: many lines, each line is header/value pair
+  for(const line of lines){
+    const hv = splitLine(line);
+    if(!hv) continue;
+    const h = (hv[0] || "").trim();
+    const v = (hv[1] || "").trim();
+    if(h) map.set(normKey(h), v);
+  }
+
+  // Fallback: if the user pasted ONE line like "Header\tValue\tHeader\tValue..."
+  if(map.size === 0 && lines.length === 1 && lines[0].includes("\t")){
+    const parts = lines[0].split("\t").map(x => x.trim());
+    // try to interpret as pairs: H,V,H,V...
+    for(let i=0;i<parts.length-1;i+=2){
+      const h = parts[i];
+      const v = parts[i+1];
+      if(h) map.set(normKey(h), v ?? "");
+    }
+  }
+
+  return map;
+}
+
+
+
+function tableToMap(){
+  const tbody = document.getElementById("nutzenTableBody");
+  const map = new Map();
+  if(!tbody) return map;
+
+  for(const tr of tbody.querySelectorAll("tr")){
+    const tds = tr.querySelectorAll("td");
+    if(tds.length < 2) continue;
+
+    const h = (tds[0].textContent || "").trim();
+    const v = (tds[1].textContent || "").trim();
+    if(h) map.set(normKey(h), v);
+  }
+  return map;
+}
+
+
+function renderOverlayBuyFromMap(m){
+  const fairFromOverlay = nzNumInput(el("ovFair")?.value);
+  const fairFromInput   = nzNum(el("nutzenFairValue")?.value);
+  const fairFromTable   = nzNum(mGet(m, "Fairer Preis"));
+
+  const fair = Number.isFinite(fairFromOverlay) ? fairFromOverlay
+             : Number.isFinite(fairFromInput)   ? fairFromInput
+             : fairFromTable;
+
+  const priceNow = nzNum(mGet(m, "Kurs aktuell"));
+  const bands = computeBuyBandsFromFair(fair, NUTZEN_STATE.buyBands);
+
+  // Ranges Text
+  const bEl = el("nutzenOverlayBuyExplain");
+  if(bEl){
+    const fmt = (n) => Number.isFinite(n) ? n.toLocaleString("de-DE",{maximumFractionDigits:2}) : "–";
+    const line = bands
+      ? `Kurs: ${fmt(priceNow)} | Fair: ${fmt(fair)} | Strong Buy ≤ ${fmt(bands.strongBuyMax)} | Buy ≤ ${fmt(bands.buyMax)} | Hold ≤ ${fmt(bands.holdMax)} | Expensive > ${fmt(bands.expensiveMax)}`
+      : `Kurs: ${fmt(priceNow)} | Fair: ${fmt(fair)} | Buy-Bands: –`;
+    bEl.textContent = line;
+  }
+
+  // Entscheidung Chip
+  const dEl = el("nutzenOverlayBuyDecision");
+  if(dEl){
+    const dec = computeBuyDecision(priceNow, fair, bands);
+    dEl.innerHTML = `<span class="dot ${dec.mode}"></span> Aktion: ${dec.label}`;
+  }
+
+  return { fair, priceNow, bands };
+}
+
+
+function mGet(m, header){
+  // m hat normKey(header) als Key
+  return m.get(normKey(header));
+}
+
+
+
+
+/* ===========================
+   6) Sector setter (re-render alles)
+=========================== */
+function setSector(sectorKey){
+  if(!NUTZEN_HEADERS_BY_SECTOR[sectorKey]) sectorKey = "standard";
+  NUTZEN_STATE.sector = sectorKey;
+
+  renderYearSelects();
+  renderNutzenTable();
+
+  // optional: Debug
+  const pre = el("nutzenDebug");
+  if(pre){
+    pre.textContent = JSON.stringify({
+      sector: NUTZEN_STATE.sector,
+      headersCount: (NUTZEN_HEADERS_BY_SECTOR[NUTZEN_STATE.sector] || []).length
+    }, null, 2);
+  }
+}
+
+/* ===========================
+   7) Init
+=========================== */
+function initNutzenUI(){
+  renderSectorSelect();
+  renderYearSelects();
+  renderNutzenTable();
+  renderRolesList();
+
+  // ✅ Listener (einmalig)
+  wirePasteUI();
+  wireSectorSelect();
+  wireYearSelects();
+  wireOverlayBuyInputs();
+
+  // optional initial
+  runAllCalcs();
+  wireTableAutoRecalc();
+}
+
+document.addEventListener("DOMContentLoaded", initNutzenUI);
+
+
+
+
+
+
+    // Regeln für Rollen listener/leser
+
+
+
+    function wireTableAutoRecalc(){
+  const tbody = el("nutzenTableBody");
+  if(!tbody) return;
+
+  let t = null;
+  function schedule(){
+    clearTimeout(t);
+    t = setTimeout(() => runAllCalcs(), 120); // debounce
+  }
+
+  tbody.addEventListener("input", (e) => {
+    if(e.target && e.target.classList.contains("nutzenVal")){
+      schedule();
+    }
+  });
+
+  tbody.addEventListener("paste", (e) => {
+    if(e.target && e.target.classList.contains("nutzenVal")){
+      schedule();
+    }
+  });
+
+  tbody.addEventListener("blur", (e) => {
+    if(e.target && e.target.classList.contains("nutzenVal")){
+      schedule();
+    }
+  }, true);
+}
+
+
+
+
+
+    function nzBoolJaNein(raw){
+  const s = nzStr(raw).toLowerCase();
+  if(isMissing(s)) return null;
+  if(s === "ja" || s === "yes" || s === "true" || s === "1") return true;
+  if(s === "nein" || s === "no"  || s === "false"|| s === "0") return false;
+  return null;
+}
+
+function buildNutzenCtxFromTableMap(m){
+  const ctx = {
+    m,
+    has: (x) => Number.isFinite(x) || x === true || x === false,
+    chk: (label, ok, missing) => ({ label, ok: !!ok, missing: !!missing }),
+  };
+
+  const num = (h) => nzNum(mGet(m, h));
+  const pct = (h) => nzPct01(mGet(m, h));
+  const boo = (h) => nzBoolJaNein(mGet(m, h));
+  const str = (h) => nzStr(mGet(m, h));
+
+  // Basics
+  ctx.priceNow = num("Kurs aktuell");
+  ctx.fair     = num("Fairer Preis");
+  ctx.beta     = num("Beta");
+  ctx.mcap     = num("Marktkapitalisierung");
+
+  ctx.priceCagr4 = pct("Kurs 4Y (CAGR)");
+  ctx.vol1 = pct("Volatilität annualisiert (Std-Abw.) 1Y");
+  ctx.vol5 = pct("Volatilität annualisiert (Std-Abw.) 5Y");
+  ctx.vol10= pct("Volatilität annualisiert (Std-Abw.) 10Y");
+
+  // Dividende
+  ctx.divFreq      = str("Div.-Frequency");
+  ctx.divYieldNow  = pct("Div.-Rendite aktuell (%)");
+  ctx.divYears     = num("Dividend Growth years");
+  ctx.divGrowthYoY = pct("Dividend Growth");
+  ctx.dpsCagr4     = pct("Dividende (DPS) 4Y (CAGR)");
+  ctx.buybackYield = pct("Buyback Yield");
+  ctx.shYield      = pct("Shareholder Yield");
+
+  // Profit/Margins (optional)
+  ctx.revYoY       = pct("Revenue Growth 1Y (YoY)");
+  ctx.revCagr4     = pct("Revenue 4Y (CAGR)");
+  ctx.opMargin     = pct("Operating Margin 1Y");
+  ctx.profitMargin = pct("Profit Margin 1Y");
+  ctx.ebitdaMargin = pct("EBITDA Margin 1Y");
+
+  ctx.netIncome    = num("Net Income 1Y");
+  ctx.netIncomePos = boo("Net income positiv (Ja/Nein)") ?? boo("Net Income positiv (Ja/Nein)");
+  if(ctx.netIncomePos == null && Number.isFinite(ctx.netIncome)) ctx.netIncomePos = ctx.netIncome > 0;
+
+  // FCF (optional)
+  ctx.fcf          = num("FCF 1Y");
+  ctx.fcfMargin    = pct("FCF-Marge 1Y");
+  ctx.fcfConv      = pct("FCF Conversion");
+  ctx.fcfPos       = boo("FCF positiv (Ja/Nein)");
+  if(ctx.fcfPos == null && Number.isFinite(ctx.fcf)) ctx.fcfPos = ctx.fcf > 0;
+
+  // Debt / Coverage (optional)
+  ctx.netDebtEbitda = num("Net Debt / EBITDA") ?? num("Net Debt/EBITDA");
+  ctx.intCov        = num("Interest Coverage") ?? num("Zinsdeckung 1Y (Interest Coverage)");
+
+  // Valuation (optional)
+  ctx.pe       = num("KGV (PE Ratio) 1Y");
+  ctx.pfcf     = num("P/FCF Ratio 1Y");
+  ctx.evEbitda = num("EV/ EBITDA Ratio");
+
+  // REIT (optional)
+  ctx.pFFO  = num("Price/FFO");
+  ctx.pAFFO = num("Price/AFFO");
+  ctx.payout= pct("Payout Ratio 1Y");
+
+  // Insurance (optional)
+  ctx.combined = pct("Combined Ratio");
+  ctx.loss     = pct("Loss Ratio");
+  ctx.expense  = pct("Expense Ratio");
+
+  // Commodities (optional)
+  ctx.netCash = num("Net Cash 1Y");
+  ctx.grossMargin    = pct("Gross Margin 1Y");
+ctx.roe            = pct("ROE 1Y");
+ctx.roa            = pct("ROA 1Y");
+ctx.roic           = pct("ROIC 1Y");
+ctx.roce           = pct("ROCE 1Y");
+
+ctx.quick          = num("Quick Ratio 1Y");
+ctx.current        = num("Current Ratio 1Y");
+
+ctx.sharesChgYoY   = pct("Shares Change (YoY)");
+ctx.sharesOut      = num("Shares Outstanding 1Y");
+
+ctx.debtFcf        = num("Debt / FCF Ratio");
+ctx.fcfYield       = pct("FCF Yield 1Y");
+
+ctx.payoutRatio    = pct("Payout Ratio 1Y");   // alias
+// optional: falls du "FCF-Payout" in Standard hast
+ctx.fcfPayout      = pct("FCF-Payout");
+
+ctx.pb   = num("P/B");
+ctx.ptbv = num("P/TBV");
+
+ctx.nii       = num("Net Interest Income 1Y");
+ctx.niiYoY    = pct("NII 1Y (YoY)");
+ctx.nonIntInc = num("Non-Interest Income 1Y");
+ctx.nonIntYoY = pct("Non-Interest Income (YoY)");
+
+ctx.roe = pct("ROE 1Y");
+ctx.roa = pct("ROA 1Y");
+
+ctx.nwp    = num("Insurance Net Premiums Written (NWP)");
+ctx.nwpYoY = pct("Insurance Net Premiums Written Growth (YoY)");
+
+ctx.pb = num("P/B Ratio"); // bei Insurern heißt es so
+
+ctx.payout = pct("Payout Ratio 1Y"); // hast du schon, aber sicherheitshalber alias:
+ctx.payoutRatio = ctx.payout;
+
+// Standard extras
+ctx.peTarget        = num("KGV target");
+ctx.opMarginPpCagr4 = pct("Operating Margin 4Y pp (CAGR)");
+ctx.cashST          = num("Cash & Short-Term Investments 1Y");
+ctx.ocf             = num("Operating Cash Flow 1Y");
+ctx.capex           = num("Capital Expenditures 1Y");
+
+// Net Debt / EBITDA Ratio 1Y (Standard-Header hat anderen Namen)
+ctx.netDebtEbitda = ctx.netDebtEbitda ?? num("Net Debt / EBITDA Ratio 1Y");
+
+// EV/EBITDA Ratio 1Y (Standard hat anderen Namen)
+ctx.evEbitda = ctx.evEbitda ?? num("EV/EBITDA Ratio 1Y");
+
+ctx.netIncomeYoY = pct("Net Income 1Y (YoY)");   // banks/insurance
+ctx.epsCagr4     = pct("EPS Growth 4Y (CAGR)");  // banks/insurance
+ctx.equity       = num("Equity 1Y");             // banks
+ctx.assets       = num("Total Assets 1Y");       // banks
+ctx.totalDebt    = num("Total Debt 1Y");         // banks/utilities/commodities
+ctx.equityBV = num("Equity (Book Value)");
+ctx.intExp   = num("Interest Expense 1Y");
+
+
+  return ctx;
+}
+
+
+
+   function pickRoleRulesBySector(sector){
+  switch(sector){
+    case "utilities":   return ROLE_RULES_UTILITIES;
+    case "brokers":     return ROLE_RULES_BROKERS;
+    case "commodities": return ROLE_RULES_COMMODITIES;
+    case "banks":       return ROLE_RULES_BANKS;
+    case "insurance":   return ROLE_RULES_INSURANCE;
+    case "reits":       return ROLE_RULES_REITS;
+    default:            return ROLE_RULES_STANDARD;
+  }
+}
+
+
+
+
+function scoreChecks(checks){
+  const arr = checks || [];
+  const relevant = arr.filter(c => !c.missing);
+  if(relevant.length === 0) return { pct: 0, ok: 0, total: 0 };
+  const ok = relevant.filter(c => c.ok).length;
+  return { pct: ok / relevant.length, ok, total: relevant.length };
+}
+
+function evalRolesForCurrentSector(){
+  const m   = tableToMap();
+  const ctx = buildNutzenCtxFromTableMap(m);
+
+  const rules = pickRoleRulesBySector(NUTZEN_STATE.sector);
+  const out = [];
+
+  for(const role of NUTZEN_ROLES){
+    const rr = rules?.[role];
+    if(!rr) continue;
+
+    const baseChecks   = rr.base   ? rr.base(ctx)   : [];
+    const healthChecks = rr.health ? rr.health(ctx) : [];
+
+    const baseScore   = scoreChecks(baseChecks);
+    const healthScore = scoreChecks(healthChecks);
+
+    const minPct = (typeof rr.minPct === "number") ? rr.minPct : 0.60;
+    const active = baseScore.total > 0 && baseScore.pct >= minPct;
+
+    out.push({ role, active, minPct, baseChecks, healthChecks, baseScore, healthScore });
+  }
+
+  out.sort((a,b) => (b.active - a.active) || (b.baseScore.pct - a.baseScore.pct));
+  return out;
+}
+
+
+
+function renderRoleWhyBlocks(evRoles){
+  const box = el("nutzenRoleWhyBase");     // wir nutzen nur Base-Box als “große Fläche”
+  const healthBox = el("nutzenRoleWhyHealth"); // optional: wird nicht mehr gebraucht
+  if(!box) return;
+
+  // 👉 nur aktive Rollen (wenn du alle willst: const list = evRoles;)
+  const list = (evRoles || []);
+
+  const icon = (c) => c.ok ? "✅" : (c.missing ? "—" : "❌");
+  const pct = (s) => Math.round(((s?.pct) || 0) * 100);
+
+  function renderChecks(arr){
+    const a = arr || [];
+    if(a.length === 0) return `<div class="muted">–</div>`;
+    return a.map(c => `<div class="whyLine">${icon(c)} ${c.label}</div>`).join("");
+  }
+
+  function renderRole(r){
+    return `
+      <div class="whyRoleBlock">
+        <div class="whyRoleHead">
+          <div class="whyRoleTitle">${r.active ? "✅" : "—"} ${r.role}</div>
+          <div class="whyRoleMeta">
+            Base ${pct(r.baseScore)}% (${r.baseScore.ok}/${r.baseScore.total}) ·
+            Health ${pct(r.healthScore)}% (${r.healthScore.ok}/${r.healthScore.total})
+          </div>
+        </div>
+
+        <div class="whyCols">
+          <div class="whyCol">
+            <div class="whyColTitle">Base</div>
+            ${renderChecks(r.baseChecks)}
+          </div>
+          <div class="whyCol">
+            <div class="whyColTitle">Health</div>
+            ${renderChecks(r.healthChecks)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  if(list.length === 0){
+    box.innerHTML = `<div class="muted">Keine Rolle erfüllt (Base).</div>`;
+  } else {
+    box.innerHTML = list.map(renderRole).join("");
+  }
+
+  // healthBox wird nicht mehr benötigt (damit da nicht doppelt was steht)
+  if(healthBox) healthBox.innerHTML = "";
+}
+
+
+
+function renderRolesFromEval(evRoles){
+  // Liste rechts / irgendwo bei dir:
+
+renderRoleWhyBlocks(evRoles);
+
+  const ul = el("nutzenRolesActive");
+  if(ul){
+    ul.innerHTML = "";
+    const act = evRoles.filter(r => r.active);
+    if(act.length === 0){
+      const li = document.createElement("li");
+      li.textContent = "Keine Rolle erfüllt (Base).";
+      ul.appendChild(li);
+    } else {
+      for(const r of act){
+        const li = document.createElement("li");
+        li.textContent = `${r.role} (${Math.round(r.baseScore.pct*100)}%)`;
+        ul.appendChild(li);
+      }
+    }
+  }
+
+  // Overlay Explain (kurz)
+  const explain = el("nutzenOverlayRolesExplain");
+  if(explain){
+   explain.textContent = `Rollen: ${summarizeRolesAll(evRoles)}`;
+  }
+}
+
+
+
+
+
+
+
+
+function runAllCalcs(){
+  const roles = evalRolesForCurrentSector();
+
+  // Details auf Rollen-Seite weiterhin detailliert
+  renderRolesFromEval(roles);
+
+  // Stress später: aktuell placeholder
+   const st = evalStressForCurrentSector();
+   renderStress(st);
+
+  // Overlay Summary (deins)
+  const stressLabel = st.label;
+
+  // Fair Value: aus Tabelle (Map) oder aus Input (nutzenFairValue)
+  const m = tableToMap();
+  syncOvFairDefaultFromData(m);
+  const fairFromTable = nzNum(mGet(m, "Fairer Preis"));
+  const fairFromInput = nzNum(el("nutzenFairValue")?.value);
+
+  const fairFromOverlay = nzNumInput(el("ovFair")?.value);
+
+const fair = Number.isFinite(fairFromOverlay) ? fairFromOverlay
+           : Number.isFinite(fairFromInput)   ? fairFromInput
+           : fairFromTable;
+
+const bands = computeBuyBandsFromFair(fair, NUTZEN_STATE.buyBands);
+  const buy = renderOverlayBuyFromMap(m);
+
+  renderAktuellerZustand({ roles, st, buy });
+
+  renderOverlaySummary({
+  rolesText: summarizeRolesAll(roles),  // statt summarizeRoles(roles, 4)
+  stressLabel,
+  fair: buy.fair,
+  bands: buy.bands
+});
+
+  // Debug
+  const pre = el("nutzenDebug");
+  if(pre){
+    pre.textContent = JSON.stringify({
+      sector: NUTZEN_STATE.sector,
+      activeRoles: roles.filter(r=>r.active).map(r=>r.role),
+      stress: stressLabel,
+      fair,
+      bands
+    }, null, 2);
+  }
+}
+
+
+
+function wirePasteUI(){
+  const btn = el("btnParseExcel");
+  const clr = el("btnClearExcel");
+  const ta  = el("excelPaste");
+  if(!btn) return;
+
+  btn.onclick = () => {   // ✅ überschreibt alte Listener
+    const raw = ta?.value || "";
+
+    const values = parseValuesOnly(raw);
+    if(values.length === 0){
+      alert("Keine Werte erkannt. Bitte Werte mit TAB (Excel), Zeilenumbrüchen, ; oder , trennen.");
+      return;
+    }
+
+    fillTableByOrder(values);
+    runAllCalcs();
+
+    openNutzenOverlay();  // ✅ Overlay öffnen
+    // KEIN goPage("table")
+  };
+
+  if(clr){
+    clr.onclick = () => { if(ta) ta.value = ""; };
+  }
+}
+
+
+
+function wireSectorSelect(){
+  const sel = el("nutzenHeaderSet");
+  if(!sel) return;
+
+  sel.addEventListener("change", () => {
+    setSector(sel.value);
+    runAllCalcs();
+  });
+}
+
+
+function wireYearSelects(){
+  const cagrSel = el("nutzenCagrYear");
+  const volSel  = el("nutzenVolYear");
+
+  cagrSel?.addEventListener("change", () => {
+    // falls du später visible columns davon abhängig machst
+    runAllCalcs();
+  });
+
+  volSel?.addEventListener("change", () => {
+    runAllCalcs();
+  });
+}
+
+
+
+    // Regeln für Rollen/ Standard 
+
+
+    // ROLE_RULES_STANDARD — nutzt nur deine vorhandenen Standard-Header
+// Erwartet: ctx.has(v), ctx.chk(label, ok, missing), und dass ctx.* Felder in buildNutzenCtx gesetzt sind
+// (z.B. ctx.divYears, ctx.divYieldNow, ctx.divGrowthYoY, ctx.dpsCagr4, ctx.pe, ctx.pfcf, ctx.fair, ctx.priceNow, usw.)
+
+const ROLE_RULES_STANDARD = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true, ctx.netIncomePos == null),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF-Payout ≤ 80%`, ctx.has(ctx.fcfPayout) && ctx.fcfPayout <= 0.80, !ctx.has(ctx.fcfPayout)),
+      ctx.chk(`Zinsdeckung ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+      ctx.chk(`Debt/FCF ≤ 10 ODER Net Debt/EBITDA ≤ 3.5`,
+        (ctx.has(ctx.debtFcf) && ctx.debtFcf <= 10) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3.5),
+        !(ctx.has(ctx.debtFcf) || ctx.has(ctx.netDebtEbitda))
+      ),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 1%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.01, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true, ctx.netIncomePos == null),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF-Payout ≤ 85%`, ctx.has(ctx.fcfPayout) && ctx.fcfPayout <= 0.85, !ctx.has(ctx.fcfPayout)),
+      ctx.chk(`FCF Yield ≥ 2%`, ctx.has(ctx.fcfYield) && ctx.fcfYield >= 0.02, !ctx.has(ctx.fcfYield)),
+      ctx.chk(`Shares Change (YoY) ≤ +2%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.02, !ctx.has(ctx.sharesChgYoY)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`KGV (PE) ≤ 15 (oder KGV target)`,
+        (ctx.has(ctx.pe) && ctx.pe <= 15) || (ctx.has(ctx.peTarget) && ctx.peTarget <= 15),
+        !(ctx.has(ctx.pe) || ctx.has(ctx.peTarget))
+      ),
+      ctx.chk(`P/FCF ≤ 15`,
+        ctx.has(ctx.pfcf) && ctx.pfcf <= 15,
+        !ctx.has(ctx.pfcf)
+      ),
+      ctx.chk(`Kurs ≤ Fairer Preis (oder 0.9×)`,
+        (ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair) ||
+        (ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.90 * ctx.fair),
+        !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 10% ODER ROIC ≥ 8% ODER ROCE ≥ 10%`,
+        (ctx.has(ctx.roe) && ctx.roe >= 0.10) || (ctx.has(ctx.roic) && ctx.roic >= 0.08) || (ctx.has(ctx.roce) && ctx.roce >= 0.10),
+        !(ctx.has(ctx.roe) || ctx.has(ctx.roic) || ctx.has(ctx.roce))
+      ),
+      ctx.chk(`Operating Margin > 0`, ctx.has(ctx.opMargin) && ctx.opMargin > 0, !ctx.has(ctx.opMargin)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Zinsdeckung ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`Debt/FCF ≤ 12 ODER Net Debt/EBITDA ≤ 3.5`,
+        (ctx.has(ctx.debtFcf) && ctx.debtFcf <= 12) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3.5),
+        !(ctx.has(ctx.debtFcf) || ctx.has(ctx.netDebtEbitda))
+      ),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 10%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.10, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Revenue 4Y CAGR ≥ 10%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.10, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`EPS 4Y CAGR ≥ 10%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.10, !ctx.has(ctx.epsCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Operating Margin Trend (4Y pp CAGR) > 0`, ctx.has(ctx.opMarginPpCagr4) && ctx.opMarginPpCagr4 > 0, !ctx.has(ctx.opMarginPpCagr4)),
+      ctx.chk(`ROIC ≥ 10% ODER ROCE ≥ 12%`, (ctx.has(ctx.roic) && ctx.roic >= 0.10) || (ctx.has(ctx.roce) && ctx.roce >= 0.12), !(ctx.has(ctx.roic) || ctx.has(ctx.roce))),
+      ctx.chk(`Shares Change (YoY) ≤ +3%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.03, !ctx.has(ctx.sharesChgYoY)),
+      ctx.chk(`FCF-Marge ≥ 5% ODER FCF positiv`, (ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05) || (ctx.fcfPos === true), !(ctx.has(ctx.fcfMargin) || ctx.fcfPos != null)),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`ROIC ≥ 12% ODER ROCE ≥ 15% ODER ROE ≥ 15%`,
+        (ctx.has(ctx.roic) && ctx.roic >= 0.12) || (ctx.has(ctx.roce) && ctx.roce >= 0.15) || (ctx.has(ctx.roe) && ctx.roe >= 0.15),
+        !(ctx.has(ctx.roic) || ctx.has(ctx.roce) || ctx.has(ctx.roe))
+      ),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Gross Margin ≥ 40%`, ctx.has(ctx.grossMargin) && ctx.grossMargin >= 0.40, !ctx.has(ctx.grossMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 60%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.60, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`FCF-Marge ≥ 10%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.10, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Net Debt/EBITDA ≤ 2.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Zinsdeckung ≥ 6`, ctx.has(ctx.intCov) && ctx.intCov >= 6, !ctx.has(ctx.intCov)),
+      ctx.chk(`Shares Change (YoY) ≤ 0%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0, !ctx.has(ctx.sharesChgYoY)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue 4Y CAGR ≥ 8%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.08, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`EPS 4Y CAGR ≥ 10%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.10, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`KGV (PE) ≤ 25 ODER P/FCF ≤ 25`,
+        (ctx.has(ctx.pe) && ctx.pe <= 25) || (ctx.has(ctx.pfcf) && ctx.pfcf <= 25),
+        !(ctx.has(ctx.pe) || ctx.has(ctx.pfcf))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`ROIC ≥ 10%`, ctx.has(ctx.roic) && ctx.roic >= 0.10, !ctx.has(ctx.roic)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Beta ≤ 1.5`, ctx.has(ctx.beta) && ctx.beta <= 1.5, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Vorher schwach: Net Income negativ ODER Profit Margin ≤ 0`,
+        (ctx.netIncomePos === false) || (ctx.has(ctx.profitMargin) && ctx.profitMargin <= 0),
+        (ctx.netIncomePos == null) && !ctx.has(ctx.profitMargin)
+      ),
+      ctx.chk(`Verbesserung: Operating Margin 4Y pp CAGR > 0`, ctx.has(ctx.opMarginPpCagr4) && ctx.opMarginPpCagr4 > 0, !ctx.has(ctx.opMarginPpCagr4)),
+      ctx.chk(`Topline dreht: Revenue YoY > 0`, ctx.has(ctx.revYoY) && ctx.revYoY > 0, !ctx.has(ctx.revYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv (oder nahe dran)`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Zinsdeckung ≥ 2`, ctx.has(ctx.intCov) && ctx.intCov >= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`Shares Change (YoY) ≤ +5%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.05, !ctx.has(ctx.sharesChgYoY)),
+      ctx.chk(`Quick Ratio ≥ 1 ODER Current Ratio ≥ 1.5`,
+        (ctx.has(ctx.quick) && ctx.quick >= 1) || (ctx.has(ctx.current) && ctx.current >= 1.5),
+        !(ctx.has(ctx.quick) || ctx.has(ctx.current))
+      ),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität hoch (wenn vorhanden)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.35, !ctx.has(ctx.vol1)),
+      ctx.chk(`YoY stark vs. 4Y CAGR (Proxy Zyklus)`,
+        ctx.has(ctx.revYoY) && ctx.has(ctx.revCagr4) && (Math.abs(ctx.revYoY) >= 0.20) && (Math.abs(ctx.revYoY) >= (Math.abs(ctx.revCagr4) + 0.10)),
+        !(ctx.has(ctx.revYoY) && ctx.has(ctx.revCagr4))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Current Ratio ≥ 1.5`, ctx.has(ctx.current) && ctx.current >= 1.5, !ctx.has(ctx.current)),
+      ctx.chk(`Net Debt/EBITDA ≤ 3.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Zinsdeckung ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Unprofitabel oder FCF negativ`,
+        (ctx.netIncomePos === false) || (ctx.fcfPos === false),
+        (ctx.netIncomePos == null) && (ctx.fcfPos == null)
+      ),
+      ctx.chk(`Hohe Unsicherheit: Beta ≥ 1.8 ODER Volatilität hoch`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.45),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Small-ish Cap (< 2B)`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Current Ratio ≥ 1`, ctx.has(ctx.current) && ctx.current >= 1, !ctx.has(ctx.current)),
+      ctx.chk(`Quick Ratio ≥ 0.8`, ctx.has(ctx.quick) && ctx.quick >= 0.8, !ctx.has(ctx.quick)),
+      ctx.chk(`Cash vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`Shares Change (YoY) ≤ +10%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.10, !ctx.has(ctx.sharesChgYoY)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net Income negativ ODER Profit Margin < 0`,
+        (ctx.netIncomePos === false) || (ctx.has(ctx.profitMargin) && ctx.profitMargin < 0),
+        (ctx.netIncomePos == null) && !ctx.has(ctx.profitMargin)
+      ),
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Zinsdeckung < 1.5 ODER Net Debt/EBITDA > 5`,
+        (ctx.has(ctx.intCov) && ctx.intCov < 1.5) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda > 5),
+        !(ctx.has(ctx.intCov) || ctx.has(ctx.netDebtEbitda))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Quick < 1 UND Current < 1.2 (akut)`,
+        ctx.has(ctx.quick) && ctx.has(ctx.current) && (ctx.quick < 1) && (ctx.current < 1.2),
+        !(ctx.has(ctx.quick) && ctx.has(ctx.current))
+      ),
+      ctx.chk(`Shares Change (YoY) > +10% (Verwässerung)`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY > 0.10, !ctx.has(ctx.sharesChgYoY)),
+      ctx.chk(`Operating Margin Trend negativ`, ctx.has(ctx.opMarginPpCagr4) && ctx.opMarginPpCagr4 < 0, !ctx.has(ctx.opMarginPpCagr4)),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true, ctx.netIncomePos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Zinsdeckung ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 3`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Revenue 4Y CAGR ≥ 0%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`Profit Margin ≥ 8%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.08, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`FCF-Payout ≤ 80%`, ctx.has(ctx.fcfPayout) && ctx.fcfPayout <= 0.80, !ctx.has(ctx.fcfPayout)),
+      ctx.chk(`Shares Change (YoY) ≤ 0%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0, !ctx.has(ctx.sharesChgYoY)),
+      ctx.chk(`Quick ≥ 1 ODER Current ≥ 1.5`, (ctx.has(ctx.quick) && ctx.quick >= 1) || (ctx.has(ctx.current) && ctx.current >= 1.5), !(ctx.has(ctx.quick) || ctx.has(ctx.current))),
+    ],
+  },
+
+  "Pricing Power": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Gross Margin ≥ 50% (oder ≥40% + OpMargin ≥20%)`,
+        (ctx.has(ctx.grossMargin) && ctx.grossMargin >= 0.50) ||
+        (ctx.has(ctx.grossMargin) && ctx.has(ctx.opMargin) && ctx.grossMargin >= 0.40 && ctx.opMargin >= 0.20),
+        !(ctx.has(ctx.grossMargin) || (ctx.has(ctx.grossMargin) && ctx.has(ctx.opMargin)))
+      ),
+      ctx.chk(`Operating Margin ≥ 20%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.20, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Revenue 4Y CAGR > 0`, ctx.has(ctx.revCagr4) && ctx.revCagr4 > 0, !ctx.has(ctx.revCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`ROIC ≥ 12%`, ctx.has(ctx.roic) && ctx.roic >= 0.12, !ctx.has(ctx.roic)),
+      ctx.chk(`OpMargin Trend ≥ 0`, ctx.has(ctx.opMarginPpCagr4) && ctx.opMarginPpCagr4 >= 0, !ctx.has(ctx.opMarginPpCagr4)),
+      ctx.chk(`FCF-Marge ≥ 10%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.10, !ctx.has(ctx.fcfMargin)),
+    ],
+  },
+
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.55,
+    base: (ctx) => [
+      // Proxy-Regeln, weil "Recurring" nicht direkt als Feld vorhanden ist
+      ctx.chk(`Revenue 4Y CAGR ≥ 8%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.08, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`Profit Margin ≥ 10% ODER EBITDA Margin ≥ 15%`,
+        (ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10) || (ctx.has(ctx.ebitdaMargin) && ctx.ebitdaMargin >= 0.15),
+        !(ctx.has(ctx.profitMargin) || ctx.has(ctx.ebitdaMargin))
+      ),
+      ctx.chk(`Beta ≤ 1.2`, ctx.has(ctx.beta) && ctx.beta <= 1.2, !ctx.has(ctx.beta)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`FCF-Marge ≥ 10%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.10, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Shares Change (YoY) ≤ +2%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.02, !ctx.has(ctx.sharesChgYoY)),
+      ctx.chk(`Volatilität moderat (Proxy)`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.35, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≤ 2`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Zinsdeckung ≥ 6`, ctx.has(ctx.intCov) && ctx.intCov >= 6, !ctx.has(ctx.intCov)),
+      ctx.chk(`Quick ≥ 1 ODER Current ≥ 1.8`,
+        (ctx.has(ctx.quick) && ctx.quick >= 1) || (ctx.has(ctx.current) && ctx.current >= 1.8),
+        !(ctx.has(ctx.quick) || ctx.has(ctx.current))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Debt/FCF ≤ 8`, ctx.has(ctx.debtFcf) && ctx.debtFcf <= 8, !ctx.has(ctx.debtFcf)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Cash vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`ROIC ≥ 8%`, ctx.has(ctx.roic) && ctx.roic >= 0.08, !ctx.has(ctx.roic)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≥ 4 ODER Debt/FCF ≥ 15`,
+        (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 4) || (ctx.has(ctx.debtFcf) && ctx.debtFcf >= 15),
+        !(ctx.has(ctx.netDebtEbitda) || ctx.has(ctx.debtFcf))
+      ),
+      ctx.chk(`Zinsdeckung ≤ 2.5`, ctx.has(ctx.intCov) && ctx.intCov <= 2.5, !ctx.has(ctx.intCov)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF Yield ≥ 5%`, ctx.has(ctx.fcfYield) && ctx.fcfYield >= 0.05, !ctx.has(ctx.fcfYield)),
+      ctx.chk(`Shares Change (YoY) ≤ +5%`, ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY <= 0.05, !ctx.has(ctx.sharesChgYoY)),
+    ],
+  },
+
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Liquidität ok (Current ≥ 1.2)`, ctx.has(ctx.current) && ctx.current >= 1.2, !ctx.has(ctx.current)),
+    ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Zinsdeckung ≥ 2`, ctx.has(ctx.intCov) && ctx.intCov >= 2, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true, ctx.netIncomePos == null),
+    ],
+  },
+};
+
+
+
+
+    // Regeln für Rollen/ Banks
+
+
+// ROLE_RULES_BANKS — nur Felder aus deinem banks-Header-Set
+// Erwartet wie gehabt: ctx.has(v), ctx.chk(label, ok, missing)
+// und buildNutzenCtxBanks(m) setzt die unten genutzten ctx.* Felder.
+
+const ROLE_RULES_BANKS = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.8%`, ctx.has(ctx.roa) && ctx.roa >= 0.008, !ctx.has(ctx.roa)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Payout-Proxy: Dividend Yield nicht extrem (≤ 8%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.08, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 1%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.01, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.8%`, ctx.has(ctx.roa) && ctx.roa >= 0.008, !ctx.has(ctx.roa)),
+      ctx.chk(`Buyback Yield ≥ 0% (oder neutral)`, ctx.has(ctx.buybackYield) && ctx.buybackYield >= 0, !ctx.has(ctx.buybackYield)),
+      ctx.chk(`Div.-Rendite nicht “Distress” (>10% = Warnsignal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.10, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`P/B ≤ 1.2`, ctx.has(ctx.pb) && ctx.pb <= 1.2, !ctx.has(ctx.pb)),
+      ctx.chk(`P/TBV ≤ 1.3`, ctx.has(ctx.ptbv) && ctx.ptbv <= 1.3, !ctx.has(ctx.ptbv)),
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.7%`, ctx.has(ctx.roa) && ctx.roa >= 0.007, !ctx.has(ctx.roa)),
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`NII YoY ≥ 5% (wenn vorhanden)`, ctx.has(ctx.niiYoY) && ctx.niiYoY >= 0.05, !ctx.has(ctx.niiYoY)),
+      ctx.chk(`Non-Interest Income YoY ≥ 5% (wenn vorhanden)`, ctx.has(ctx.nonIntYoY) && ctx.nonIntYoY >= 0.05, !ctx.has(ctx.nonIntYoY)),
+      ctx.chk(`EPS 4Y CAGR ≥ 8%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income YoY ≥ 5%`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY >= 0.05, !ctx.has(ctx.netIncomeYoY)),
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 1.0%`, ctx.has(ctx.roa) && ctx.roa >= 0.010, !ctx.has(ctx.roa)),
+      ctx.chk(`Profit Margin ≥ 20%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.20, !ctx.has(ctx.profitMargin)),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 1.0%`, ctx.has(ctx.roa) && ctx.roa >= 0.010, !ctx.has(ctx.roa)),
+      ctx.chk(`Profit Margin ≥ 20%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.20, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`EPS 4Y CAGR ≥ 8%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`P/TBV nicht teuer (≤ 2.0)`, ctx.has(ctx.ptbv) && ctx.ptbv <= 2.0, !ctx.has(ctx.ptbv)),
+      ctx.chk(`Stabilität: Beta ≤ 1.2`, ctx.has(ctx.beta) && ctx.beta <= 1.2, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`EPS 4Y CAGR ≥ 8%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`Net Income YoY ≥ 5%`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY >= 0.05, !ctx.has(ctx.netIncomeYoY)),
+      ctx.chk(`Bewertung nicht teuer: P/TBV ≤ 1.8 ODER P/B ≤ 1.6`,
+        (ctx.has(ctx.ptbv) && ctx.ptbv <= 1.8) || (ctx.has(ctx.pb) && ctx.pb <= 1.6),
+        !(ctx.has(ctx.ptbv) || ctx.has(ctx.pb))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.9%`, ctx.has(ctx.roa) && ctx.roa >= 0.009, !ctx.has(ctx.roa)),
+      ctx.chk(`Beta ≤ 1.4`, ctx.has(ctx.beta) && ctx.beta <= 1.4, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Vorher schwach: Net Income YoY < 0 ODER Profit Margin niedrig (<10%)`,
+        (ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY < 0) || (ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.10),
+        !(ctx.has(ctx.netIncomeYoY) || ctx.has(ctx.profitMargin))
+      ),
+      ctx.chk(`Jetzt besser: Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`EPS 4Y CAGR > 0 (Trend dreht)`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 > 0, !ctx.has(ctx.epsCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 8%`, ctx.has(ctx.roe) && ctx.roe >= 0.08, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.5%`, ctx.has(ctx.roa) && ctx.roa >= 0.005, !ctx.has(ctx.roa)),
+      ctx.chk(`P/B ≤ 1.5 (nicht zu teuer im Turnaround)`, ctx.has(ctx.pb) && ctx.pb <= 1.5, !ctx.has(ctx.pb)),
+      ctx.chk(`Div.-Rendite nicht “Distress” (≤10%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.10, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 1Y hoch (≥35%)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.35, !ctx.has(ctx.vol1)),
+      ctx.chk(`Kurs 4Y CAGR stark schwankungsanfällig (Proxy)`, ctx.has(ctx.priceCagr4) && Math.abs(ctx.priceCagr4) >= 0.10, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Bewertung konservativ: P/TBV ≤ 1.8`, ctx.has(ctx.ptbv) && ctx.ptbv <= 1.8, !ctx.has(ctx.ptbv)),
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Net Income negativ ODER ROE < 5%`,
+        (ctx.has(ctx.netIncome) && ctx.netIncome < 0) || (ctx.has(ctx.roe) && ctx.roe < 0.05),
+        !(ctx.has(ctx.netIncome) || ctx.has(ctx.roe))
+      ),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.8 ODER Vol 1Y ≥ 45%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.45),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Small-ish Cap (< 2B)`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Cash vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`Div.-Rendite optional/klein (≤6%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.06, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`P/B nicht extrem hoch (≤3)`, ctx.has(ctx.pb) && ctx.pb <= 3, !ctx.has(ctx.pb)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net Income negativ`, ctx.has(ctx.netIncome) && ctx.netIncome < 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`ROE < 0 ODER ROA < 0`, (ctx.has(ctx.roe) && ctx.roe < 0) || (ctx.has(ctx.roa) && ctx.roa < 0), !(ctx.has(ctx.roe) || ctx.has(ctx.roa))),
+      ctx.chk(`Div.-Rendite extrem (Warnsignal > 10%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.10, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`P/B < 0.8 (Distress-Bewertung)`, ctx.has(ctx.pb) && ctx.pb < 0.8, !ctx.has(ctx.pb)),
+      ctx.chk(`Net Income YoY stark negativ (< -20%)`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY < -0.20, !ctx.has(ctx.netIncomeYoY)),
+      ctx.chk(`Profit Margin < 5%`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Vol 5Y moderat (≤25%)`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.8%`, ctx.has(ctx.roa) && ctx.roa >= 0.008, !ctx.has(ctx.roa)),
+      ctx.chk(`Div.-Rendite 2–6%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02 && ctx.divYieldNow <= 0.06, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Vol 10Y moderat (≤22%)`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.22, !ctx.has(ctx.vol10)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`ROA ≥ 0.9%`, ctx.has(ctx.roa) && ctx.roa >= 0.009, !ctx.has(ctx.roa)),
+      ctx.chk(`Profit Margin ≥ 20%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.20, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`P/TBV ≤ 2.0`, ctx.has(ctx.ptbv) && ctx.ptbv <= 2.0, !ctx.has(ctx.ptbv)),
+    ],
+  },
+
+  // Für Banken nur eingeschränkt sinnvoll -> Proxy-Regeln (Marge + Pricing in Kredit/Fees spiegelt sich in Profitabilität)
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Profit Margin ≥ 25%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.25, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`ROE ≥ 13%`, ctx.has(ctx.roe) && ctx.roe >= 0.13, !ctx.has(ctx.roe)),
+      ctx.chk(`Non-Interest Income YoY ≥ 0% (Fees stabil)`,
+        ctx.has(ctx.nonIntYoY) && ctx.nonIntYoY >= 0,
+        !ctx.has(ctx.nonIntYoY)
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROA ≥ 1.0%`, ctx.has(ctx.roa) && ctx.roa >= 0.010, !ctx.has(ctx.roa)),
+      ctx.chk(`EPS 4Y CAGR ≥ 8%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`P/B ≤ 2.0 (nicht “super teuer”)`, ctx.has(ctx.pb) && ctx.pb <= 2.0, !ctx.has(ctx.pb)),
+    ],
+  },
+
+  // Für Banken faktisch NICHT sauber ableitbar -> sehr konservativer Proxy, oder du setzt es später per Branche/Tag
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.40,
+    base: (ctx) => [
+      ctx.chk(`Proxy: Non-Interest Income vorhanden`, ctx.has(ctx.nonIntIncome) && ctx.nonIntIncome !== 0, !ctx.has(ctx.nonIntIncome)),
+      ctx.chk(`Proxy: Non-Interest Income YoY ≥ 0%`, ctx.has(ctx.nonIntYoY) && ctx.nonIntYoY >= 0, !ctx.has(ctx.nonIntYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Vol 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.65,
+    base: (ctx) => [
+      // Banken: klassisch Kapitalquoten fehlen -> Proxies über Leverage/Equity-Polster
+      ctx.chk(`Equity/Assets ≥ 8% (Proxy Kapitalstärke)`,
+        ctx.has(ctx.equity) && ctx.has(ctx.assets) && ctx.assets > 0 && (ctx.equity / ctx.assets) >= 0.08,
+        !(ctx.has(ctx.equity) && ctx.has(ctx.assets))
+      ),
+      ctx.chk(`Cash & ST Investments vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`Total Debt relativ zu Equity nicht extrem (Debt/Equity ≤ 3)`,
+        ctx.has(ctx.totalDebt) && ctx.has(ctx.equity) && ctx.equity > 0 && (ctx.totalDebt / ctx.equity) <= 3,
+        !(ctx.has(ctx.totalDebt) && ctx.has(ctx.equity))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`ROA ≥ 0.8%`, ctx.has(ctx.roa) && ctx.roa >= 0.008, !ctx.has(ctx.roa)),
+      ctx.chk(`P/B ≤ 1.8`, ctx.has(ctx.pb) && ctx.pb <= 1.8, !ctx.has(ctx.pb)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Equity/Assets < 6% (Proxy hohe Leverage)`,
+        ctx.has(ctx.equity) && ctx.has(ctx.assets) && ctx.assets > 0 && (ctx.equity / ctx.assets) < 0.06,
+        !(ctx.has(ctx.equity) && ctx.has(ctx.assets))
+      ),
+      ctx.chk(`Debt/Equity ≥ 5 (Proxy)`,
+        ctx.has(ctx.totalDebt) && ctx.has(ctx.equity) && ctx.equity > 0 && (ctx.totalDebt / ctx.equity) >= 5,
+        !(ctx.has(ctx.totalDebt) && ctx.has(ctx.equity))
+      ),
+      ctx.chk(`Profit Margin < 10% (wenig Puffer)`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.10, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROA < 0.5%`, ctx.has(ctx.roa) && ctx.roa < 0.005, !ctx.has(ctx.roa)),
+      ctx.chk(`Net Income YoY < 0`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY < 0, !ctx.has(ctx.netIncomeYoY)),
+      ctx.chk(`Div.-Rendite > 8% (Stress-Signal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.08, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Vol 1Y ≤ 45%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+    ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 8%`, ctx.has(ctx.roe) && ctx.roe >= 0.08, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+    ],
+  },
+};
+
+
+
+
+
+// Regeln für Rollen/ Versicherer 
+
+
+
+const ROLE_RULES_INSURANCE = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Combined Ratio < 100%`, ctx.has(ctx.combined) && ctx.combined < 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Payout Ratio ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+      ctx.chk(`Zinsdeckung ≥ 3 (wenn vorhanden)`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 1%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.01, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Combined Ratio ≤ 98% (stärker)`, ctx.has(ctx.combined) && ctx.combined <= 0.98, !ctx.has(ctx.combined)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Payout Ratio ≤ 65%`, ctx.has(ctx.payout) && ctx.payout <= 0.65, !ctx.has(ctx.payout)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`P/B Ratio ≤ 1.1`, ctx.has(ctx.pb) && ctx.pb <= 1.1, !ctx.has(ctx.pb)),
+      ctx.chk(`KGV (PE) ≤ 12 (optional)`,
+        ctx.has(ctx.pe) && ctx.pe <= 12,
+        !ctx.has(ctx.pe)
+      ),
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio < 100%`, ctx.has(ctx.combined) && ctx.combined < 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`NWP Growth YoY ≥ 0%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0, !ctx.has(ctx.nwpYoY)),
+      ctx.chk(`Payout Ratio ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`NWP Growth YoY ≥ 8%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0.08, !ctx.has(ctx.nwpYoY)),
+      ctx.chk(`Revenue Growth YoY ≥ 8%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.08, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Net Income YoY ≥ 5%`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY >= 0.05, !ctx.has(ctx.netIncomeYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio ≤ 98%`, ctx.has(ctx.combined) && ctx.combined <= 0.98, !ctx.has(ctx.combined)),
+      ctx.chk(`Loss Ratio ≤ 70%`, ctx.has(ctx.loss) && ctx.loss <= 0.70, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≤ 30%`, ctx.has(ctx.expense) && ctx.expense <= 0.30, !ctx.has(ctx.expense)),
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Combined Ratio ≤ 95%`, ctx.has(ctx.combined) && ctx.combined <= 0.95, !ctx.has(ctx.combined)),
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Loss Ratio ≤ 68%`, ctx.has(ctx.loss) && ctx.loss <= 0.68, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≤ 30%`, ctx.has(ctx.expense) && ctx.expense <= 0.30, !ctx.has(ctx.expense)),
+      ctx.chk(`NWP Growth YoY ≥ 0%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0, !ctx.has(ctx.nwpYoY)),
+      ctx.chk(`Payout Ratio ≤ 65%`, ctx.has(ctx.payout) && ctx.payout <= 0.65, !ctx.has(ctx.payout)),
+      ctx.chk(`Zinsdeckung ≥ 4 (wenn vorhanden)`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`NWP Growth YoY ≥ 5%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0.05, !ctx.has(ctx.nwpYoY)),
+      ctx.chk(`Net Income YoY ≥ 5%`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY >= 0.05, !ctx.has(ctx.netIncomeYoY)),
+      ctx.chk(`Bewertung ok: P/B ≤ 1.5`, ctx.has(ctx.pb) && ctx.pb <= 1.5, !ctx.has(ctx.pb)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Combined Ratio ≤ 98%`, ctx.has(ctx.combined) && ctx.combined <= 0.98, !ctx.has(ctx.combined)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Payout ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Combined Ratio > 100% ODER nahe 100% (≥ 99%)`,
+        ctx.has(ctx.combined) && ctx.combined >= 0.99,
+        !ctx.has(ctx.combined)
+      ),
+      ctx.chk(`Jetzt besser: Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Net Income YoY > 0 (Trend dreht)`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY > 0, !ctx.has(ctx.netIncomeYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio ≤ 99% (Verbesserung)`, ctx.has(ctx.combined) && ctx.combined <= 0.99, !ctx.has(ctx.combined)),
+      ctx.chk(`Loss Ratio ≤ 72%`, ctx.has(ctx.loss) && ctx.loss <= 0.72, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≤ 33%`, ctx.has(ctx.expense) && ctx.expense <= 0.33, !ctx.has(ctx.expense)),
+      ctx.chk(`P/B ≤ 1.5`, ctx.has(ctx.pb) && ctx.pb <= 1.5, !ctx.has(ctx.pb)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität hoch (1Y/5Y/10Y)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.35, !ctx.has(ctx.vol1)),
+      ctx.chk(`Combined Ratio schwankungsanfällig (≥ 98% = “dünn”)`, ctx.has(ctx.combined) && ctx.combined >= 0.98, !ctx.has(ctx.combined)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+      ctx.chk(`ROE ≥ 8%`, ctx.has(ctx.roe) && ctx.roe >= 0.08, !ctx.has(ctx.roe)),
+      ctx.chk(`NWP Growth YoY ≥ 0%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0, !ctx.has(ctx.nwpYoY)),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Combined Ratio ≥ 102% ODER Net Income negativ`,
+        (ctx.has(ctx.combined) && ctx.combined >= 1.02) || (ctx.has(ctx.netIncome) && ctx.netIncome < 0),
+        !(ctx.has(ctx.combined) || ctx.has(ctx.netIncome))
+      ),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.8 ODER Vol ≥ 45%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.45),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Small-ish Cap (< 2B)`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Cash vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`P/B nicht extrem hoch (≤ 3)`, ctx.has(ctx.pb) && ctx.pb <= 3, !ctx.has(ctx.pb)),
+      ctx.chk(`Div.-Rendite nicht “Distress” (>12% Warnsignal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.12, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Combined Ratio ≥ 105%`, ctx.has(ctx.combined) && ctx.combined >= 1.05, !ctx.has(ctx.combined)),
+      ctx.chk(`Net Income negativ`, ctx.has(ctx.netIncome) && ctx.netIncome < 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Net Income YoY < -20%`, ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY < -0.20, !ctx.has(ctx.netIncomeYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`P/B < 0.8 (Distress-Bewertung)`, ctx.has(ctx.pb) && ctx.pb < 0.8, !ctx.has(ctx.pb)),
+      ctx.chk(`Loss Ratio ≥ 80%`, ctx.has(ctx.loss) && ctx.loss >= 0.80, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≥ 35%`, ctx.has(ctx.expense) && ctx.expense >= 0.35, !ctx.has(ctx.expense)),
+      ctx.chk(`Zinsdeckung < 2 (wenn vorhanden)`, ctx.has(ctx.intCov) && ctx.intCov < 2, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Combined Ratio < 100%`, ctx.has(ctx.combined) && ctx.combined < 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Volatilität moderat`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.30, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+      ctx.chk(`Combined Ratio ≤ 98%`, ctx.has(ctx.combined) && ctx.combined <= 0.98, !ctx.has(ctx.combined)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 65%`, ctx.has(ctx.payout) && ctx.payout <= 0.65, !ctx.has(ctx.payout)),
+      ctx.chk(`ROE ≥ 10%`, ctx.has(ctx.roe) && ctx.roe >= 0.10, !ctx.has(ctx.roe)),
+      ctx.chk(`Loss Ratio ≤ 70%`, ctx.has(ctx.loss) && ctx.loss <= 0.70, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≤ 30%`, ctx.has(ctx.expense) && ctx.expense <= 0.30, !ctx.has(ctx.expense)),
+    ],
+  },
+
+  // Für Versicherer nur bedingt ableitbar -> Proxy über Combined Ratio + Margen + Wachstum der Prämien
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Combined Ratio verbessert/strong: ≤ 98%`, ctx.has(ctx.combined) && ctx.combined <= 0.98, !ctx.has(ctx.combined)),
+      ctx.chk(`NWP Growth YoY ≥ 5%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0.05, !ctx.has(ctx.nwpYoY)),
+      ctx.chk(`Profit Margin ≥ 10% (optional)`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Loss Ratio ≤ 70%`, ctx.has(ctx.loss) && ctx.loss <= 0.70, !ctx.has(ctx.loss)),
+      ctx.chk(`Expense Ratio ≤ 30%`, ctx.has(ctx.expense) && ctx.expense <= 0.30, !ctx.has(ctx.expense)),
+      ctx.chk(`ROE ≥ 12%`, ctx.has(ctx.roe) && ctx.roe >= 0.12, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  // Für Versicherer nicht sauber -> Proxy: stabiler Fee/Recurring ist nicht vorhanden, daher konservativ
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.40,
+    base: (ctx) => [
+      ctx.chk(`Proxy: NWP vorhanden`, ctx.has(ctx.nwp) && ctx.nwp > 0, !ctx.has(ctx.nwp)),
+      ctx.chk(`Proxy: NWP Growth YoY ≥ 0%`, ctx.has(ctx.nwpYoY) && ctx.nwpYoY >= 0, !ctx.has(ctx.nwpYoY)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio ≤ 100%`, ctx.has(ctx.combined) && ctx.combined <= 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`Volatilität moderat`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.35, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.65,
+    base: (ctx) => [
+      // Kapitalstärke-Proxy (ohne Solvency/RBC): Equity/MarketCap und BV/Share + P/B
+      ctx.chk(`P/B Ratio ≤ 1.5`, ctx.has(ctx.pb) && ctx.pb <= 1.5, !ctx.has(ctx.pb)),
+      ctx.chk(`Equity (Book Value) vorhanden`, ctx.has(ctx.equityBV) && ctx.equityBV > 0, !ctx.has(ctx.equityBV)),
+      ctx.chk(`Zinsdeckung ≥ 3 (wenn vorhanden)`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.has(ctx.netIncome) && ctx.netIncome > 0, !ctx.has(ctx.netIncome)),
+      ctx.chk(`Combined Ratio ≤ 100%`, ctx.has(ctx.combined) && ctx.combined <= 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`Cash vorhanden`, ctx.has(ctx.cashST) && ctx.cashST > 0, !ctx.has(ctx.cashST)),
+      ctx.chk(`Payout Ratio ≤ 70%`, ctx.has(ctx.payout) && ctx.payout <= 0.70, !ctx.has(ctx.payout)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Interest Expense vorhanden & hoch (Proxy)`, ctx.has(ctx.intExp) && ctx.intExp > 0, !ctx.has(ctx.intExp)),
+      ctx.chk(`Zinsdeckung ≤ 2 (wenn vorhanden)`, ctx.has(ctx.intCov) && ctx.intCov <= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`Profit Margin niedrig (< 5%)`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio ≥ 100% (wenig Puffer)`, ctx.has(ctx.combined) && ctx.combined >= 1.00, !ctx.has(ctx.combined)),
+      ctx.chk(`Payout Ratio > 70%`, ctx.has(ctx.payout) && ctx.payout > 0.70, !ctx.has(ctx.payout)),
+      ctx.chk(`ROE < 8%`, ctx.has(ctx.roe) && ctx.roe < 0.08, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Volatilität moderat (≤45%)`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio ≤ 100%`, ctx.has(ctx.combined) && ctx.combined <= 1.00, !ctx.has(ctx.combined)),
+    ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`ROE ≥ 8%`, ctx.has(ctx.roe) && ctx.roe >= 0.08, !ctx.has(ctx.roe)),
+    ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Combined Ratio < 100%`, ctx.has(ctx.combined) && ctx.combined < 1.00, !ctx.has(ctx.combined)),
+    ],
+  },
+};
+
+
+
+
+
+
+// Regeln für Rollen/ REITs
+
+
+
+const ROLE_RULES_REITS = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 85% (REIT-typisch)`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/FFO ≤ 18`, ctx.has(ctx.pFFO) && ctx.pFFO <= 18, !ctx.has(ctx.pFFO)),
+      ctx.chk(`Price/AFFO ≤ 20`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 20, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 2%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/AFFO ≤ 22`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 22, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Volatilität 1Y ≤ 35%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.35, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Price/FFO ≤ 14`, ctx.has(ctx.pFFO) && ctx.pFFO <= 14, !ctx.has(ctx.pFFO)),
+      ctx.chk(`Price/AFFO ≤ 16`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 16, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Dividend Yield ≥ 4%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.04, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Volatilität 5Y ≤ 28%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.28, !ctx.has(ctx.vol5)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.60,
+    base: (ctx) => [
+      // in deinem REIT-Set fehlen direkte Growth-Felder für FFO/AFFO -> Proxy über 4Y Kurs-CAGR + Div-Wachstum
+      ctx.chk(`Kurs 4Y CAGR ≥ 8% (Proxy)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 >= 0.08, !ctx.has(ctx.priceCagr4)),
+      ctx.chk(`Dividend Growth YoY > 0%`, ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0, !ctx.has(ctx.divGrowthYoY)),
+      ctx.chk(`DPS 4Y CAGR > 0%`, ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0, !ctx.has(ctx.dpsCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Price/AFFO ≤ 25 (nicht “zu teuer”)`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 25, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Payout Ratio ≤ 90%`, ctx.has(ctx.payout) && ctx.payout <= 0.90, !ctx.has(ctx.payout)),
+      ctx.chk(`Volatilität 5Y ≤ 30%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.30, !ctx.has(ctx.vol5)),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 80% (Quality-Proxy)`, ctx.has(ctx.payout) && ctx.payout <= 0.80, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/AFFO ≤ 20`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 20, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Volatilität 10Y ≤ 25%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.25, !ctx.has(ctx.vol10)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Beta ≤ 1.1`, ctx.has(ctx.beta) && ctx.beta <= 1.1, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.60,
+    base: (ctx) => [
+      // Growth-Proxy + nicht zu teuer
+      ctx.chk(`Kurs 4Y CAGR ≥ 6% (Proxy)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 >= 0.06, !ctx.has(ctx.priceCagr4)),
+      ctx.chk(`DPS 4Y CAGR ≥ 3%`, ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 >= 0.03, !ctx.has(ctx.dpsCagr4)),
+      ctx.chk(`Price/AFFO ≤ 22`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 22, !ctx.has(ctx.pAFFO)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Volatilität 5Y ≤ 28%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.28, !ctx.has(ctx.vol5)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.55,
+    base: (ctx) => [
+      // Proxy: stark gefallen + sehr günstig bewertet
+      ctx.chk(`Kurs 4Y CAGR ≤ 0% (schwach)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 <= 0, !ctx.has(ctx.priceCagr4)),
+      ctx.chk(`Sehr günstig: Price/FFO ≤ 12 ODER Price/AFFO ≤ 14`,
+        (ctx.has(ctx.pFFO) && ctx.pFFO <= 12) || (ctx.has(ctx.pAFFO) && ctx.pAFFO <= 14),
+        !(ctx.has(ctx.pFFO) || ctx.has(ctx.pAFFO))
+      ),
+      ctx.chk(`Dividende noch da (Yield > 0)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 95% (überlebt)`, ctx.has(ctx.payout) && ctx.payout <= 0.95, !ctx.has(ctx.payout)),
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Volatilität 1Y ≤ 45%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 1Y hoch (≥35%)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.35, !ctx.has(ctx.vol1)),
+      ctx.chk(`Kurs 4Y CAGR stark (|≥10%|)`, ctx.has(ctx.priceCagr4) && Math.abs(ctx.priceCagr4) >= 0.10, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Price/FFO ≤ 18`, ctx.has(ctx.pFFO) && ctx.pFFO <= 18, !ctx.has(ctx.pFFO)),
+      ctx.chk(`Payout Ratio ≤ 90%`, ctx.has(ctx.payout) && ctx.payout <= 0.90, !ctx.has(ctx.payout)),
+      ctx.chk(`Div.-Rendite ≤ 9% (sonst Stress)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.09, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Sehr volatil: Beta ≥ 1.8 ODER Vol 1Y ≥ 45%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.45),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Sehr teuer: Price/AFFO ≥ 28 ODER Price/FFO ≥ 25`,
+        (ctx.has(ctx.pAFFO) && ctx.pAFFO >= 28) || (ctx.has(ctx.pFFO) && ctx.pFFO >= 25),
+        !(ctx.has(ctx.pAFFO) || ctx.has(ctx.pFFO))
+      ),
+      ctx.chk(`Small-ish Cap (< 2B)`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Dividend Yield > 0 (sonst “pure story”)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Payout Ratio ≤ 100%`, ctx.has(ctx.payout) && ctx.payout <= 1.00, !ctx.has(ctx.payout)),
+      ctx.chk(`Kurs ≤ 1.3× Fairer Preis (sonst zu heiß)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.30 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Div.-Rendite extrem (Warnsignal > 12%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.12, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Payout Ratio > 100% (nicht gedeckt)`, ctx.has(ctx.payout) && ctx.payout > 1.00, !ctx.has(ctx.payout)),
+      ctx.chk(`Kurs deutlich unter Fair Value (≤ 0.75×)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.75 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Sehr günstig: Price/FFO ≤ 10 ODER Price/AFFO ≤ 12`,
+        (ctx.has(ctx.pFFO) && ctx.pFFO <= 10) || (ctx.has(ctx.pAFFO) && ctx.pAFFO <= 12),
+        !(ctx.has(ctx.pFFO) || ctx.has(ctx.pAFFO))
+      ),
+      ctx.chk(`Volatilität 1Y ≥ 45%`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.45, !ctx.has(ctx.vol1)),
+      ctx.chk(`Beta ≥ 1.6`, ctx.has(ctx.beta) && ctx.beta >= 1.6, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Div.-Rendite 3–7%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.03 && ctx.divYieldNow <= 0.07, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 90%`, ctx.has(ctx.payout) && ctx.payout <= 0.90, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/AFFO ≤ 22`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 22, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 10Y ≤ 22%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.22, !ctx.has(ctx.vol10)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/AFFO ≤ 20`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 20, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Dividendenwachstum: DPS 4Y CAGR ≥ 2%`, ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 >= 0.02, !ctx.has(ctx.dpsCagr4)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+    ],
+  },
+
+  // REITs: Pricing Power ≈ Fähigkeit, Mieten zu erhöhen -> Proxy: stabile Div-Steigerung + nicht zu hoher Payout + nicht zu hohe Bewertung
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth YoY > 0%`, ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0, !ctx.has(ctx.divGrowthYoY)),
+      ctx.chk(`DPS 4Y CAGR ≥ 3%`, ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 >= 0.03, !ctx.has(ctx.dpsCagr4)),
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Price/AFFO ≤ 22`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 22, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Beta ≤ 1.1`, ctx.has(ctx.beta) && ctx.beta <= 1.1, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  // REITs sind oft "Recurring" per Definition; Proxy: stabile Div + niedrige Vol + moderate Bewertung
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Dividende regelmäßig (Frequency vorhanden)`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Volatilität 5Y ≤ 28%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.28, !ctx.has(ctx.vol5)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 90%`, ctx.has(ctx.payout) && ctx.payout <= 0.90, !ctx.has(ctx.payout)),
+      ctx.chk(`Price/AFFO ≤ 24`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 24, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Beta ≤ 1.2`, ctx.has(ctx.beta) && ctx.beta <= 1.2, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  // In deinem REIT-Set fehlen Debt-Metriken, daher nur Proxy über EV/EBITDA (Leverage/Teuer/Struktur)
+  "Balance Sheet Strong": {
+    minPct: 0.50,
+    base: (ctx) => [
+      ctx.chk(`EV/EBITDA ≤ 14 (Proxy)`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 14, !ctx.has(ctx.evEbitda)),
+      ctx.chk(`Payout Ratio ≤ 85%`, ctx.has(ctx.payout) && ctx.payout <= 0.85, !ctx.has(ctx.payout)),
+      ctx.chk(`Volatilität 10Y ≤ 25%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.25, !ctx.has(ctx.vol10)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Price/AFFO ≤ 22`, ctx.has(ctx.pAFFO) && ctx.pAFFO <= 22, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Beta ≤ 1.1`, ctx.has(ctx.beta) && ctx.beta <= 1.1, !ctx.has(ctx.beta)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.50,
+    base: (ctx) => [
+      ctx.chk(`EV/EBITDA ≥ 18 (Proxy “heavier/teurer”)`, ctx.has(ctx.evEbitda) && ctx.evEbitda >= 18, !ctx.has(ctx.evEbitda)),
+      ctx.chk(`Payout Ratio ≥ 95%`, ctx.has(ctx.payout) && ctx.payout >= 0.95, !ctx.has(ctx.payout)),
+      ctx.chk(`Volatilität 1Y ≥ 40%`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.40, !ctx.has(ctx.vol1)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Price/AFFO ≥ 26 (teuer)`, ctx.has(ctx.pAFFO) && ctx.pAFFO >= 26, !ctx.has(ctx.pAFFO)),
+      ctx.chk(`Div.-Rendite > 10% (Stress)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.10, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Beta ≥ 1.4`, ctx.has(ctx.beta) && ctx.beta >= 1.4, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Vol 1Y ≤ 45%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 95%`, ctx.has(ctx.payout) && ctx.payout <= 0.95, !ctx.has(ctx.payout)),
+    ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Vol 5Y ≤ 30%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.30, !ctx.has(ctx.vol5)),
+    ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Payout Ratio ≤ 90%`, ctx.has(ctx.payout) && ctx.payout <= 0.90, !ctx.has(ctx.payout)),
+    ],
+  },
+};
+
+
+
+
+
+
+ // Regeln für Rollen/ Versorger
+
+
+ const ROLE_RULES_UTILITIES = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF-Marge ≥ 3%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.03, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Zinsdeckung (Interest Coverage) ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 4.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Div.-Rendite nicht “Distress” (≤ 8%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.08, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 2%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF Conversion ≥ 60%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.60, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Net Debt/EBITDA ≤ 5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 5, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`KGV (PE) ≤ 16`, ctx.has(ctx.pe) && ctx.pe <= 16, !ctx.has(ctx.pe)),
+      ctx.chk(`P/FCF ≤ 16`, ctx.has(ctx.pfcf) && ctx.pfcf <= 16, !ctx.has(ctx.pfcf)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`EV/EBITDA ≤ 12`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 12, !ctx.has(ctx.evEbitda)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Interest Coverage ≥ 2.5`, ctx.has(ctx.intCov) && ctx.intCov >= 2.5, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 5%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.05, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Kurs 4Y CAGR ≥ 6% (Proxy)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 >= 0.06, !ctx.has(ctx.priceCagr4)),
+      ctx.chk(`EBITDA Margin ≥ 20%`, ctx.has(ctx.ebitdaMargin) && ctx.ebitdaMargin >= 0.20, !ctx.has(ctx.ebitdaMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`Capex/OCF ≤ 80% (Proxy)`,
+        ctx.has(ctx.capex) && ctx.has(ctx.ocf) && ctx.ocf > 0 && (ctx.capex / ctx.ocf) <= 0.80,
+        !(ctx.has(ctx.capex) && ctx.has(ctx.ocf))
+      ),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`EBITDA Margin ≥ 25%`, ctx.has(ctx.ebitdaMargin) && ctx.ebitdaMargin >= 0.25, !ctx.has(ctx.ebitdaMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Net Debt/EBITDA ≤ 4`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 4%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.04, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Bewertung ok: EV/EBITDA ≤ 14 ODER P/FCF ≤ 20`,
+        (ctx.has(ctx.evEbitda) && ctx.evEbitda <= 14) || (ctx.has(ctx.pfcf) && ctx.pfcf <= 20),
+        !(ctx.has(ctx.evEbitda) || ctx.has(ctx.pfcf))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Net Debt/EBITDA ≤ 4.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF-Marge ≥ 4%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.04, !ctx.has(ctx.fcfMargin)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY < 0 (Stress)`, ctx.has(ctx.revYoY) && ctx.revYoY < 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF positiv (trotz Stress)`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Sehr günstig: P/FCF ≤ 12 ODER EV/EBITDA ≤ 9`,
+        (ctx.has(ctx.pfcf) && ctx.pfcf <= 12) || (ctx.has(ctx.evEbitda) && ctx.evEbitda <= 9),
+        !(ctx.has(ctx.pfcf) || ctx.has(ctx.evEbitda))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF-Marge ≥ 3%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.03, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Interest Coverage ≥ 2`, ctx.has(ctx.intCov) && ctx.intCov >= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 6`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 6, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.50,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.2`, ctx.has(ctx.beta) && ctx.beta >= 1.2, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 1Y hoch (≥30%)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.30, !ctx.has(ctx.vol1)),
+      ctx.chk(`Kurs 4Y CAGR stark (|≥10%|)`, ctx.has(ctx.priceCagr4) && Math.abs(ctx.priceCagr4) >= 0.10, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Net Debt/EBITDA ≤ 5.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 5.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 2.5`, ctx.has(ctx.intCov) && ctx.intCov >= 2.5, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.6 ODER Vol 1Y ≥ 40%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.6) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.40),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Leverage hoch: Net Debt/EBITDA ≥ 6`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 6, !ctx.has(ctx.netDebtEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Interest Coverage ≥ 1.5`, ctx.has(ctx.intCov) && ctx.intCov >= 1.5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Div.-Rendite extrem (>9% Warnsignal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.09, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`P/FCF ≥ 25 (teuer)`, ctx.has(ctx.pfcf) && ctx.pfcf >= 25, !ctx.has(ctx.pfcf)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Interest Coverage < 1.5`, ctx.has(ctx.intCov) && ctx.intCov < 1.5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≥ 7`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 7, !ctx.has(ctx.netDebtEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Capex/OCF > 100% (Cash Drain)`,
+        ctx.has(ctx.capex) && ctx.has(ctx.ocf) && ctx.ocf > 0 && (ctx.capex / ctx.ocf) > 1.0,
+        !(ctx.has(ctx.capex) && ctx.has(ctx.ocf))
+      ),
+      ctx.chk(`Profit Margin < 5%`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Kurs deutlich unter Fair Value (≤0.75×)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.75 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Div.-Rendite 3–7%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.03 && ctx.divYieldNow <= 0.07, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 5, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 10Y ≤ 22%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.22, !ctx.has(ctx.vol10)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Net Debt/EBITDA ≤ 4.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`EBITDA Margin ≥ 25%`, ctx.has(ctx.ebitdaMargin) && ctx.ebitdaMargin >= 0.25, !ctx.has(ctx.ebitdaMargin)),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF-Marge ≥ 4%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.04, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.50,
+    base: (ctx) => [
+      // Utilities sind recurring per Definition -> Proxy über Stabilität
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF Conversion ≥ 60%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.60, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`Net Debt/EBITDA ≤ 5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 5, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≤ 4`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF-Marge ≥ 4%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.04, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Volatilität 10Y ≤ 25%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.25, !ctx.has(ctx.vol10)),
+      ctx.chk(`EV/EBITDA ≤ 12`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 12, !ctx.has(ctx.evEbitda)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≥ 6`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 6, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≤ 2`, ctx.has(ctx.intCov) && ctx.intCov <= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Capex/OCF > 100%`, ctx.has(ctx.capex) && ctx.has(ctx.ocf) && ctx.ocf > 0 && (ctx.capex / ctx.ocf) > 1.0, !(ctx.has(ctx.capex) && ctx.has(ctx.ocf))),
+      ctx.chk(`Profit Margin < 5%`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Div.-Rendite > 9% (Stress)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.09, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": { minPct: 1.0, base:(ctx)=>[ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap)&&ctx.mcap>0&&ctx.mcap<2e9, !ctx.has(ctx.mcap))], health:(ctx)=>[ctx.chk(`Vol 1Y ≤ 45%`, ctx.has(ctx.vol1)&&ctx.vol1<=0.45, !ctx.has(ctx.vol1))] },
+  "Mid Cap":   { minPct: 1.0, base:(ctx)=>[ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap)&&ctx.mcap>=2e9&&ctx.mcap<1e10, !ctx.has(ctx.mcap))], health:(ctx)=>[ctx.chk(`FCF positiv`, ctx.fcfPos===true, ctx.fcfPos==null)] },
+  "Large Cap": { minPct: 1.0, base:(ctx)=>[ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap)&&ctx.mcap>=1e10&&ctx.mcap<2e11, !ctx.has(ctx.mcap))], health:(ctx)=>[ctx.chk(`Interest Coverage ≥ 2.5`, ctx.has(ctx.intCov)&&ctx.intCov>=2.5, !ctx.has(ctx.intCov))] },
+  "Mega Cap":  { minPct: 1.0, base:(ctx)=>[ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap)&&ctx.mcap>=2e11, !ctx.has(ctx.mcap))], health:(ctx)=>[ctx.chk(`Net Debt/EBITDA ≤ 6`, ctx.has(ctx.netDebtEbitda)&&ctx.netDebtEbitda<=6, !ctx.has(ctx.netDebtEbitda))] },
+};
+
+
+ // Regeln für Rollen/ Broker
+
+
+
+ // =====================================================
+// ROLE_RULES_BROKERS — Regeln (base/health) für Brokers/Asset Manager
+// nutzt nur Felder aus deinem brokers-Header-Set
+//
+// Erwartet: ctx.has(v), ctx.chk(label, ok, missing)
+// und später (wenn du willst) buildNutzenCtxBrokers(m) mit ctx.* Mapping.
+// =====================================================
+
+const ROLE_RULES_BROKERS = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Operating Margin ≥ 12%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.12, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Beta ≤ 1.3`, ctx.has(ctx.beta) && ctx.beta <= 1.3, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 1%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.01, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Revenue 4Y CAGR ≥ 6% (falls vorhanden)`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.06, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`EPS 4Y CAGR ≥ 8% (falls vorhanden)`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`Buyback Yield ≥ 0%`, ctx.has(ctx.buybackYield) && ctx.buybackYield >= 0, !ctx.has(ctx.buybackYield)),
+      ctx.chk(`FCF positiv (falls vorhanden)`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`KGV ≤ 15`, ctx.has(ctx.pe) && ctx.pe <= 15, !ctx.has(ctx.pe)),
+      ctx.chk(`P/FCF ≤ 15`, ctx.has(ctx.pfcf) && ctx.pfcf <= 15, !ctx.has(ctx.pfcf)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 12%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.12, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 8%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.08, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Revenue 4Y CAGR ≥ 8%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.08, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`EPS 4Y CAGR ≥ 10%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.10, !ctx.has(ctx.epsCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 12%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.12, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Kurs 4Y CAGR ≥ 8% (Proxy)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 >= 0.08, !ctx.has(ctx.priceCagr4)),
+      ctx.chk(`FCF positiv (falls vorhanden)`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 20%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.20, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Volatilität 5Y ≤ 30%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.30, !ctx.has(ctx.vol5)),
+      ctx.chk(`Beta ≤ 1.2`, ctx.has(ctx.beta) && ctx.beta <= 1.2, !ctx.has(ctx.beta)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Bewertung nicht heiß: KGV ≤ 28`, ctx.has(ctx.pe) && ctx.pe <= 28, !ctx.has(ctx.pe)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue 4Y CAGR ≥ 6%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.06, !ctx.has(ctx.revCagr4)),
+      ctx.chk(`EPS 4Y CAGR ≥ 8%`, ctx.has(ctx.epsCagr4) && ctx.epsCagr4 >= 0.08, !ctx.has(ctx.epsCagr4)),
+      ctx.chk(`Bewertung ok: KGV ≤ 22 ODER P/FCF ≤ 22`,
+        (ctx.has(ctx.pe) && ctx.pe <= 22) || (ctx.has(ctx.pfcf) && ctx.pfcf <= 22),
+        !(ctx.has(ctx.pe) || ctx.has(ctx.pfcf))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Beta ≤ 1.4`, ctx.has(ctx.beta) && ctx.beta <= 1.4, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY < 0 (Stress)`, ctx.has(ctx.revYoY) && ctx.revYoY < 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Jetzt profitabel: Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Sehr günstig: KGV ≤ 12 ODER P/FCF ≤ 12`,
+        (ctx.has(ctx.pe) && ctx.pe <= 12) || (ctx.has(ctx.pfcf) && ctx.pfcf <= 12),
+        !(ctx.has(ctx.pe) || ctx.has(ctx.pfcf))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Volatilität 1Y ≤ 45%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 1Y hoch (≥35%)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.35, !ctx.has(ctx.vol1)),
+      ctx.chk(`Kurs 4Y CAGR stark (|≥10%|)`, ctx.has(ctx.priceCagr4) && Math.abs(ctx.priceCagr4) >= 0.10, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 8%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.08, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Bewertung ok: KGV ≤ 25`, ctx.has(ctx.pe) && ctx.pe <= 25, !ctx.has(ctx.pe)),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Net income positiv = Nein`, ctx.netIncomePos === false, ctx.netIncomePos == null),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.8 ODER Vol 1Y ≥ 45%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.45),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Small-ish Cap (< 2B)`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv (falls vorhanden)`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Div.-Rendite extrem (>10% Warnsignal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.10, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`KGV ≥ 35 (teuer)`, ctx.has(ctx.pe) && ctx.pe >= 35, !ctx.has(ctx.pe)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net income positiv = Nein`, ctx.netIncomePos === false, ctx.netIncomePos == null),
+      ctx.chk(`FCF negativ (falls vorhanden)`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Kurs stark unter Fair Value (≤0.75×)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.75 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Profit Margin < 0`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Operating Margin < 5%`, ctx.has(ctx.opMargin) && ctx.opMargin < 0.05, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Beta ≥ 1.6`, ctx.has(ctx.beta) && ctx.beta >= 1.6, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Div.-Rendite 2–6%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02 && ctx.divYieldNow <= 0.06, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Operating Margin ≥ 10%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.10, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 0.9`, ctx.has(ctx.beta) && ctx.beta <= 0.9, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 10Y ≤ 22%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.22, !ctx.has(ctx.vol10)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 12%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.12, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 12%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.12, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+  },
+
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      // Proxy: hohe/stabile Margen + Wachstum
+      ctx.chk(`Operating Margin ≥ 20%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.20, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 15%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.15, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Revenue 4Y CAGR ≥ 5%`, ctx.has(ctx.revCagr4) && ctx.revCagr4 >= 0.05, !ctx.has(ctx.revCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+      ctx.chk(`Beta ≤ 1.2`, ctx.has(ctx.beta) && ctx.beta <= 1.2, !ctx.has(ctx.beta)),
+    ],
+  },
+
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.50,
+    base: (ctx) => [
+      // Proxy: stabile Earnings + Dividende regelmäßig + niedrige Vola
+      ctx.chk(`Dividende regelmäßig (Frequency vorhanden)`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+      ctx.chk(`Volatilität 5Y ≤ 25%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Operating Margin ≥ 12%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.12, !ctx.has(ctx.opMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.45,
+    base: (ctx) => [
+      // keine Debt-Kennzahlen vorhanden -> Proxy/konservativ
+      ctx.chk(`FCF positiv (falls vorhanden)`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Volatilität 5Y ≤ 28%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.28, !ctx.has(ctx.vol5)),
+      ctx.chk(`Bewertung nicht heiß: EV/EBITDA ≤ 16 (falls vorhanden)`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 16, !ctx.has(ctx.evEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Shareholder Yield ≥ 0%`, ctx.has(ctx.shYield) && ctx.shYield >= 0, !ctx.has(ctx.shYield)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.45,
+    base: (ctx) => [
+      // ohne Debt -> Proxy über Stress (FCF negativ + hohe Vola + teuer)
+      ctx.chk(`FCF negativ (falls vorhanden)`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.6 ODER Vol 1Y ≥ 40%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.6) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.40),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Teuer/Stress: EV/EBITDA ≥ 20 (falls vorhanden)`, ctx.has(ctx.evEbitda) && ctx.evEbitda >= 20, !ctx.has(ctx.evEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Profit Margin < 5%`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Kurs stark unter Fair Value (≤0.75×)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.75 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Div.-Rendite > 8% (Stress)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.08, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Volatilität 1Y ≤ 45%`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.45, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+    ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Profit Margin ≥ 8%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.08, !ctx.has(ctx.profitMargin)),
+    ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [
+      ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Volatilität 5Y ≤ 30%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.30, !ctx.has(ctx.vol5)),
+    ],
+  },
+};
+
+
+
+
+
+
+// Regeln für Rollen/ Rohstoffe
+
+
+const ROLE_RULES_COMMODITIES = {
+  "Dividenden Aristokrat": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 25`, ctx.has(ctx.divYears) && ctx.divYears >= 25, !ctx.has(ctx.divYears)),
+      ctx.chk(`Div.-Rendite aktuell > 0%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0, !ctx.has(ctx.divYieldNow)),
+      ctx.chk(`Div.-Frequency vorhanden`, ctx.has(ctx.divFreq) && String(ctx.divFreq).toLowerCase() !== "none", !ctx.has(ctx.divFreq)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Interest Coverage ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 2.5 ODER Net Cash positiv`,
+        (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5) || (ctx.has(ctx.netCash) && ctx.netCash > 0),
+        !(ctx.has(ctx.netDebtEbitda) || ctx.has(ctx.netCash))
+      ),
+      ctx.chk(`Div.-Rendite nicht “Distress” (≤ 10%)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow <= 0.10, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Dividendenwachstum": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Dividend Growth years ≥ 5`, ctx.has(ctx.divYears) && ctx.divYears >= 5, !ctx.has(ctx.divYears)),
+      ctx.chk(`Dividend Growth YoY > 0% ODER DPS 4Y CAGR > 0%`,
+        (ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY > 0) || (ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 > 0),
+        !(ctx.has(ctx.divGrowthYoY) || ctx.has(ctx.dpsCagr4))
+      ),
+      ctx.chk(`Div.-Rendite aktuell ≥ 2%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02, !ctx.has(ctx.divYieldNow)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`FCF Conversion ≥ 60%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.60, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`Net Debt/EBITDA ≤ 3 ODER Net Cash > 0`,
+        (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3) || (ctx.has(ctx.netCash) && ctx.netCash > 0),
+        !(ctx.has(ctx.netDebtEbitda) || ctx.has(ctx.netCash))
+      ),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Value": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Kurs ≤ Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`KGV (PE) ≤ 12 (zyklisch)`, ctx.has(ctx.pe) && ctx.pe <= 12, !ctx.has(ctx.pe)),
+      ctx.chk(`P/FCF ≤ 10`, ctx.has(ctx.pfcf) && ctx.pfcf <= 10, !ctx.has(ctx.pfcf)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`EV/EBITDA ≤ 6`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 6, !ctx.has(ctx.evEbitda)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Net Income positiv`, ctx.netIncomePos === true || (ctx.has(ctx.netIncome) && ctx.netIncome > 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Interest Coverage ≥ 2.5`, ctx.has(ctx.intCov) && ctx.intCov >= 2.5, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Wachstum": {
+    minPct: 0.60,
+    base: (ctx) => [
+      // bei Commodities ist Wachstum zyklisch – wir bleiben konservativ
+      ctx.chk(`Revenue Growth YoY ≥ 10%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.10, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Kurs 4Y CAGR ≥ 8% (Proxy)`, ctx.has(ctx.priceCagr4) && ctx.priceCagr4 >= 0.08, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`EBITDA Margin ≥ 20%`, ctx.has(ctx.ebitdaMargin) && ctx.ebitdaMargin >= 0.20, !ctx.has(ctx.ebitdaMargin)),
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Net Debt/EBITDA ≤ 3.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Quality": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Operating Margin ≥ 20%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.20, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`Net Cash > 0 ODER Net Debt/EBITDA ≤ 2.5`,
+        (ctx.has(ctx.netCash) && ctx.netCash > 0) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5),
+        !(ctx.has(ctx.netCash) || ctx.has(ctx.netDebtEbitda))
+      ),
+      ctx.chk(`Interest Coverage ≥ 5`, ctx.has(ctx.intCov) && ctx.intCov >= 5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Volatilität 5Y ≤ 35%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.35, !ctx.has(ctx.vol5)),
+    ],
+  },
+
+  "GARP": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 6%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0.06, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Bewertung ok: P/FCF ≤ 15 ODER EV/EBITDA ≤ 8`,
+        (ctx.has(ctx.pfcf) && ctx.pfcf <= 15) || (ctx.has(ctx.evEbitda) && ctx.evEbitda <= 8),
+        !(ctx.has(ctx.pfcf) || ctx.has(ctx.evEbitda))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Kurs ≤ 1.1× Fairer Preis`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 1.10 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+      ctx.chk(`Net Debt/EBITDA ≤ 3`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 3`, ctx.has(ctx.intCov) && ctx.intCov >= 3, !ctx.has(ctx.intCov)),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+    ],
+  },
+
+  "Turnaround": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Net Income negativ ODER Profit Margin ≤ 0`,
+        (ctx.netIncomePos === false) || (ctx.has(ctx.profitMargin) && ctx.profitMargin <= 0),
+        (ctx.netIncomePos == null) && !ctx.has(ctx.profitMargin)
+      ),
+      ctx.chk(`Jetzt Cash: FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+      ctx.chk(`Sehr günstig: EV/EBITDA ≤ 5 ODER P/FCF ≤ 8`,
+        (ctx.has(ctx.evEbitda) && ctx.evEbitda <= 5) || (ctx.has(ctx.pfcf) && ctx.pfcf <= 8),
+        !(ctx.has(ctx.evEbitda) || ctx.has(ctx.pfcf))
+      ),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Revenue Growth YoY > 0`, ctx.has(ctx.revYoY) && ctx.revYoY > 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`Interest Coverage ≥ 2`, ctx.has(ctx.intCov) && ctx.intCov >= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≤ 4`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "Zykliker": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Beta ≥ 1.3`, ctx.has(ctx.beta) && ctx.beta >= 1.3, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 1Y hoch (≥40%)`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.40, !ctx.has(ctx.vol1)),
+      ctx.chk(`Kurs 4Y CAGR stark (|≥12%|)`, ctx.has(ctx.priceCagr4) && Math.abs(ctx.priceCagr4) >= 0.12, !ctx.has(ctx.priceCagr4)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Leverage nicht extrem: Net Debt/EBITDA ≤ 4.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 4.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≥ 2.5`, ctx.has(ctx.intCov) && ctx.intCov >= 2.5, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+  },
+
+  "Spekulation": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Sehr volatil: Beta ≥ 1.8 ODER Vol 1Y ≥ 55%`,
+        (ctx.has(ctx.beta) && ctx.beta >= 1.8) || (ctx.has(ctx.vol1) && ctx.vol1 >= 0.55),
+        !(ctx.has(ctx.beta) || ctx.has(ctx.vol1))
+      ),
+      ctx.chk(`Leverage hoch: Net Debt/EBITDA ≥ 5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 5, !ctx.has(ctx.netDebtEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Interest Coverage ≥ 1.5`, ctx.has(ctx.intCov) && ctx.intCov >= 1.5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Gross Margin ≥ 20% (wenn vorhanden)`, ctx.has(ctx.grossMargin) && ctx.grossMargin >= 0.20, !ctx.has(ctx.grossMargin)),
+      ctx.chk(`Div.-Rendite extrem (>12% Warnsignal)`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.12, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "Krisenfall": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+      ctx.chk(`Interest Coverage < 1.5`, ctx.has(ctx.intCov) && ctx.intCov < 1.5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Net Debt/EBITDA ≥ 6`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 6, !ctx.has(ctx.netDebtEbitda)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Income negativ`, ctx.netIncomePos === false || (ctx.has(ctx.netIncome) && ctx.netIncome < 0), (ctx.netIncomePos == null) && !ctx.has(ctx.netIncome)),
+      ctx.chk(`Profit Margin < 0`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Kurs stark unter Fair Value (≤0.75×)`, ctx.has(ctx.priceNow) && ctx.has(ctx.fair) && ctx.priceNow <= 0.75 * ctx.fair, !(ctx.has(ctx.priceNow) && ctx.has(ctx.fair))),
+    ],
+  },
+
+  "Defensiv": {
+    minPct: 0.60,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.1`, ctx.has(ctx.beta) && ctx.beta <= 1.1, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 5Y ≤ 30%`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.30, !ctx.has(ctx.vol5)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Cash > 0 ODER Net Debt/EBITDA ≤ 2.5`,
+        (ctx.has(ctx.netCash) && ctx.netCash > 0) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5),
+        !(ctx.has(ctx.netCash) || ctx.has(ctx.netDebtEbitda))
+      ),
+      ctx.chk(`Interest Coverage ≥ 4`, ctx.has(ctx.intCov) && ctx.intCov >= 4, !ctx.has(ctx.intCov)),
+      ctx.chk(`Div.-Rendite 2–8%`, ctx.has(ctx.divYieldNow) && ctx.divYieldNow >= 0.02 && ctx.divYieldNow <= 0.08, !ctx.has(ctx.divYieldNow)),
+    ],
+  },
+
+  "stabil Defensiv": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Beta ≤ 1.0`, ctx.has(ctx.beta) && ctx.beta <= 1.0, !ctx.has(ctx.beta)),
+      ctx.chk(`Volatilität 10Y ≤ 28%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.28, !ctx.has(ctx.vol10)),
+      ctx.chk(`Dividend Growth years ≥ 10`, ctx.has(ctx.divYears) && ctx.divYears >= 10, !ctx.has(ctx.divYears)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`FCF Conversion ≥ 70%`, ctx.has(ctx.fcfConv) && ctx.fcfConv >= 0.70, !ctx.has(ctx.fcfConv)),
+      ctx.chk(`Net Cash > 0 ODER Net Debt/EBITDA ≤ 2.5`,
+        (ctx.has(ctx.netCash) && ctx.netCash > 0) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5),
+        !(ctx.has(ctx.netCash) || ctx.has(ctx.netDebtEbitda))
+      ),
+      ctx.chk(`Interest Coverage ≥ 5`, ctx.has(ctx.intCov) && ctx.intCov >= 5, !ctx.has(ctx.intCov)),
+      ctx.chk(`Dividendenwachstum: DPS 4Y CAGR ≥ 2%`, ctx.has(ctx.dpsCagr4) && ctx.dpsCagr4 >= 0.02, !ctx.has(ctx.dpsCagr4)),
+    ],
+  },
+
+  "Pricing Power": {
+    minPct: 0.55,
+    base: (ctx) => [
+      ctx.chk(`Gross Margin ≥ 30%`, ctx.has(ctx.grossMargin) && ctx.grossMargin >= 0.30, !ctx.has(ctx.grossMargin)),
+      ctx.chk(`Operating Margin ≥ 15%`, ctx.has(ctx.opMargin) && ctx.opMargin >= 0.15, !ctx.has(ctx.opMargin)),
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF-Marge ≥ 5%`, ctx.has(ctx.fcfMargin) && ctx.fcfMargin >= 0.05, !ctx.has(ctx.fcfMargin)),
+      ctx.chk(`Net Debt/EBITDA ≤ 3.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3.5, !ctx.has(ctx.netDebtEbitda)),
+    ],
+  },
+
+  "Abo Modell/ Recurring Revenue": {
+    minPct: 0.40,
+    base: (ctx) => [
+      // Bei Commodities i.d.R. NICHT recurring -> wir setzen bewusst harte Bedingungen,
+      // damit diese Rolle selten triggert (eher z.B. Pipeline/royalty-like Modelle).
+      ctx.chk(`Volatilität 5Y ≤ 25% (Proxy Stabilität)`, ctx.has(ctx.vol5) && ctx.vol5 <= 0.25, !ctx.has(ctx.vol5)),
+      ctx.chk(`Revenue Growth YoY ≥ 0%`, ctx.has(ctx.revYoY) && ctx.revYoY >= 0, !ctx.has(ctx.revYoY)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Profit Margin ≥ 10%`, ctx.has(ctx.profitMargin) && ctx.profitMargin >= 0.10, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Net Cash > 0 ODER Net Debt/EBITDA ≤ 2`, (ctx.has(ctx.netCash) && ctx.netCash > 0) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2), !(ctx.has(ctx.netCash) || ctx.has(ctx.netDebtEbitda))),
+      ctx.chk(`Interest Coverage ≥ 5`, ctx.has(ctx.intCov) && ctx.intCov >= 5, !ctx.has(ctx.intCov)),
+    ],
+  },
+
+  "Balance Sheet Strong": {
+    minPct: 0.70,
+    base: (ctx) => [
+      ctx.chk(`Net Cash > 0`, ctx.has(ctx.netCash) && ctx.netCash > 0, !ctx.has(ctx.netCash)),
+      ctx.chk(`Interest Coverage ≥ 5`, ctx.has(ctx.intCov) && ctx.intCov >= 5, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≤ 2.5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 2.5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Volatilität 10Y ≤ 30%`, ctx.has(ctx.vol10) && ctx.vol10 <= 0.30, !ctx.has(ctx.vol10)),
+      ctx.chk(`EV/EBITDA ≤ 8`, ctx.has(ctx.evEbitda) && ctx.evEbitda <= 8, !ctx.has(ctx.evEbitda)),
+    ],
+  },
+
+  "Schuldenlastig/ Leveraged": {
+    minPct: 0.65,
+    base: (ctx) => [
+      ctx.chk(`Net Debt/EBITDA ≥ 5`, ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda >= 5, !ctx.has(ctx.netDebtEbitda)),
+      ctx.chk(`Interest Coverage ≤ 2`, ctx.has(ctx.intCov) && ctx.intCov <= 2, !ctx.has(ctx.intCov)),
+      ctx.chk(`FCF negativ`, ctx.fcfPos === false, ctx.fcfPos == null),
+    ],
+    health: (ctx) => [
+      ctx.chk(`Net Cash negativ (d.h. Netto-Schulden)`, ctx.has(ctx.netCash) && ctx.netCash < 0, !ctx.has(ctx.netCash)),
+      ctx.chk(`Profit Margin < 5%`, ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+      ctx.chk(`Volatilität 1Y ≥ 50%`, ctx.has(ctx.vol1) && ctx.vol1 >= 0.50, !ctx.has(ctx.vol1)),
+    ],
+  },
+
+  // Caps
+  "Small Cap": {
+    minPct: 1.0,
+    base: (ctx) => [ ctx.chk(`Marktkapitalisierung < 2B`, ctx.has(ctx.mcap) && ctx.mcap > 0 && ctx.mcap < 2e9, !ctx.has(ctx.mcap)) ],
+    health: (ctx) => [ ctx.chk(`Volatilität 1Y ≤ 60% (Proxy)`, ctx.has(ctx.vol1) && ctx.vol1 <= 0.60, !ctx.has(ctx.vol1)) ],
+  },
+
+  "Mid Cap": {
+    minPct: 1.0,
+    base: (ctx) => [ ctx.chk(`Marktkapitalisierung 2B–<10B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e9 && ctx.mcap < 1e10, !ctx.has(ctx.mcap)) ],
+    health: (ctx) => [ ctx.chk(`Interest Coverage ≥ 2`, ctx.has(ctx.intCov) && ctx.intCov >= 2, !ctx.has(ctx.intCov)) ],
+  },
+
+  "Large Cap": {
+    minPct: 1.0,
+    base: (ctx) => [ ctx.chk(`Marktkapitalisierung 10B–<200B`, ctx.has(ctx.mcap) && ctx.mcap >= 1e10 && ctx.mcap < 2e11, !ctx.has(ctx.mcap)) ],
+    health: (ctx) => [ ctx.chk(`FCF positiv`, ctx.fcfPos === true, ctx.fcfPos == null) ],
+  },
+
+  "Mega Cap": {
+    minPct: 1.0,
+    base: (ctx) => [ ctx.chk(`Marktkapitalisierung ≥ 200B`, ctx.has(ctx.mcap) && ctx.mcap >= 2e11, !ctx.has(ctx.mcap)) ],
+    health: (ctx) => [ ctx.chk(`Net Cash > 0 ODER Net Debt/EBITDA ≤ 3`, (ctx.has(ctx.netCash) && ctx.netCash > 0) || (ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda <= 3), !(ctx.has(ctx.netCash) || ctx.has(ctx.netDebtEbitda))) ],
+  },
+};
+
+
+    // Regeln für Stress Flag
+
+
+function countTriggers(trigs){
+  const arr = trigs || [];
+  const relevant = arr.filter(t => !t.missing);
+  const bad = relevant.filter(t => t.bad).length;
+  return { bad, total: relevant.length };
+}
+
+// Farbe aus Base+Health ableiten (konservativ, aber stabil)
+function stressColorFromCounts(baseC, healthC){
+  const totalRelevant = (baseC.total || 0) + (healthC.total || 0);
+  if(totalRelevant === 0) return null; // ✅ nichts eingegeben => kein Stress-Wert
+
+  const b = baseC.bad;
+  const h = healthC.bad;
+
+  if(b >= 4 || h >= 4 || (b >= 3 && h >= 2)) return "darkbad";
+  if(b >= 3 || h >= 3 || (b >= 2 && h >= 1)) return "bad";
+  if(b >= 1 || h >= 1) return "warn";
+  return "good";
+}
+
+function stressLabel(mode){
+  if(mode === "good") return "Grün";
+  if(mode === "warn") return "Gelb";
+  if(mode === "bad") return "Rot";
+  if(mode === "darkbad") return "Dunkelrot";
+  return "–"; // ✅ null/unknown
+}
+
+// Helper für Trigger
+function t(label, bad, missing){
+  return { label, bad: !!bad, missing: !!missing };
+}
+
+
+
+function pickStressRulesBySector(sector){
+  switch(sector){
+    case "utilities":   return STRESS_RULES_UTILITIES;
+    case "brokers":     return STRESS_RULES_BROKERS;
+    case "commodities": return STRESS_RULES_COMMODITIES;
+    case "banks":       return STRESS_RULES_BANKS;
+    case "insurance":   return STRESS_RULES_INSURANCE;
+    case "reits":       return STRESS_RULES_REITS;
+    default:            return STRESS_RULES_STANDARD;
+  }
+}
+
+function evalStressForCurrentSector(){
+  const m   = tableToMap();
+  const ctx = buildNutzenCtxFromTableMap(m);
+
+  const rules = pickStressRulesBySector(NUTZEN_STATE.sector) || STRESS_RULES_STANDARD;
+
+  const baseTriggers   = (rules.base   ? rules.base(ctx)   : []) || [];
+  const healthTriggers = (rules.health ? rules.health(ctx) : []) || [];
+
+  const baseC   = countTriggers(baseTriggers);
+  const healthC = countTriggers(healthTriggers);
+
+  const mode  = stressColorFromCounts(baseC, healthC); // good/warn/bad/darkbad
+  const label = stressLabel(mode);
+
+  return {
+    mode,
+    label,
+    baseTriggers,
+    healthTriggers,
+    score: { base: baseC, health: healthC }
+  };
+}
+
+
+
+
+function stressLegendHTML(st){
+  const b = st?.score?.base   || { bad:0, total:0 };
+  const h = st?.score?.health || { bad:0, total:0 };
+
+  const baseBad   = b.bad || 0;
+  const healthBad = h.bad || 0;
+
+  // muss exakt zu stressColorFromCounts passen:
+  const isDarkRed = (baseBad >= 4) || (healthBad >= 4) || (baseBad >= 3 && healthBad >= 2);
+  const isRed     = !isDarkRed && (baseBad >= 3 || healthBad >= 3 || (baseBad >= 2 && healthBad >= 1));
+  const isYellow  = !isDarkRed && !isRed && (baseBad >= 1 || healthBad >= 1);
+  const isGreen   = !isDarkRed && !isRed && !isYellow && (baseBad === 0 && healthBad === 0);
+
+  const icon = (ok, missing=false) => missing ? "—" : (ok ? "✅" : "❌");
+  const line = (ok, label, missing=false) => `<div class="whyLine">${icon(ok, missing)} ${label}</div>`;
+
+  // ✅ Trigger-Liste: zeigt ALLE Trigger (nicht nur negative)
+  const renderTriggerList = (arr) => {
+    const a = arr || [];
+    if(a.length === 0) return `<div class="muted">–</div>`;
+    return a.map(tg => {
+      const ic = tg.missing ? "—" : (tg.bad ? "❌" : "✅");
+      return `<div class="whyLine">${ic} ${tg.label}</div>`;
+    }).join("");
+  };
+
+  function block(title, dotClass, active, baseLinesHTML, healthLinesHTML){
+    return `
+      <div class="whyRoleBlock">
+        <div class="whyRoleHead">
+          <div class="whyRoleTitle">
+            <span class="dot ${dotClass}" style="display:inline-block;margin-right:8px;vertical-align:middle"></span>
+            ${active ? "✅" : "—"} ${title}
+          </div>
+          <div class="whyRoleMeta">Base ${baseBad} neg · Health ${healthBad} neg</div>
+        </div>
+
+        <div class="whyCols">
+          <div>
+            <div class="whyColTitle">Base</div>
+            ${baseLinesHTML}
+
+            <div class="whyColTitle" style="margin-top:10px">Trigger (Base)</div>
+            ${renderTriggerList(st?.baseTriggers)}
+          </div>
+
+          <div>
+            <div class="whyColTitle">Health</div>
+            ${healthLinesHTML}
+
+            <div class="whyColTitle" style="margin-top:10px">Trigger (Health)</div>
+            ${renderTriggerList(st?.healthTriggers)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== Regeln-Linien pro Farbe (wie du es magst) =====
+
+  // GRÜN
+  const greenBase = line(baseBad === 0,  `0 negative Trigger (aktuell: ${baseBad})`);
+  const greenHealth = line(healthBad === 0, `0 negative Trigger (aktuell: ${healthBad})`);
+
+  // GELB
+  const yellowBase = line(baseBad >= 1, `≥ 1 negativer Trigger (aktuell: ${baseBad})`);
+  const yellowHealth = [
+    line(healthBad >= 1, `≥ 1 negativer Trigger (aktuell: ${healthBad})`),
+    line(!isRed && !isDarkRed, `nicht Rot/Dunkelrot`)
+  ].join("");
+
+  // ROT
+  const redBase = [
+    line(baseBad >= 3, `≥ 3 negative Trigger (aktuell: ${baseBad})`),
+    line(baseBad >= 2 && healthBad >= 1, `Kombi: Base ≥ 2 & Health ≥ 1`)
+  ].join("");
+  const redHealth = [
+    line(healthBad >= 3, `≥ 3 negative Trigger (aktuell: ${healthBad})`),
+    line(!isDarkRed, `nicht Dunkelrot`)
+  ].join("");
+
+  // DUNKELROT
+  const darkRedBase = [
+    line(baseBad >= 4, `≥ 4 negative Trigger (aktuell: ${baseBad})`),
+    line(baseBad >= 3 && healthBad >= 2, `Kombi: Base ≥ 3 & Health ≥ 2`)
+  ].join("");
+  const darkRedHealth = line(healthBad >= 4, `≥ 4 negative Trigger (aktuell: ${healthBad})`);
+
+  return [
+    block("Grün",      "good",    isGreen,    greenBase,    greenHealth),
+    block("Gelb",      "warn",    isYellow,   yellowBase,   yellowHealth),
+    block("Rot",       "bad",     isRed,      redBase,      redHealth),
+    block("Dunkelrot", "darkbad", isDarkRed,  darkRedBase,  darkRedHealth),
+  ].join("");
+}
+
+
+function renderStressWhyNow(st){
+  const box = el("stressWhyNow");
+  if(!box) return;
+
+  const badBase   = (st?.baseTriggers || []).filter(x => !x.missing && x.bad);
+  const badHealth = (st?.healthTriggers || []).filter(x => !x.missing && x.bad);
+
+  const icon = (x) => x.bad ? "❌" : "✅";
+
+  const listHTML = (arr) => {
+    if(!arr.length) return `<div class="muted">– keine negativen Trigger</div>`;
+    return arr.map(x => `<div class="whyLine">${icon(x)} ${x.label}</div>`).join("");
+  };
+
+  const b = st?.score?.base || { bad:0, total:0 };
+  const h = st?.score?.health || { bad:0, total:0 };
+
+  box.innerHTML = `
+    <div class="whyRoleBlock">
+      <div class="whyRoleHead">
+        <div class="whyRoleTitle">Warum: ${st?.label ?? "–"}</div>
+        <div class="whyRoleMeta">Base ${b.bad}/${b.total} · Health ${h.bad}/${h.total}</div>
+      </div>
+
+      <div class="whyCols">
+        <div>
+          <div class="whyColTitle">Base (negativ)</div>
+          ${listHTML(badBase)}
+        </div>
+        <div>
+          <div class="whyColTitle">Health (negativ)</div>
+          ${listHTML(badHealth)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStressPageClean(st){
+  // Dot + Label
+  const dot = el("stressPageDot");
+  if(dot){
+    dot.classList.remove("good","warn","bad","darkbad");
+    if(st?.mode) dot.classList.add(st.mode);
+  }
+  const lab = el("stressPageLabel");
+  if(lab) lab.textContent = `Stress: ${st?.label ?? "–"}`;
+
+  // Warum jetzt?
+  renderStressWhyNow(st);
+
+  // Farben Erklärung (immer alle Farben)
+const legend = el("stressLegendAll");
+if(legend) legend.innerHTML = stressLegendHTML(st);
+}
+
+/**
+ * EINZIGE renderStress Funktion (alte alle löschen!)
+ * - aktualisiert Stress-Seite (clean)
+ * - optional: Overlay Kurztext weiter befüllen (wenn du willst)
+ */
+function renderStress(st){
+  // Stress Seite
+  renderStressPageClean(st);
+
+  // Overlay Kurztext (optional behalten)
+  const ov = el("nutzenOverlayStressExplain");
+  if(ov){
+    ov.textContent = `Stress: ${st.label} | Base ${st.score.base.bad}/${st.score.base.total} | Health ${st.score.health.bad}/${st.score.health.total}`;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Regeln für Stress Flag/ Standard 
+    const STRESS_RULES_STANDARD = {
+  base: (ctx) => ([
+    t("Net Income negativ", ctx.netIncomePos === false, ctx.netIncomePos == null),
+    t("FCF negativ", ctx.fcfPos === false, ctx.fcfPos == null),
+    t("Revenue YoY < 0", ctx.has(ctx.revYoY) && ctx.revYoY < 0, !ctx.has(ctx.revYoY)),
+    t("Interest Coverage < 2", ctx.has(ctx.intCov) && ctx.intCov < 2, !ctx.has(ctx.intCov)),
+    t("Net Debt/EBITDA > 5", ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda > 5, !ctx.has(ctx.netDebtEbitda)),
+  ]),
+  health: (ctx) => ([
+    t("Current Ratio < 1.0", ctx.has(ctx.current) && ctx.current < 1.0, !ctx.has(ctx.current)),
+    t("Quick Ratio < 0.8", ctx.has(ctx.quick) && ctx.quick < 0.8, !ctx.has(ctx.quick)),
+    t("FCF Conversion < 40%", ctx.has(ctx.fcfConv) && ctx.fcfConv < 0.40, !ctx.has(ctx.fcfConv)),
+    t("FCF-Marge < 0%", ctx.has(ctx.fcfMargin) && ctx.fcfMargin < 0, !ctx.has(ctx.fcfMargin)),
+    t("Shares Change (YoY) > +5% (Verwässerung)", ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY > 0.05, !ctx.has(ctx.sharesChgYoY)),
+  ])
+};
+
+
+
+        // Regeln für Stress Flag/ Banks
+
+        const STRESS_RULES_BANKS = {
+  base: (ctx) => ([
+    t("Net Income negativ", ctx.has(ctx.netIncome) && ctx.netIncome < 0, !ctx.has(ctx.netIncome)),
+    t("ROE < 5%", ctx.has(ctx.roe) && ctx.roe < 0.05, !ctx.has(ctx.roe)),
+    t("ROA < 0.3%", ctx.has(ctx.roa) && ctx.roa < 0.003, !ctx.has(ctx.roa)),
+    t("Div.-Rendite > 10% (Distress-Signal)", ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.10, !ctx.has(ctx.divYieldNow)),
+    t("P/B > 2.5 (sehr teuer/risiko)", ctx.has(ctx.pb) && ctx.pb > 2.5, !ctx.has(ctx.pb)),
+  ]),
+  health: (ctx) => ([
+    t("Net Income YoY < -20%", ctx.has(ctx.netIncomeYoY) && ctx.netIncomeYoY < -0.20, !ctx.has(ctx.netIncomeYoY)),
+    t("NII YoY < -5% (wenn vorhanden)", ctx.has(ctx.niiYoY) && ctx.niiYoY < -0.05, !ctx.has(ctx.niiYoY)),
+    t("Non-Interest Income YoY < -10% (wenn vorhanden)", ctx.has(ctx.nonIntYoY) && ctx.nonIntYoY < -0.10, !ctx.has(ctx.nonIntYoY)),
+    t("Beta > 1.6 (hohes Risiko)", ctx.has(ctx.beta) && ctx.beta > 1.6, !ctx.has(ctx.beta)),
+  ])
+};
+
+
+            // Regeln für Stress Flag/ Versicherer 
+            const STRESS_RULES_INSURANCE = {
+  base: (ctx) => ([
+    t("Combined Ratio > 100%", ctx.has(ctx.combined) && ctx.combined > 1.00, !ctx.has(ctx.combined)),
+    t("Net Income negativ", ctx.has(ctx.netIncome) && ctx.netIncome < 0, !ctx.has(ctx.netIncome)),
+    t("ROE < 6%", ctx.has(ctx.roe) && ctx.roe < 0.06, !ctx.has(ctx.roe)),
+    t("Payout Ratio > 80%", ctx.has(ctx.payout) && ctx.payout > 0.80, !ctx.has(ctx.payout)),
+    t("P/B > 2.0 (sehr teuer)", ctx.has(ctx.pb) && ctx.pb > 2.0, !ctx.has(ctx.pb)),
+  ]),
+  health: (ctx) => ([
+    t("Loss Ratio > 75% (wenn vorhanden)", ctx.has(ctx.loss) && ctx.loss > 0.75, !ctx.has(ctx.loss)),
+    t("Expense Ratio > 35% (wenn vorhanden)", ctx.has(ctx.expense) && ctx.expense > 0.35, !ctx.has(ctx.expense)),
+    t("NWP Growth YoY < -5% (wenn vorhanden)", ctx.has(ctx.nwpYoY) && ctx.nwpYoY < -0.05, !ctx.has(ctx.nwpYoY)),
+    t("Interest Coverage < 2 (wenn vorhanden)", ctx.has(ctx.intCov) && ctx.intCov < 2, !ctx.has(ctx.intCov)),
+  ])
+};
+
+
+
+                // Regeln für Stress Flag/ REITs
+                const STRESS_RULES_REITS = {
+  base: (ctx) => ([
+    t("Payout Ratio > 100% (nicht gedeckt)", ctx.has(ctx.payout) && ctx.payout > 1.00, !ctx.has(ctx.payout)),
+    t("Price/FFO > 25 (teuer)", ctx.has(ctx.pFFO) && ctx.pFFO > 25, !ctx.has(ctx.pFFO)),
+    t("Price/AFFO > 28 (teuer)", ctx.has(ctx.pAFFO) && ctx.pAFFO > 28, !ctx.has(ctx.pAFFO)),
+    t("Div.-Rendite > 10% (Distress)", ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.10, !ctx.has(ctx.divYieldNow)),
+    t("Vol 1Y > 45% (Risky)", ctx.has(ctx.vol1) && ctx.vol1 > 0.45, !ctx.has(ctx.vol1)),
+  ]),
+  health: (ctx) => ([
+    t("Kurs 4Y CAGR < 0 (langfristig schwach)", ctx.has(ctx.priceCagr4) && ctx.priceCagr4 < 0, !ctx.has(ctx.priceCagr4)),
+    t("Dividend Growth YoY < 0", ctx.has(ctx.divGrowthYoY) && ctx.divGrowthYoY < 0, !ctx.has(ctx.divGrowthYoY)),
+    t("Beta > 1.6", ctx.has(ctx.beta) && ctx.beta > 1.6, !ctx.has(ctx.beta)),
+  ])
+};
+
+
+
+                    // Regeln für Stress Flag/ Versorger
+                    const STRESS_RULES_UTILITIES = {
+  base: (ctx) => ([
+    t("FCF negativ", ctx.fcfPos === false, ctx.fcfPos == null),
+    t("Interest Coverage < 2", ctx.has(ctx.intCov) && ctx.intCov < 2, !ctx.has(ctx.intCov)),
+    t("Net Debt/EBITDA > 6", ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda > 6, !ctx.has(ctx.netDebtEbitda)),
+    t("Payout Ratio > 90% (wenn vorhanden)", ctx.has(ctx.payout) && ctx.payout > 0.90, !ctx.has(ctx.payout)),
+    t("Revenue YoY < 0", ctx.has(ctx.revYoY) && ctx.revYoY < 0, !ctx.has(ctx.revYoY)),
+  ]),
+  health: (ctx) => ([
+    t("Capex/OCF > 110% (Cash Drain)", ctx.has(ctx.capex) && ctx.has(ctx.ocf) && ctx.ocf > 0 && (ctx.capex/ctx.ocf) > 1.10, !(ctx.has(ctx.capex) && ctx.has(ctx.ocf))),
+    t("FCF-Marge < 0%", ctx.has(ctx.fcfMargin) && ctx.fcfMargin < 0, !ctx.has(ctx.fcfMargin)),
+    t("Vol 1Y > 35% (ungewöhnlich für Utility)", ctx.has(ctx.vol1) && ctx.vol1 > 0.35, !ctx.has(ctx.vol1)),
+  ])
+};
+
+
+
+
+                        // Regeln für Stress Flag/ Broker
+                        const STRESS_RULES_BROKERS = {
+  base: (ctx) => ([
+    t("Revenue YoY < -10%", ctx.has(ctx.revYoY) && ctx.revYoY < -0.10, !ctx.has(ctx.revYoY)),
+    t("Net Income negativ", ctx.netIncomePos === false, ctx.netIncomePos == null),
+    t("Profit Margin < 5%", ctx.has(ctx.profitMargin) && ctx.profitMargin < 0.05, !ctx.has(ctx.profitMargin)),
+    t("Beta > 1.6", ctx.has(ctx.beta) && ctx.beta > 1.6, !ctx.has(ctx.beta)),
+    t("Vol 1Y > 45%", ctx.has(ctx.vol1) && ctx.vol1 > 0.45, !ctx.has(ctx.vol1)),
+  ]),
+  health: (ctx) => ([
+    t("FCF negativ (falls vorhanden)", ctx.fcfPos === false, ctx.fcfPos == null),
+    t("Shares Change (YoY) > +5%", ctx.has(ctx.sharesChgYoY) && ctx.sharesChgYoY > 0.05, !ctx.has(ctx.sharesChgYoY)),
+    t("KGV > 35 (heiß)", ctx.has(ctx.pe) && ctx.pe > 35, !ctx.has(ctx.pe)),
+  ])
+};
+
+
+
+                            // Regeln für Stress Flag/ Rohstoffe 
+
+                            const STRESS_RULES_COMMODITIES = {
+  base: (ctx) => ([
+    t("FCF negativ", ctx.fcfPos === false, ctx.fcfPos == null),
+    t("Net Income negativ", ctx.netIncomePos === false, ctx.netIncomePos == null),
+    t("Interest Coverage < 2", ctx.has(ctx.intCov) && ctx.intCov < 2, !ctx.has(ctx.intCov)),
+    t("Net Debt/EBITDA > 5", ctx.has(ctx.netDebtEbitda) && ctx.netDebtEbitda > 5, !ctx.has(ctx.netDebtEbitda)),
+    t("Vol 1Y > 60% (sehr riskant)", ctx.has(ctx.vol1) && ctx.vol1 > 0.60, !ctx.has(ctx.vol1)),
+  ]),
+  health: (ctx) => ([
+    t("Revenue YoY < -15% (zyklischer Einbruch)", ctx.has(ctx.revYoY) && ctx.revYoY < -0.15, !ctx.has(ctx.revYoY)),
+    t("Gross Margin < 10% (wenn vorhanden)", ctx.has(ctx.grossMargin) && ctx.grossMargin < 0.10, !ctx.has(ctx.grossMargin)),
+    t("Div.-Rendite > 12% (Distress)", ctx.has(ctx.divYieldNow) && ctx.divYieldNow > 0.12, !ctx.has(ctx.divYieldNow)),
+  ])
+};
+
+
+
+
+console.log("JS loaded");
+
+
+(function debugPageSwitch(){
+  const pTable = document.getElementById("page-table");
+  const pHome  = document.getElementById("page-home");
+
+  if(!pTable || !pHome) return;
+
+  // Beobachte Class-Änderungen
+  const obs = new MutationObserver(() => {
+    const tableOn = pTable.classList.contains("isActive");
+    const homeOn  = pHome.classList.contains("isActive");
+    if(tableOn && !homeOn){
+      console.log("⚠️ Tabelle wurde aktiv geschaltet!");
+      console.trace("Stacktrace (wer war’s):");
+    }
+  });
+
+  obs.observe(pTable, { attributes:true, attributeFilter:["class"] });
+})();
+
+
+  </script>
+</body>
+</html>
