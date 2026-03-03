@@ -492,6 +492,40 @@ main.grid{
 @media (max-width: 980px){
   main.grid{ grid-template-columns: 1fr; }
 }
+
+/* ===== Overlay Mini Boxes ===== */
+.miniGrid{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap:10px;
+}
+@media (max-width:980px){
+  .miniGrid{ grid-template-columns: 1fr 1fr; }
+}
+
+.miniCard{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(0,0,0,.12);
+  padding:10px 12px;
+}
+.miniLabel{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.miniValue{
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+.miniSub{
+  margin-top:4px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+
   </style>
 </head>
 
@@ -512,6 +546,8 @@ main.grid{
         <button class="btn" onclick="goPage('table')">Tabelle</button>
         <button class="btn" onclick="goPage('roles')">Rollen</button>
         <button class="btn" onclick="goPage('stress')">Stress</button>
+        <button class="btn" onclick="goPage('fair')">Fair Preis</button>
+        <button class="btn" onclick="goPage('tools')">Rechner</button>
         <button class="btn primary" onclick="openNutzenOverlay()">Nutzen Overlay</button>
       </nav>
     </header>
@@ -519,172 +555,169 @@ main.grid{
     <!-- ===== PAGES ===== -->
     <main class="grid">
 
-      <!-- LEFT: Main content -->
-        <section class="card">
-  <div id="page-home" class="page isActive">
-          <h2>
-            <span>Home</span>
-          </h2>
+      <!-- LEFT: Main content (ALLE pages bleiben IN dieser Section!) -->
+      <section class="card">
+
+        <!-- ✅ GLOBAL: Excel Paste (sichtbar auf ALLEN Seiten) -->
+        <div style="padding:14px 16px; border-bottom:1px solid var(--line)">
+          <div class="muted" style="font-size:12px;margin-bottom:6px">Excel Paste (Copy → Paste)</div>
+
+          <textarea id="excelPaste"
+            placeholder="Excel markieren → Cmd+C → hier einfügen (Tab-getrennt)"
+            style="width:100%;min-height:140px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20);color:var(--text);outline:none;resize:vertical"></textarea>
+
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" id="btnParseExcel" style="flex:1">In Tabelle übernehmen</button>
+            <button class="btn" id="btnClearExcel">Leeren</button>
+          </div>
+        </div>
+
+        <!-- ===== HOME ===== -->
+        <div id="page-home" class="page isActive">
+          <h2><span>Home</span></h2>
+
           <div class="body">
             <div class="split">
-  <!-- LEFT: Quick Controls -->
-  <div class="card" style="box-shadow:none">
-    <h2>Quick Controls</h2>
-    <div class="body">
 
-      <div class="row">
-        <div class="field">
-          <label for="nutzenHeaderSet">Header-Set</label>
-          <select id="nutzenHeaderSet">
-            <option value="standard">Standard</option>
-            <option value="banks">Banks</option>
-            <option value="reits">REITs</option>
-            <option value="utilities">Utilities</option>
-            <option value="brokers">Brokers / Asset Manager</option>
-            <option value="insurance">Insurance</option>
-            <option value="commodities">Commodities</option>
-          </select>
-        </div>
+              <!-- LEFT: Quick Controls -->
+              <div class="card" style="box-shadow:none">
+                <h2>Quick Controls</h2>
+                <div class="body">
 
-        <div class="field">
-          <label for="nutzenCagrYear">CAGR Jahr</label>
-          <select id="nutzenCagrYear">
-            <option value="1">1Y</option>
-            <option value="2">2Y</option>
-            <option value="3">3Y</option>
-            <option value="4" selected>4Y</option>
-          </select>
-        </div>
+                  <div class="row">
+                    <div class="field">
+                      <label for="nutzenHeaderSet">Header-Set</label>
+                      <select id="nutzenHeaderSet">
+                        <option value="standard">Standard</option>
+                        <option value="banks">Banks</option>
+                        <option value="reits">REITs</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="brokers">Brokers / Asset Manager</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="commodities">Commodities</option>
+                      </select>
+                    </div>
 
-        <div class="field">
-          <label for="nutzenVolYear">Vol Jahr</label>
-          <select id="nutzenVolYear">
-            <option value="1" selected>1Y</option>
-            <option value="5">5Y</option>
-            <option value="10">10Y</option>
-          </select>
-        </div>
-      </div>
+                    <div class="field">
+                      <label for="nutzenCagrYear">CAGR Jahr</label>
+                      <select id="nutzenCagrYear">
+                        <option value="1">1Y</option>
+                        <option value="2">2Y</option>
+                        <option value="3">3Y</option>
+                        <option value="4" selected>4Y</option>
+                      </select>
+                    </div>
 
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="nutzenBtnRecalc">Recalc</button>
-        <button class="btn" id="nutzenBtnExport">Export</button>
-        <button class="btn" onclick="goPage('table')">Zur Tabelle</button>
-      </div>
+                    <div class="field">
+                      <label for="nutzenVolYear">Vol Jahr</label>
+                      <select id="nutzenVolYear">
+                        <option value="1" selected>1Y</option>
+                        <option value="5">5Y</option>
+                        <option value="10">10Y</option>
+                      </select>
+                    </div>
+                  </div>
 
-    </div>
-  </div>
+                  <div class="row" style="margin-top:10px">
+                    <button class="btn" id="nutzenBtnRecalc">Recalc</button>
+                    <button class="btn" id="nutzenBtnExport">Export</button>
+                    <button class="btn" onclick="goPage('table')">Zur Tabelle</button>
+                  </div>
 
-  <!-- RIGHT: DCF Einstellungen -->
-  <div class="card" style="box-shadow:none">
-    <h2>DCF Einstellungen</h2>
-    <div class="body">
+                </div>
+              </div>
 
-      <div class="row">
-        <div class="field" style="flex:1">
-          <label for="ovDcfPreset">Preset</label>
-<select id="ovDcfPreset">
-  <option value="eu">EU</option>
-  <option value="usa">USA</option>
-  <option value="middleeast">Middle East</option>
-  <option value="china">China</option>
-  <option value="defensive">Defensiv</option>
-  <option value="normal">Normal</option>
-  <option value="aggressive">Aggressiv</option>
-  <option value="custom">Custom</option>
-</select>
-        </div>
-      </div>
+              <!-- RIGHT: DCF Einstellungen -->
+              <div class="card" style="box-shadow:none">
+                <h2>DCF Einstellungen</h2>
+                <div class="body">
 
-      <div class="row">
-        <div class="field">
-          <label for="ovRf">rf (Risk-free) %</label>
-          <input id="ovRf" type="text" value="3,00"/>
-        </div>
-        <div class="field">
-          <label for="ovErp">ERP %</label>
-          <input id="ovErp" type="text" value="5,00"/>
-        </div>
-      </div>
+                  <div class="row">
+                    <div class="field" style="flex:1">
+                      <label for="ovDcfPreset">Preset</label>
+                      <select id="ovDcfPreset">
+                        <option value="eu">EU</option>
+                        <option value="usa">USA</option>
+                        <option value="middleeast">Middle East</option>
+                        <option value="china">China</option>
+                        <option value="defensive">Defensiv</option>
+                        <option value="normal">Normal</option>
+                        <option value="aggressive">Aggressiv</option>
+                        <option value="custom">Custom</option>
+                      </select>
+                    </div>
+                  </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="ovGt">gT (Terminal) %</label>
-          <input id="ovGt" type="text" value="2,50"/>
-        </div>
-        <div class="field">
-          <label for="ovYears">Years</label>
-          <input id="ovYears" type="number" min="1" max="30" step="1" value="5"/>
-        </div>
-      </div>
+                  <div class="row">
+                    <div class="field">
+                      <label for="ovRf">rf (Risk-free) %</label>
+                      <input id="ovRf" type="text" value="3,00" />
+                    </div>
+                    <div class="field">
+                      <label for="ovErp">ERP %</label>
+                      <input id="ovErp" type="text" value="5,00" />
+                    </div>
+                  </div>
 
-    </div>
-  </div>
-</div>
-  </div>
- </div>
+                  <div class="row">
+                    <div class="field">
+                      <label for="ovGt">gT (Terminal) %</label>
+                      <input id="ovGt" type="text" value="2,50" />
+                    </div>
+                    <div class="field">
+                      <label for="ovYears">Years</label>
+                      <input id="ovYears" type="number" min="1" max="30" step="1" value="5" />
+                    </div>
+                  </div>
 
+                </div>
+              </div>
+
+            </div><!-- /.split -->
+          </div><!-- /.body -->
+        </div><!-- /#page-home -->
+
+        <!-- ⚠️ HIER kommen danach page-table, page-roles, page-stress, page-fair, page-tools rein
+             (alles weiterhin innerhalb von <section class="card">) -->
             
      
 
    
-
-
-        <div style="margin-top:14px">
-  <div class="muted" style="font-size:12px;margin-bottom:6px">Excel Paste (Copy → Paste)</div>
-  <textarea id="excelPaste"
-    placeholder="Excel markieren → Cmd+C → hier einfügen (Tab-getrennt)"
-    style="width:100%;min-height:140px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20);color:var(--text);outline:none;resize:vertical"></textarea>
-
-  <div class="row" style="margin-top:10px">
-    <button class="btn primary" id="btnParseExcel" style="flex:1">In Tabelle übernehmen</button>
-    <button class="btn" id="btnClearExcel">Leeren</button>
-  </div>
-
-  <p class="muted" style="margin:10px 0 0 0;font-size:12px;line-height:1.4">
-    Unterstützt 2 Formate:<br>
-    (A) 2 Spalten: <span class="muted">Header | Wert</span><br>
-    (B) 2 Zeilen: <span class="muted">Header-Zeile</span> + <span class="muted">Wert-Zeile</span>
-  </p>
-</div>
-
-
-
+        <!-- ===== TABLE ===== -->
         <div id="page-table" class="page">
           <h2>
             <span>Tabelle</span>
             <span class="chip"><span class="dot"></span> Header-Reihenfolge egal (Mapping über Namen)</span>
           </h2>
+
           <div class="body">
-
-
             <div class="row" style="margin-bottom:12px">
-  <div class="field" style="min-width:220px">
-    <label for="nutzenHeaderSetTable">Header-Set</label>
-    <select id="nutzenHeaderSetTable"></select>
-  </div>
-  <div class="field" style="min-width:160px">
-    <label for="nutzenCagrYearTable">CAGR Jahr</label>
-    <select id="nutzenCagrYearTable"></select>
-  </div>
-  <div class="field" style="min-width:160px">
-    <label for="nutzenVolYearTable">Vol Jahr</label>
-    <select id="nutzenVolYearTable"></select>
-  </div>
-</div>
+              <div class="field" style="min-width:220px">
+                <label for="nutzenHeaderSetTable">Header-Set</label>
+                <select id="nutzenHeaderSetTable"></select>
+              </div>
+
+              <div class="field" style="min-width:160px">
+                <label for="nutzenCagrYearTable">CAGR Jahr</label>
+                <select id="nutzenCagrYearTable"></select>
+              </div>
+
+              <div class="field" style="min-width:160px">
+                <label for="nutzenVolYearTable">Vol Jahr</label>
+                <select id="nutzenVolYearTable"></select>
+              </div>
+            </div>
 
             <div class="tableWrap" aria-label="Nutzen Tabelle">
               <table id="nutzenTable">
                 <thead>
                   <tr id="nutzenTableHeadRow">
-                    <!-- JS füllt THs passend zum Header-Set -->
                     <th>Header</th>
                     <th>Wert</th>
                     <th class="muted">Notizen</th>
                   </tr>
                 </thead>
-                <tbody id="nutzenTableBody">
-                </tbody>
+                <tbody id="nutzenTableBody"></tbody>
               </table>
             </div>
 
@@ -695,13 +728,16 @@ main.grid{
           </div>
         </div>
 
+        <!-- ===== ROLES ===== -->
         <div id="page-roles" class="page">
           <h2>
             <span>Rollen</span>
             <span class="chip"><span class="dot"></span> Base + Health</span>
           </h2>
+
           <div class="body">
             <div class="split">
+
               <div class="card" style="box-shadow:none">
                 <h2>Aktive Rollen</h2>
                 <div class="body">
@@ -716,57 +752,275 @@ main.grid{
                 <div class="body">
                   <div class="muted" style="font-size:12px;margin-bottom:6px">Base</div>
                   <div id="nutzenRoleWhyBase">–</div>
+
                   <div class="muted" style="font-size:12px;margin:12px 0 6px">Health</div>
                   <div id="nutzenRoleWhyHealth">–</div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
 
-<div id="page-stress" class="page">
+        <!-- ===== STRESS ===== -->
+        <div id="page-stress" class="page">
+          <div class="body">
+            <div class="split">
 
-  <div class="body">
-    <div class="split">
+              <!-- Card 1: aktueller Stress + Warum -->
+              <div class="card" style="box-shadow:none">
+                <h2>Aktueller Stress</h2>
+                <div class="body">
 
-      <!-- Card 1: aktueller Stress + Warum -->
-      <div class="card" style="box-shadow:none">
-        <h2>Aktueller Stress</h2>
-        <div class="body">
+                  <div class="row" style="gap:8px">
+                    <span class="chip">
+                      <span class="dot" id="stressPageDot"></span>
+                      <span id="stressPageLabel">Stress: –</span>
+                    </span>
+                  </div>
 
-          <div class="row" style="gap:8px">
-            <span class="chip">
-              <span class="dot" id="stressPageDot"></span>
-              <span id="stressPageLabel">Stress: –</span>
-            </span>
+                  <div class="muted" style="font-size:12px;margin:12px 0 6px">Warum diese Farbe?</div>
+                  <div id="stressWhyNow">–</div>
+
+                </div>
+              </div>
+
+              <!-- Card 2: Farben-Erklärung -->
+              <div class="card" style="box-shadow:none">
+                <h2>Farben Erklärung</h2>
+                <div class="body">
+                  <div id="stressLegendAll">–</div>
+                </div>
+              </div>
+
+            </div>
           </div>
-
-          <div class="muted" style="font-size:12px;margin:12px 0 6px">Warum diese Farbe?</div>
-          <div id="stressWhyNow">–</div>
-
         </div>
+
+
+
+                <!-- ===== FAIR VALUE PAGE ===== -->
+        <div id="page-fair" class="page">
+          <h2>
+            <span>Fair Preis</span>
+            <span class="chip"><span class="dot"></span> Intrinsisch (DCF) + Kurs-Vergleich</span>
+          </h2>
+
+          <div class="body">
+            <div class="split">
+
+              <!-- Links: Kurzfazit -->
+              <div class="card" style="box-shadow:none">
+                <h2>Ergebnis</h2>
+                <div class="body">
+                  <div id="fairSummary">–</div>
+                </div>
+              </div>
+
+              <!-- Rechts: DCF Breakdown -->
+              <div class="card" style="box-shadow:none">
+                <h2>Wie kommt der intrinsische Wert zustande?</h2>
+                <div class="body">
+                  <div id="fairExplain">–</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TOOLS PAGE ===== -->
+        <div id="page-tools" class="page">
+          <h2>
+            <span>Rechner</span>
+          </h2>
+
+          <div class="body">
+            <div class="split">
+
+              <!-- LEFT: Währungsrechner -->
+              <div class="card" style="box-shadow:none">
+                <h2>Währungsrechner</h2>
+                <div class="body">
+
+                  <div class="row">
+                    <div class="field" style="min-width:180px">
+                      <label for="fxMode">Richtung</label>
+                      <select id="fxMode">
+                        <option value="USD_EUR">USD → EUR</option>
+                        <option value="EUR_USD">EUR → USD</option>
+                      </select>
+                    </div>
+
+                    <div class="field" style="min-width:180px">
+                      <label for="fxRate">Wechselkurs</label>
+                      <input id="fxRate" type="text" placeholder="z.B. 0,92 oder 1,09" />
+                    </div>
+
+                    <div class="field" style="min-width:160px; max-width:220px">
+                      <label>&nbsp;</label>
+                      <button class="btn" id="btnFxRefresh" type="button" style="width:100%">Aktualisieren</button>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <div class="field">
+                      <label for="fxAmount" id="fxAmountLabel">Betrag (USD)</label>
+                      <input id="fxAmount" type="text" placeholder="z.B. 100" />
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <button class="btn primary" id="btnFxConvert">Umrechnen</button>
+                    <div class="chip" style="flex:1">
+                      <span class="dot"></span>
+                      <span id="fxOut">–</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- RIGHT: CAGR Rechner -->
+              <div class="card" style="box-shadow:none">
+                <h2>CAGR Rechner</h2>
+                <div class="body">
+
+                  <div class="row">
+                    <div class="field" style="min-width:220px">
+                      <label for="cagrMode">Modus</label>
+                      <select id="cagrMode">
+                        <option value="revenue" selected>CAGR Revenue</option>
+                        <option value="eps">CAGR EPS</option>
+                        <option value="dps">CAGR DPS</option>
+                      </select>
+                    </div>
+
+                    <div class="field" style="min-width:260px">
+                      <label for="cagrCalcMode">Berechnung</label>
+                      <select id="cagrCalcMode">
+                        <option value="rate" selected> Rate</option>
+                        <option value="end"> Ende </option>
+                        <option value="start"> Start </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <div class="field">
+                      <label for="cagrStart" id="cagrStartLabel">Startwert (Revenue)</label>
+                      <input id="cagrStart" type="text" placeholder="z.B. 100" />
+                    </div>
+
+                    <div class="field">
+                      <label for="cagrEnd" id="cagrEndLabel">Endwert (Revenue)</label>
+                      <input id="cagrEnd" type="text" placeholder="z.B. 180" />
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <div class="field">
+                      <label for="cagrYears">Jahre</label>
+                      <input id="cagrYears" type="number" min="0.1" step="0.1" placeholder="z.B. 4" />
+                    </div>
+
+                    <div class="field">
+                      <label for="cagrRate" id="cagrRateLabel">CAGR (%)</label>
+                      <input id="cagrRate" type="text" placeholder="z.B. 12,5%" />
+                    </div>
+
+                    <div class="field" style="min-width:180px">
+                      <label>&nbsp;</label>
+                      <button class="btn primary" id="btnCagrCalc" type="button" style="width:100%">Berechnen</button>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:10px">
+                    <div class="chip" style="flex:1">
+                      <span class="dot"></span>
+                      <span id="cagrOut">–</span>
+                    </div>
+                  </div>
+
+                  <div class="muted" id="cagrMeta" style="margin-top:10px;font-size:12px;line-height:1.4">–</div>
+
+                </div>
+              </div>
+
+              <!-- ✅ Vola Rechner (simpel) -->
+<div class="card" style="box-shadow:none; grid-column: 1 / -1; width:100%;">
+  <h2>Volatilität Rechner</h2>
+  <div class="body">
+
+    <div class="row">
+      <div class="field" style="min-width:180px">
+        <label for="volMode">Zeitraum</label>
+        <select id="volMode">
+          <option value="1">1Y</option>
+          <option value="5">5Y</option>
+          <option value="10">10Y</option>
+        </select>
       </div>
 
-      <!-- Card 2: Farben-Erklärung (immer alle Farben + Base/Health) -->
-      <div class="card" style="box-shadow:none">
-        <h2>Farben Erklärung</h2>
-        <div class="body">
-          <div id="stressLegendAll">–</div>
-        </div>
+      <div class="field" style="min-width:220px">
+        <label for="volFreq">Frequency</label>
+        <select id="volFreq">
+          <option value="daily" selected>Täglich (252)</option>
+          <option value="weekly">Wöchentlich (52)</option>
+          <option value="monthly">Monatlich (12)</option>
+        </select>
       </div>
 
+      <div class="field" style="min-width:260px">
+        <label for="volInputType">Art</label>
+        <select id="volInputType">
+          <option value="prices" selected>Kurs (nimmt Adj. Close, sonst Close)</option>
+          <option value="returns">Rendite (nimmt Change %, sonst berechnet aus Kurs)</option>
+        </select>
+      </div>
     </div>
+
+    <div class="row" style="margin-top:10px">
+      <div class="field">
+        <label for="volData">Daten (mit Header erlaubt)</label>
+        <textarea id="volData"
+          placeholder="Date  Open  High  Low  Close  Adj. Close  Change  Volume
+Feb 27, 2026  24.87  25.86  24.82  25.60  25.60  3.14%  6,075,302
+..."
+          style="width:100%;min-height:180px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.20);color:var(--text);outline:none;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="btnVolCalc" type="button">Vola berechnen</button>
+      <div class="chip" style="flex:1">
+        <span class="dot"></span>
+        <span id="volOut">Volatilität: –</span>
+      </div>
+    </div>
+
+    <div class="muted" id="volMeta" style="margin-top:10px;font-size:12px;line-height:1.4">–</div>
+
   </div>
 </div>
 
-      </section>
 
-      <!-- RIGHT: Side panel -->
+
+
+
+
+
+            </div> <!-- /.split -->
+          </div>   <!-- /.body -->
+        </div>     <!-- /#page-tools -->
+      </section>
+      <!-- ✅ RIGHT: Side panel (bleibt IMMER rechts, weil es als 2. Spalte von <main class="grid"> sitzt) -->
       <aside class="card">
         <h2>
-          <span>Inputs & Status</span>
+          <span>Inputs &amp; Status (geht nicht)</span>
           <span class="chip"><span class="dot"></span> IDs ready</span>
         </h2>
+
         <div class="body">
           <div class="row">
             <div class="field">
@@ -788,7 +1042,7 @@ main.grid{
           </div>
 
           <div style="margin-top:14px">
-            <button class="btn primary" style="width:100%" onclick="openNutzenOverlay()">Overlay öffnen</button>
+            <button class="btn primary" style="width:100%" type="button" onclick="openNutzenOverlay()">Overlay öffnen</button>
           </div>
 
           <div style="margin-top:12px">
@@ -805,125 +1059,173 @@ main.grid{
     </main>
   </div>
 
-<!-- ===== OVERLAY ===== -->
-<div id="nutzenOverlayBackdrop"
-     class="backdrop"
-     aria-hidden="true"
-     onclick="closeNutzenOverlay()"></div>
+  <!-- ===== OVERLAY ===== -->
+  <div id="nutzenOverlayBackdrop"
+       class="backdrop"
+       aria-hidden="true"
+       onclick="closeNutzenOverlay()"></div>
 
-<div id="nutzenOverlay" class="overlay" aria-hidden="true" role="dialog" aria-modal="true">
-  <div class="overlayTop">
-    <strong>Nutzen Overlay</strong>
-    <button class="btn" type="button" onclick="closeNutzenOverlay()">Schließen</button>
+  <div id="nutzenOverlay" class="overlay" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="overlayTop">
+      <strong>Nutzen Overlay</strong>
+      <button class="btn" type="button" onclick="closeNutzenOverlay()">Schließen</button>
+    </div>
+
+    <div class="overlayGrid overlayGridNew">
+      <!-- Preis-Ranges: volle Breite -->
+      <div class="card overlaySpan2" style="box-shadow:none">
+        <h2>Preis Ranges</h2>
+
+        <div class="body">
+          <div class="row" style="gap:10px;flex-wrap:wrap">
+            <div class="field" style="min-width:160px">
+              <label for="ovFair">Fair Value (Override)</label>
+              <input id="ovFair" placeholder="leer = aus Tabelle" />
+            </div>
+            <div class="field" style="min-width:120px">
+              <label for="ovStrongBuyMult">Strong Buy</label>
+              <input id="ovStrongBuyMult" placeholder="0,75" />
+            </div>
+            <div class="field" style="min-width:120px">
+              <label for="ovBuyMult">Buy</label>
+              <input id="ovBuyMult" placeholder="0,90" />
+            </div>
+            <div class="field" style="min-width:120px">
+              <label for="ovHoldMult">Hold</label>
+              <input id="ovHoldMult" placeholder="1,10" />
+            </div>
+            <div class="field" style="min-width:120px">
+              <label for="ovExpensiveMult">Expensive</label>
+              <input id="ovExpensiveMult" placeholder="1,25" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px; gap:12px; align-items:flex-end; flex-wrap:wrap">
+            <button class="btn" id="ovBuyReset" type="button">Reset</button>
+
+            <!-- ✅ DCF Einstellungen EXTRA im Overlay -->
+            <div class="card"
+                 style="box-shadow:none; padding:10px; border:1px solid var(--line); border-radius:16px; background:rgba(0,0,0,.10); flex:1; min-width:320px">
+              <div class="muted" style="font-size:12px; margin-bottom:6px">DCF Einstellungen</div>
+
+              <div class="row" style="gap:10px; flex-wrap:wrap">
+                <div class="field" style="min-width:160px">
+                  <label for="ovDcfPresetOv">Preset</label>
+                  <select id="ovDcfPresetOv">
+                    <option value="eu">EU</option>
+                    <option value="usa">USA</option>
+                    <option value="middleeast">Middle East</option>
+                    <option value="china">China</option>
+                    <option value="defensive">Defensiv</option>
+                    <option value="normal">Normal</option>
+                    <option value="aggressive">Aggressiv</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+
+                <div class="field" style="min-width:110px">
+                  <label for="ovRfOv">rf %</label>
+                  <input id="ovRfOv" type="text" placeholder="3,00" />
+                </div>
+
+                <div class="field" style="min-width:110px">
+                  <label for="ovErpOv">ERP %</label>
+                  <input id="ovErpOv" type="text" placeholder="5,00" />
+                </div>
+
+                <div class="field" style="min-width:110px">
+                  <label for="ovGtOv">gT %</label>
+                  <input id="ovGtOv" type="text" placeholder="2,50" />
+                </div>
+
+                <div class="field" style="min-width:90px">
+                  <label for="ovYearsOv">Years</label>
+                  <input id="ovYearsOv" type="number" min="1" max="30" step="1" placeholder="5" />
+                </div>
+
+                <div class="row" style="gap:10px; flex-wrap:wrap; margin-top:8px">
+  <div class="field" style="min-width:160px">
+    <label for="ovCapital">Kapital (€)</label>
+    <input id="ovCapital" type="text" placeholder="z.B. 10000" />
   </div>
 
-  <div class="overlayGrid overlayGridNew">
-    <!-- Preis-Ranges: volle Breite -->
-    <div class="card overlaySpan2" style="box-shadow:none">
-      <h2>Preis Ranges</h2>
-      <div class="body">
-        <div class="row" style="gap:10px;flex-wrap:wrap">
-          <div class="field" style="min-width:160px">
-            <label for="ovFair">Fair Value (Override)</label>
-            <input id="ovFair" placeholder="leer = aus Tabelle" />
-          </div>
-          <div class="field" style="min-width:120px">
-            <label for="ovStrongBuyMult">Strong Buy</label>
-            <input id="ovStrongBuyMult" placeholder="0,75" />
-          </div>
-          <div class="field" style="min-width:120px">
-            <label for="ovBuyMult">Buy</label>
-            <input id="ovBuyMult" placeholder="0,90" />
-          </div>
-          <div class="field" style="min-width:120px">
-            <label for="ovHoldMult">Hold</label>
-            <input id="ovHoldMult" placeholder="1,10" />
-          </div>
-          <div class="field" style="min-width:120px">
-            <label for="ovExpensiveMult">Expensive</label>
-            <input id="ovExpensiveMult" placeholder="1,25" />
-          </div>
-        </div>
-
-<div class="row" style="margin-top:10px; gap:12px; align-items:flex-end; flex-wrap:wrap">
-  <button class="btn" id="ovBuyReset" type="button">Reset</button>
-
-  <!-- ✅ DCF Einstellungen EXTRA im Overlay -->
-  <div class="card" style="box-shadow:none; padding:10px; border:1px solid var(--line); border-radius:16px; background:rgba(0,0,0,.10); flex:1; min-width:320px">
-    <div class="muted" style="font-size:12px; margin-bottom:6px">DCF Einstellungen</div>
-
-    <div class="row" style="gap:10px; flex-wrap:wrap">
-      <div class="field" style="min-width:160px">
-        <label for="ovDcfPresetOv">Preset</label>
-        <select id="ovDcfPresetOv">
-          <option value="eu">EU</option>
-          <option value="usa">USA</option>
-          <option value="middleeast">Middle East</option>
-          <option value="china">China</option>
-          <option value="defensive">Defensiv</option>
-          <option value="normal">Normal</option>
-          <option value="aggressive">Aggressiv</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
-
-      <div class="field" style="min-width:110px">
-        <label for="ovRfOv">rf %</label>
-        <input id="ovRfOv" type="text" placeholder="3,00" />
-      </div>
-
-      <div class="field" style="min-width:110px">
-        <label for="ovErpOv">ERP %</label>
-        <input id="ovErpOv" type="text" placeholder="5,00" />
-      </div>
-
-      <div class="field" style="min-width:110px">
-        <label for="ovGtOv">gT %</label>
-        <input id="ovGtOv" type="text" placeholder="2,50" />
-      </div>
-
-      <div class="field" style="min-width:90px">
-        <label for="ovYearsOv">Years</label>
-        <input id="ovYearsOv" type="number" min="1" max="30" step="1" placeholder="5" />
-      </div>
+  <div class="field" style="min-width:190px">
+    <label for="ovDivYield">Dividendenrendite (%)</label>
+    <input id="ovDivYield" type="text" placeholder="auto / Tabelle / manuell" />
+    <div class="row" style="gap:8px; margin-top:6px; align-items:center; flex-wrap:wrap">
+      <button class="btn" id="ovDivYieldClear" type="button">Reset</button>
     </div>
   </div>
-</div>
 
-        <div style="margin-top:10px" id="nutzenOverlayBuyExplain">–</div>
-        <div style="margin-top:8px" id="nutzenOverlayBuyDecision" class="chip">
-          <span class="dot"></span> Aktion: –
-        </div>
-      </div>
-    </div>
-
-    <!-- Stress -->
-    <div class="card" style="box-shadow:none">
-      <h2>Stress Flag</h2>
-      <div class="body">
-        <div id="nutzenOverlayStressExplain">–</div>
-      </div>
-    </div>
-
-    <!-- Rollen -->
-    <div class="card" style="box-shadow:none">
-      <h2>Rollen</h2>
-      <div class="body">
-        <div id="nutzenOverlayRolesExplain">–</div>
-      </div>
-    </div>
+  <div class="field" style="min-width:220px">
+    <label for="ovDivAnnual">Jährliche Dividende (auto)</label>
+    <input id="ovDivAnnual" type="text" placeholder="–" disabled />
   </div>
 </div>
 
+
+              </div>
+            </div>
+          </div>
+
+        <div style="margin-top:10px" class="miniGrid" id="ovBuyBandsBoxes">
+  <div class="miniCard">
+    <div class="miniLabel">Fair</div>
+    <div class="miniValue" id="ovBoxFair">–</div>
+  </div>
+  <div class="miniCard">
+    <div class="miniLabel">Strong Buy ≤</div>
+    <div class="miniValue" id="ovBoxStrong">–</div>
+  </div>
+  <div class="miniCard">
+    <div class="miniLabel">Buy ≤</div>
+    <div class="miniValue" id="ovBoxBuy">–</div>
+  </div>
+  <div class="miniCard">
+    <div class="miniLabel">Hold ≤</div>
+    <div class="miniValue" id="ovBoxHold">–</div>
+  </div>
+  <div class="miniCard">
+    <div class="miniLabel">Expensive &gt;</div>
+    <div class="miniValue" id="ovBoxExp">–</div>
+  </div>
+</div>
+          <div style="margin-top:8px" id="nutzenOverlayBuyDecision" class="chip">
+            <span class="dot"></span> Aktion: –
+          </div>
+        </div>
+      </div>
+
+      <!-- Stress -->
+      <div class="card" style="box-shadow:none">
+        <h2>Stress Flag</h2>
+        <div class="body">
+          <div id="nutzenOverlayStressExplain">–</div>
+        </div>
+      </div>
+
+      <!-- Rollen -->
+      <div class="card" style="box-shadow:none">
+        <h2>Rollen</h2>
+        <div class="body">
+          <div id="nutzenOverlayRolesExplain">–</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
 
 
   <script>
     console.log("SCRIPT START");
-    window.NUTZEN_STATE = window.NUTZEN_STATE || {
-  sector: "standard",
-  buyBands: { strongBuy:0.75, buy:0.90, hold:1.10, expensive:1.25 }
-};
+window.NUTZEN_DEFAULT_BANDS = { strongBuy:0.75, buy:0.90, hold:1.10, expensive:1.25 };
 
+window.NUTZEN_STATE = window.NUTZEN_STATE || {
+  sector: "standard",
+  buyBands: { ...window.NUTZEN_DEFAULT_BANDS }
+};
 
 
 
@@ -944,8 +1246,13 @@ window.goPage = function goPage(page){
       if(bd) bd.classList.add("isOpen");
       if(ov) ov.setAttribute("aria-hidden", "false");
       if(bd) bd.setAttribute("aria-hidden", "false");
-        wireDcfInputsOverlay();
-  syncDcfMainToOverlay();
+
+      wireOverlayBuyInputs(); 
+      wireDcfInputsOverlay();
+      wireOverlayDividendControls();
+      wireCapitalAutoFormat(); 
+      syncDcfMainToOverlay();
+      runAllCalcs();
     }
     function closeNutzenOverlay(){
       const ov = document.getElementById("nutzenOverlay");
@@ -1010,6 +1317,8 @@ const NUTZEN_ROLES = [
   "Mega Cap",
 ];
 
+
+
 // 2) Sektoren
 const NUTZEN_SECTORS = [
   { key:"standard", label:"Standard" },
@@ -1026,608 +1335,307 @@ const NUTZEN_SECTORS = [
 
 
 // Vollständige CRITERIA-Registry für ALLE Header aus deinen Sektoren.
-// -> stabile IDs + label + aliases (für Paste / unterschiedliche Schreibweisen)
+// =======================================================
+// CRITERIA (neu) – NUR für Standard + Utilities/Versorger
+// Ziel: Alle Header aus STANDARD_HEADERS + UTILITIES_HEADERS_FINAL
+// werden über aliases sauber auf IDs gemappt (keine ⚠️ mehr).
+// =======================================================
 
 const CRITERIA = {
   // =====================
-  // Kurs / Risiko
+  // PRICE / RISK / HISTORY
   // =====================
-PRICE_NOW: {
-  label: "Kurs aktuell",
-  aliases: [
-    "Kurs aktuell", "Price", "Current Price", "Aktueller Kurs",
-    "open Kurs aktuell", "Open Kurs aktuell", "open price", "Open Price"
-  ]
+  PRICE_NOW: {
+    label: "Kurs aktuell",
+    aliases: ["Kurs aktuell","Price","Current Price","Aktueller Kurs","Open Price","open price","Open Kurs aktuell","open Kurs aktuell"]
   },
-  CAGR_4Y: {
-    label: "Kurs 4Y (CAGR)",
-    aliases: ["Kurs 4Y (CAGR)", "4Y CAGR", "Price 4Y CAGR", "CAGR 4Y"]
+  RANGE_52W: {
+    label: "52-Week Range",
+    aliases: ["52-Week Range","52 Week Range","52 Week Range ","52 week range","52 week Range","52- week range"]
   },
+  BETA: { label: "Beta", aliases: ["Beta"] },
+
   VOL_1_5_10: {
     label: "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
     aliases: [
       "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
+      "Volatilität annualisiert (Std-Abw.) 1Y",
+      "Volatilität annualisiert (Std-Abw.) 5Y",
+      "Volatilität annualisiert (Std-Abw.) 10Y",
+      "Volatilität annualisiert",
+      "Volatilität",
+      "Votalität",
+      "Volatiliät",
+      "Volatility",
       "Volatility annualized 1Y/5Y/10Y",
-      "Volatility 1Y/5Y/10Y",
-      "Volatilität 1Y/5Y/10Y"
+      "Volatility 1Y/5Y/10Y"
     ]
   },
-  BETA: {
-    label: "Beta",
-    aliases: ["Beta"]
-  },
-  RANGE_52W: {
-    label: "52-Week Range",
-    aliases: ["52-Week Range", "52 Week Range", "52W Range"]
-  },
-  PRICE_CHANGE_52W: {
-    label: "52-Week Price Change",
-    aliases: ["52-Week Price Change", "52 Week Price Change", "52W Price Change"]
+  CAGR_4Y: {
+    label: "Kurs 4Y (CAGR)",
+    aliases: ["Kurs 4Y (CAGR)","Kurs 4 Y (CAGR)","4Y CAGR","Price 4Y CAGR","CAGR 4Y"]
   },
 
   // =====================
-  // Größe / Bewertung / Multiples
+  // SIZE / VALUATION / MULTIPLES
   // =====================
   MARKET_CAP: {
     label: "Marktkapitalisierung",
-    aliases: ["Marktkapitalisierung", "Market Cap", "Market Capitalization"]
-  },
-  ENTERPRISE_VALUE: {
-    label: "Enterprise Value",
-    aliases: ["Enterprise Value", "EV"]
+    aliases: [
+      "Marktkapitalisierung","Market Cap","Market Capitalization",
+      "Markkapitaliserung","Marktkapitaliserung","Markkapitaliserung"
+    ]
   },
   FAIR_VALUE: {
     label: "Fairer Preis",
-    aliases: ["Fairer Preis", "Fair Value", "Fair price", "Fair Value Estimate"]
+    aliases: ["Fairer Preis","Fair Value","Fair price","Fair Value Estimate","Farier Preis","Faier Preis"]
   },
+
   PE_1Y: {
     label: "KGV (PE Ratio) 1Y",
-    aliases: ["KGV (PE Ratio) 1Y", "PE Ratio 1Y", "P/E 1Y", "P/E Ratio 1Y"]
+    aliases: [
+      "KGV (PE Ratio) 1Y","PE Ratio 1Y","P/E 1Y","P/E Ratio 1Y",
+      "PE Ratio 1Y (KGV)","PE RATIO 1Y (KGV)","KGV 1Y","KGV"
+    ]
   },
-  PB: {
-    label: "P/B",
-    aliases: ["P/B", "P/B Ratio", "Price to Book", "Price/Book"]
+  PB_RATIO_1Y: {
+    label: "PB Ratio 1Y",
+    aliases: ["PB Ratio 1Y","PB Ratio","P/B Ratio 1Y","P/B Ratio","P/B","pb ratio 1y"]
   },
-  PB_RATIO: {
-    label: "P/B Ratio",
-    aliases: ["P/B Ratio", "P/B", "Price to Book", "Price/Book"]
-  },
-  PTBV: {
-    label: "P/TBV",
-    aliases: ["P/TBV", "Price to Tangible Book", "Price/Tangible Book"]
-  },
-  PTBV_RATIO: {
-    label: "P/TBV Ratio",
-    aliases: ["P/TBV Ratio", "P/TBV", "Price to Tangible Book", "Price/Tangible Book"]
-  },
-  EV_EBITDA_1Y: {
-    label: "EV/EBITDA Ratio 1Y",
-    aliases: ["EV/EBITDA Ratio 1Y", "EV/EBITDA 1Y", "EV/EBITDA Ratio (1Y)"]
-  },
-  EV_EBITDA: {
-    label: "EV/EBITDA Ratio",
-    aliases: ["EV/EBITDA Ratio", "EV/EBITDA", "EV/ EBITDA Ratio", "EV/ EBITDA Ratio 1Y"]
-  },
-  EV_EBITDA_RATIO: {
-    label: "EV/EBITDA Ratio",
-    aliases: ["EV/EBITDA Ratio", "EV/EBITDA", "EV/ EBITDA Ratio"]
+  PTBV_RATIO_1Y: {
+    label: "P/TBV Ratio 1Y",
+    aliases: ["P/TBV Ratio 1Y","P/TBV Ratio","P/TBV","Price/Tangible Book"]
   },
   P_FCF_1Y: {
     label: "P/FCF Ratio 1Y",
-    aliases: ["P/FCF Ratio 1Y", "P/FCF 1Y", "Price/FCF 1Y", "P/FCF Ratio"]
+    aliases: [
+      "P/FCF Ratio 1Y","P/FCF 1Y","Price/FCF 1Y","P/FCF Ratio",
+      "P/ FCF Ratio  1Y","P/ FCF Ratio 1Y","p/ fcf ratio 1y"
+    ]
   },
-  P_FCF: {
-    label: "P/FCF Ratio",
-    aliases: ["P/FCF Ratio", "P/FCF", "Price/FCF"]
+  P_OCF_1Y: {
+    label: "P/OCF Ratio 1Y",
+    aliases: ["P/OCF Ratio 1Y","P/OCF Ratio","P/ OCF Ratio","P/ OCF Ratio 1Y","P/OCF"]
   },
-  EV_FCF: {
-    label: "EV/FCF Ratio",
-    aliases: ["EV/FCF Ratio", "EV/FCF", "EV/FCF Ratio 1Y"]
+  EV_SALES_1Y: {
+    label: "EV/Sales Ratio 1Y",
+    aliases: ["EV/Sales Ratio 1Y","EV/Sales 1Y","EV/ Sales Ratio 1Y","EV/Sales","EV/Revenue","EV/ Sales"]
   },
-  EV_FCF_RATIO: {
-    label: "EV/FCF Ratio",
-    aliases: ["EV/FCF Ratio", "EV/FCF", "EV/FCF Ratio 1Y"]
+  EV_EBITDA_1Y: {
+    label: "EV/EBITDA Ratio 1Y",
+    aliases: ["EV/EBITDA Ratio 1Y","EV/EBITDA 1Y","EV/ EBITDA Ratio 1Y","EV/ EBITDA Ratio","EV/EBITDA Ratio"]
   },
 
   // =====================
-  // Wachstum / Umsatz / EPS
+  // GROWTH / REVENUE / EPS / INCOME
   // =====================
-  REV_CAGR_4Y: {
-    label: "Revenue 4Y (CAGR)",
-    aliases: ["Revenue 4Y (CAGR)", "Revenue CAGR 4Y", "Umsatz 4Y (CAGR)"]
-  },
   REV_GROWTH_YOY_1Y: {
     label: "Revenue Growth 1Y (YoY)",
-    aliases: ["Revenue Growth 1Y (YoY)", "Revenue Growth (YoY)", "Umsatzwachstum (YoY)"]
+    aliases: ["Revenue Growth 1Y (YoY)","Revenue Growth (YoY)","Revenue Growth YoY","Umsatzwachstum (YoY)"]
   },
-  REV_GROWTH_YOY: {
-    label: "Revenue Growth (YoY)",
-    aliases: ["Revenue Growth (YoY)", "Revenue Growth YoY", "Revenue Growth 1Y (YoY)"]
+  REV_CAGR_4Y: {
+    label: "Revenue 4Y (CAGR)",
+    aliases: ["Revenue 4Y (CAGR)","Revenue CAGR 4Y","Umsatz 4Y (CAGR)"]
   },
-  REVENUE_FY: {
-    label: "Revenue (FY)",
-    aliases: ["Revenue (FY)", "Revenue FY", "Umsatz (FY)"]
-  },
-  REVENUE_TTM: {
-    label: "Revenue (TTM)",
-    aliases: ["Revenue (TTM)", "Revenue TTM", "Umsatz (TTM)"]
-  },
-  TOTAL_REVENUE: {
-    label: "Total Revenue",
-    aliases: ["Total Revenue", "Gesamtumsatz"]
+  REVENUE_1Y: {
+    label: "Revenue 1Y",
+    aliases: ["Revenue 1Y","Revenue (FY)","Revenue FY","Revenue (TTM)","Revenue TTM","Revenue"]
   },
 
-  EPS_GROWTH_CAGR_4Y: {
-    label: "EPS Growth 4Y (CAGR)",
-    aliases: ["EPS Growth 4Y (CAGR)", "EPS CAGR 4Y", "EPS Growth CAGR 4Y"]
-  },
   EPS_DILUTED: {
     label: "EPS (Diluted)",
-    aliases: ["EPS (Diluted)", "Diluted EPS", "EPS Diluted"]
+    aliases: ["EPS (Diluted)","Diluted EPS","EPS Diluted"]
   },
-  EPS_GROWTH: {
-    label: "EPS Growth",
-    aliases: ["EPS Growth", "EPS Growth (YoY)", "EPS Wachstum"]
+  EPS_DILUTED_1Y: {
+    label: "EPS (diluted) 1Y",
+    aliases: ["EPS (diluted) 1Y","EPS (diluted)","EPS diluted 1Y","eps diluted 1y","Earnings Per Share (EPS)"]
   },
-  EPS_TTM: {
-    label: "EPS (TTM)",
-    aliases: ["EPS (TTM)", "EPS TTM"]
+  EPS_GROWTH_CAGR_4Y: {
+    label: "EPS Growth 4Y (CAGR)",
+    aliases: ["EPS Growth 4Y (CAGR)","EPS CAGR 4Y","EPS Growth CAGR 4Y","EPS (CAGR) 4Y"]
   },
-  EPS: {
-    label: "EPS",
-    aliases: ["EPS", "Earnings Per Share (EPS)", "Earnings Per Share"]
-  },
-  EPS_1Y: {
-    label: "Earnings Per Share (EPS)",
-    aliases: ["Earnings Per Share (EPS)", "EPS", "Earnings Per Share"]
+
+  NET_INCOME_1Y: {
+    label: "Net Income 1Y",
+    aliases: ["Net Income 1Y","Net Income (1Y)","Net Income","Net Income FY","Net Income TTM"]
   },
 
   // =====================
-  // Margen / Profitabilität / Returns
-  // =====================
-  OP_MARGIN_1Y: {
-    label: "Operating Margin 1Y",
-    aliases: ["Operating Margin 1Y", "Operating Margin (1Y)"]
-  },
-  OP_MARGIN: {
-    label: "Operating Margin",
-    aliases: ["Operating Margin", "Operating Margin 1Y"]
-  },
-  PROFIT_MARGIN_1Y: {
-    label: "Profit Margin 1Y",
-    aliases: ["Profit Margin 1Y", "Profit Margin (1Y)"]
-  },
-
-        // =====================
-  // Margen / Profitabilität / Returns
+  // MARGINS / RETURNS
   // =====================
   GROSS_MARGIN_1Y: {
     label: "Gross Margin 1Y",
-    aliases: [
-      "Gross Margin 1Y",
-      "Gross Margin (1Y)",
-      "Gross Margin",
-      "Bruttomarge 1Y",
-      "Bruttomarge",
-      "Gross Profit Margin 1Y",
-      "Gross Profit Margin"
-    ]
+    aliases: ["Gross Margin 1Y","Gross Margin","Gross Margin (1Y)","Bruttomarge 1Y","Bruttomarge"]
+  },
+  OPERATING_MARGIN_1Y: {
+    label: "Operating Margin 1Y",
+    aliases: ["Operating Margin 1Y","Operating Margin","Operating Margin (1Y)"]
+  },
+  PROFIT_MARGIN_1Y: {
+    label: "Profit Margin 1Y",
+    aliases: ["Profit Margin 1Y","Profit Margin","Profit Margin (1Y)"]
   },
 
-  PROFIT_MARGIN: {
-    label: "Profit Margin",
-    aliases: ["Profit Margin", "Profit Margin 1Y"]
+  ROE_1Y: {
+    label: "ROE 1Y",
+    aliases: ["ROE 1Y","ROE","Return on Equity (ROE)"]
   },
   ROIC_1Y: {
     label: "ROIC 1Y",
-    aliases: ["ROIC 1Y", "ROIC", "Return on Invested Capital (ROIC)"]
+    aliases: ["ROIC 1Y","ROIC","Return on Invested Capital (ROIC)"]
   },
-  ROE_1Y: {
-    label: "ROE 1Y",
-    aliases: ["ROE 1Y", "ROE", "Return on Equity (ROE)"]
+  ROCE_1Y: {
+    label: "ROCE 1Y",
+    aliases: ["ROCE 1Y","ROCE","Return on Capital Employed (ROCE)"]
   },
-  ROA_1Y: {
-    label: "ROA 1Y",
-    aliases: ["ROA 1Y", "ROA", "Return on Assets (ROA)"]
-  },
-  NET_INCOME_1Y: {
-    label: "Net Income 1Y",
-    aliases: ["Net Income 1Y", "Net Income (1Y)"]
-  },
-  NET_INCOME: {
-    label: "Net Income",
-    aliases: ["Net Income", "Net Income 1Y"]
-  },
-  NET_INCOME_TTM: {
-    label: "Net Income (TTM)",
-    aliases: ["Net Income (TTM)", "Net Income TTM"]
-  },
-  NET_INCOME_GROWTH: {
-    label: "Net Income Growth",
-    aliases: ["Net Income Growth", "Net Income Growth (YoY)"]
-  },
+
+  // =====================
+  // SHARES
+  // =====================
   SHARES_OUT_DILUTED_1Y: {
-  label: "Shares Outstanding (diluted) 1Y",
-  aliases: [
-    "Shares Outstanding (diluted) 1Y",
-    "Shares Outstanding (Diluted) 1Y",
-    "Shares Outstanding Diluted 1Y",
-    "Shares Outstanding (diluted)",
-    "Diluted Shares Outstanding",
-    "Weighted Avg Shares Diluted",
-    "Weighted Average Shares Diluted"
-  ]
-},
-CASH_STI_1Y: {
-  label: "Cash & Short-Term Investments 1Y",
-  aliases: [
-    "Cash & Short-Term Investments 1Y",
-    "Cash & Short-Term Investments",
-    "Cash and Short-Term Investments 1Y",
-    "Cash and Short-Term Investments",
-    "Cash & Short Term Investments 1Y",
-    "Cash & Short Term Investments"
-  ]
-},
-TOTAL_DEBT_1Y: {
-  label: "Total Debt 1Y",
-  aliases: [
-    "Total Debt 1Y",
-    "Total Debt (1Y)",
-    "Total Debt",
-    "Gesamtschulden 1Y",
-    "Total Dept 1Y" // falls Excel-Tippfehler
-  ]
-},
-
-
-  // =====================
-  // Cashflow / FCF / Capex
-  // =====================
-  OCF_1Y: {
-    label: "Operating Cash Flow 1Y",
-    aliases: ["Operating Cash Flow 1Y", "Operating Cash Flow (1Y)"]
-  },
-  OCF: {
-    label: "Operating Cash Flow",
-    aliases: ["Operating Cash Flow", "Operating Cash Flow 1Y"]
-  },
-  CAPEX_1Y: {
-    label: "Capital Expenditures 1Y",
-    aliases: ["Capital Expenditures 1Y", "CapEx 1Y", "Capital Expenditures (1Y)"]
-  },
-  CAPEX: {
-    label: "Capital Expenditures",
-    aliases: ["Capital Expenditures", "CapEx"]
-  },
-  FCF_1Y: {
-    label: "FCF 1Y",
-    aliases: ["FCF 1Y", "Free Cash Flow 1Y", "Free Cash Flow (1Y)"]
-  },
-  FREE_CASH_FLOW: {
-    label: "Free Cash Flow",
-    aliases: ["Free Cash Flow", "FCF", "Free Cash Flow 1Y"]
-  },
-  FCF_MARGIN_1Y: {
-    label: "FCF-Marge 1Y",
-    aliases: ["FCF-Marge 1Y", "FCF Margin 1Y", "FCF Margin"]
-  },
-  FCF_MARGIN: {
-    label: "FCF Margin",
-    aliases: ["FCF Margin", "FCF-Marge 1Y", "FCF Margin 1Y"]
-  },
-  FCF_POSITIVE_YN: {
-    label: "FCF positiv (Ja/Nein)",
-    aliases: ["FCF positiv (Ja/Nein)", "FCF Positive (Yes/No)", "FCF positive"]
-  },
-  FCF_PER_SHARE: {
-    label: "FCF Per Share",
-    aliases: ["FCF Per Share", "Free Cash Flow Per Share", "FCF/Share"]
-  },
-  FCF_YIELD_1Y: {
-    label: "FCF Yield 1Y",
-    aliases: ["FCF Yield 1Y", "FCF Yield", "Free Cash Flow Yield 1Y"]
-  },
-
-  // =====================
-  // Verschuldung / Liquidität / Zinsdeckung
-  // =====================
-  NET_DEBT_EBITDA_1Y: {
-    label: "Net Debt / EBITDA Ratio 1Y",
-    aliases: ["Net Debt / EBITDA Ratio 1Y", "Net Debt / EBITDA", "Net Debt/EBITDA 1Y"]
-  },
-  NET_DEBT_EBITDA: {
-    label: "Net Debt / EBITDA",
-    aliases: ["Net Debt / EBITDA", "Net Debt/EBITDA", "Net Debt / EBITDA 1Y"]
-  },
-  INTEREST_COVERAGE_1Y: {
-    label: "Zinsdeckung 1Y (Interest Coverage)",
-    aliases: ["Zinsdeckung 1Y (Interest Coverage)", "Interest Coverage 1Y", "Interest Coverage"]
-  },
-  INTEREST_COVERAGE: {
-    label: "Interest Coverage",
-    aliases: ["Interest Coverage", "Zinsdeckung 1Y (Interest Coverage)"]
-  },
-  CURRENT_RATIO_1Y: {
-    label: "Current Ratio 1Y",
-    aliases: ["Current Ratio 1Y", "Current Ratio (1Y)", "Current Ratio"]
-  },
-  CURRENT_RATIO: {
-    label: "Current Ratio",
-    aliases: ["Current Ratio", "Current Ratio 1Y"]
-  },
-  QUICK_RATIO_1Y: {
-    label: "Quick Ratio 1Y",
-    aliases: ["Quick Ratio 1Y", "Quick Ratio (1Y)", "Quick Ratio"]
-  },
-  QUICK_RATIO: {
-    label: "Quick Ratio",
-    aliases: ["Quick Ratio", "Quick Ratio 1Y"]
-  },
-
-  TOTAL_DEBT: {
-    label: "Total Debt",
-    aliases: ["Total Debt", "Gesamtschulden"]
-  },
-  NET_DEBT: {
-    label: "Net Debt",
-    aliases: ["Net Debt", "Nettoverschuldung"]
-  },
-  DEBT_EQUITY_RATIO: {
-    label: "Debt / Equity Ratio",
-    aliases: ["Debt / Equity Ratio", "Debt/Equity Ratio", "D/E Ratio"]
-  },
-  NET_DEBT_EQUITY_RATIO: {
-    label: "Net Debt / Equity Ratio",
-    aliases: ["Net Debt / Equity Ratio", "Net Debt/Equity Ratio"]
-  },
-  DEBT_FCF_RATIO: {
-    label: "Debt / FCF Ratio",
-    aliases: ["Debt / FCF Ratio", "Debt/FCF Ratio"]
-  },
-  DEBT_EBITDA_RATIO: {
-    label: "Debt / EBITDA Ratio",
-    aliases: ["Debt / EBITDA Ratio", "Debt/EBITDA Ratio"]
-  },
-  DEBT_EQUITY: {
-    label: "Debt / Equity",
-    aliases: ["Debt / Equity", "Debt/Equity"]
-  },
-
-  // =====================
-  // Dividende / Shareholder Return
-  // =====================
-  DIV_PER_YEAR: {
-    label: "Dividende (p.a.)",
-    aliases: ["Dividende (p.a.)", "Dividend (annual)", "Dividend per year"]
-  },
-  DIV_FREQUENCY: {
-    label: "Div.-Frequency",
-    aliases: ["Div.-Frequency", "Dividend Frequency", "Frequency"]
-  },
-  DIV_YIELD: {
-    label: "Div.-Rendite aktuell (%)",
-    aliases: ["Div.-Rendite aktuell (%)", "Dividend Yield", "Dividend Yield (%)"]
-  },
-
-
-    // =====================
-  // Dividende / Shareholder Return
-  // =====================
-  DIVIDEND_DPS_CAGR_4Y: {
-    label: "Dividende (DPS) 4Y (CAGR)",
+    label: "Shares Outstanding (diluted) 1Y",
     aliases: [
-      "Dividende (DPS) 4Y (CAGR)",
-      "Dividende (DPS) 4Y (CAGR)",          // bewusst doppelt ok (copy/paste safe)
-      "DPS (CAGR) 4Y",
-      "DPS CAGR 4Y",
-      "Dividend Per Share (CAGR) 4Y",
-      "Dividend Per Share CAGR 4Y",
-      "DPS Dividend Per Share (CAGR) 4Y",
-      "Dividende pro Aktie (CAGR) 4Y"
+      "Shares Outstanding (diluted) 1Y",
+      "Shares Outstanding (Diluted) 1Y",
+      "Shares Outstanding Diluted 1Y",
+      "Diluted Shares Outstanding",
+      "Weighted Avg Shares Diluted",
+      "Weighted Average Shares Diluted",
+      "Share outstanding 1Y (diluted)",
+      "share outstanding 1y diluted"
     ]
-  },
-
-
-  DIV_GROWTH_YEARS: {
-    label: "Dividend Growth years",
-    aliases: ["Dividend Growth years", "Dividend Growth Years"]
-  },
-  DIV_GROWTH: {
-    label: "Dividend Growth",
-    aliases: ["Dividend Growth", "Dividend Growth (YoY)"]
-  },
-  DIV_GROWTH_YOY: {
-    label: "Dividend Growth (YoY)",
-    aliases: ["Dividend Growth (YoY)", "Dividend Growth", "Dividend Growth YoY"]
-  },
-  PAYOUT_RATIO_1Y: {
-    label: "Payout Ratio 1Y",
-    aliases: ["Payout Ratio 1Y", "Payout Ratio", "Dividend Payout Ratio 1Y"]
-  },
-  BUYBACK_YIELD: {
-    label: "Buyback Yield",
-    aliases: ["Buyback Yield"]
-  },
-  SHAREHOLDER_YIELD: {
-    label: "Shareholder Yield",
-    aliases: ["Shareholder Yield"]
   },
   SHARES_CHANGE_YOY: {
     label: "Shares Change (YoY)",
-    aliases: ["Shares Change (YoY)", "Shares Change YoY", "Shares Outstanding Change (YoY)"]
+    aliases: ["Shares Change (YoY)","Shares Change YoY","Shares Outstanding Change (YoY)"]
   },
 
   // =====================
-  // Banken-spezifisch
+  // CASHFLOW / FCF / CAPEX
   // =====================
-  NET_INTEREST_INCOME_1Y: {
-    label: "Net Interest Income 1Y",
-    aliases: ["Net Interest Income 1Y", "Net Interest Income"]
+  OCF_1Y: {
+    label: "Operating Cash Flow 1Y",
+    aliases: ["Operating Cash Flow 1Y","Operating Cash Flow","Operating Cash Flow (1Y)","Operating Cash Flow"]
   },
-  NET_INTEREST_INCOME_GROWTH_YOY: {
-    label: "Net Interest Income Growth (YoY)",
-    aliases: ["Net Interest Income Growth (YoY)", "NII Growth (YoY)"]
-  },
-  TOTAL_NON_INTEREST_INCOME: {
-    label: "Total Non-Interest Income",
-    aliases: ["Total Non-Interest Income", "Non-Interest Income"]
-  },
-  NON_INTEREST_INCOME_GROWTH_YOY: {
-    label: "Non-Interest Income Growth (YoY)",
-    aliases: ["Non-Interest Income Growth (YoY)"]
-  },
-  PROVISION_LOAN_LOSSES: {
-    label: "Provision for Loan Losses",
-    aliases: ["Provision for Loan Losses", "Loan Loss Provision"]
-  },
-
-  // =====================
-  // Versicherer-spezifisch
-  // =====================
-  PREMIUMS_ANNUITY_REVENUE: {
-    label: "Premiums & Annuity Revenue",
-    aliases: ["Premiums & Annuity Revenue", "Premiums and Annuity Revenue"]
-  },
-  TOTAL_INTEREST_DIV_INCOME: {
-    label: "Total Interest & Dividend Income",
-    aliases: ["Total Interest & Dividend Income", "Interest & Dividend Income"]
-  },
-  POLICY_BENEFITS: {
-    label: "Policy Benefits",
-    aliases: ["Policy Benefits"]
-  },
-  SG_A: {
-    label: "Selling, General & Administrative",
-    aliases: ["Selling, General & Administrative", "SG&A", "SGA"]
-  },
-  OPERATING_INCOME: {
-    label: "Operating Income",
-    aliases: ["Operating Income"]
-  },
-
-  // =====================
-  // REIT-spezifisch
-  // =====================
-  FFO: {
-    label: "Funds From Operations (FFO)",
-    aliases: ["Funds From Operations (FFO)", "FFO"]
-  },
-  AFFO: {
-    label: "Adjusted Funds From Operations (AFFO)",
-    aliases: ["Adjusted Funds From Operations (AFFO)", "AFFO"]
-  },
-  FFO_PAYOUT_RATIO: {
-    label: "FFO Payout Ratio",
-    aliases: ["FFO Payout Ratio"]
-  },
-
-  // =====================
-  // Utilities / allgemein: EBITDA etc.
-  // =====================
-  EBITDA_1Y: {
-    label: "EBITDA 1Y",
-    aliases: ["EBITDA 1Y", "EBITDA (1Y)"]
-  },
-  EBITDA: {
-    label: "EBITDA",
-    aliases: ["EBITDA"]
-  },
-  EBITDA_MARGIN: {
-    label: "EBITDA Margin",
-    aliases: ["EBITDA Margin"]
-  },
-
-  // =====================
-  // Commodities / zusätzliche Cash-KPIs
-  // =====================
-  GROSS_PROFIT: {
-    label: "Gross Profit",
-    aliases: ["Gross Profit"]
-  },
-  OPERATING_INCOME_IS: {
-    label: "Operating Income",
-    aliases: ["Operating Income"]
-  },
-  NET_CASH: {
-    label: "Net Cash",
-    aliases: ["Net Cash"]
-  },
-  NET_CASH_PER_SHARE: {
-    label: "Net Cash Per Share",
-    aliases: ["Net Cash Per Share"]
-  },
-
-  // =====================
-  // Bilanz-Positionen (Banks/Insurance/REITs/…)
-  // =====================
-  TOTAL_ASSETS_1Y: {
-    label: "Total Assets 1Y",
-    aliases: ["Total Assets 1Y", "Total Assets"]
-  },
-  TOTAL_LIABILITIES_1Y: {
-    label: "Total Liabilities 1Y",
-    aliases: ["Total Liabilities 1Y", "Total Liabilities"]
-  },
-  EQUITY_1Y: {
-    label: "Equity 1Y",
-    aliases: ["Equity 1Y", "Equity"]
-  },
-  EQUITY_BOOK_VALUE: {
-    label: "Equity (Book Value)",
-    aliases: ["Equity (Book Value)", "Equity", "Book Value"]
-  },
-  BOOK_VALUE_PER_SHARE: {
-    label: "Book Value per Share",
-    aliases: ["Book Value per Share", "Book Value Per Share"]
-  },
-  CASH_EQUIV: {
-    label: "Cash & Cash Equivalents",
-    aliases: ["Cash & Cash Equivalents", "Cash and Cash Equivalents"],
-
-
-    // neu
-
-
-    // === CORE IDs (werden von Roles/Stress/DCF genutzt) ===
-PRICE_NOW: { label:"Kurs aktuell", aliases:["Kurs aktuell","Price","Current Price","Aktueller Kurs","open Kurs aktuell","Open Kurs aktuell"] },
-FAIR_VALUE:{ label:"Fairer Preis", aliases:["Fairer Preis","Fair Value","Fair price","Fair Value Estimate","Faier Preis","Faier Preis "] },
-
-VOL_1_5_10: {
-  label: "Volatilität annualisiert (ausgewähltes Jahr)",
+CAPEX_1Y: {
+  label: "Capital Expenditures 1Y",
   aliases: [
-    "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
-    "Volatility annualized 1Y/5Y/10Y",
-    "Volatility 1Y/5Y/10Y",
-    "Volatilität 1Y/5Y/10Y"
+    "Capital Expenditures 1Y",
+    "Capital Expenditures (1Y)",
+    "CapEx 1Y",
+    "Capital Expenditures",
+    "CapEx",
+    "Capital Expenditures (CapEx) 1Y",
+    "Capital Expenditures (CapEx) 1Y",
+    "Capital Expenditures (CapEx) 1Y",
+    "Capital Expenditures (CapEx) 1Y",
+    "Capital Expenditures (CapEx) 1Y"
   ]
 },
-
-PE_1Y:      { label:"KGV (PE Ratio) 1Y", aliases:["KGV (PE Ratio) 1Y","PE Ratio 1Y","P/E 1Y","P/E Ratio 1Y","PE Ration (KGV) 1Y"] },
-EV_EBITDA_1Y:{ label:"EV/EBITDA Ratio 1Y", aliases:["EV/EBITDA Ratio 1Y","EV/EBITDA 1Y","EV/EBITDA Ratio (1Y)"] },
-P_FCF_1Y:    { label:"P/FCF Ratio 1Y", aliases:["P/FCF Ratio 1Y","P/FCF 1Y","Price/FCF 1Y","P/FCF Ratio"] },
-
-SHARES_CHANGE_YOY:{ label:"Shares Change (YoY)", aliases:["Shares Change (YoY)","Shares Change YoY","Shares Outstanding Change (YoY)"] },
-
-FCF_POSITIVE_YN:{ label:"FCF positiv (Ja/Nein)", aliases:["FCF positiv (Ja/Nein)","FCF positiv ja/nein","FCF Positive (Yes/No)","FCF positive"] },
-FCF_MARGIN_1Y:  { label:"FCF-Marge 1Y", aliases:["FCF-Marge 1Y","FCF Margin 1Y","FCF Margin"] },
-
-REV_GROWTH_YOY_1Y:{ label:"Revenue Growth 1Y (YoY)", aliases:["Revenue Growth 1Y (YoY)","Revenue Growth (YoY)","Umsatzwachstum (YoY)"] },
-EPS_GROWTH_CAGR_4Y:{ label:"EPS Growth 4Y (CAGR)", aliases:["EPS Growth 4Y (CAGR)","EPS CAGR 4Y","EPS (CAGR) 4Y","EPS Growth CAGR 4Y"] },
-
-NET_DEBT_EBITDA_1Y:{ label:"Net Debt / EBITDA Ratio 1Y", aliases:["Net Debt / EBITDA Ratio 1Y","Net Debt/EBITDA 1Y","Net Debt/ EBITDA Ratio 1Y","Net Debt / EBITDA"] },
-INTEREST_COVERAGE_1Y:{ label:"Zinsdeckung 1Y (Interest Coverage)", aliases:["Zinsdeckung 1Y (Interest Coverage)","Interest Coverage 1Y","Interest Coverage  1Y (Zinsdeckung)"] },
-CURRENT_RATIO_1Y:{ label:"Current Ratio 1Y", aliases:["Current Ratio 1Y","Current Ratio (1Y)","Current Ratio"] },
-
-CASH_STI_1Y:{ label:"Cash & Short-Term Investments 1Y", aliases:["Cash & Short-Term Investments 1Y","Cash & Short-Term Investments","Cash and Short-Term Investments 1Y","Cash and Short-Term Investments"] },
-TOTAL_DEBT_1Y:{ label:"Total Debt 1Y", aliases:["Total Debt 1Y","Total Debt (1Y)","Total Debt","Total Dept 1Y","Total Dept 1Y "] },
-
-PAYOUT_RATIO_1Y:{ label:"Payout Ratio 1Y", aliases:["Payout Ratio 1Y","Payout Ratio","Dividend Payout Ratio 1Y","Payout Ratio"] },
-
-
-
+  FCF_1Y: {
+    label: "FCF 1Y",
+    aliases: ["FCF 1Y","Free Cash Flow 1Y","Free Cash Flow (1Y)","Free Cash Flow","FCF"]
   },
+  FCF_POSITIVE_YN: {
+    label: "FCF positiv (Ja/Nein)",
+    aliases: ["FCF positiv (Ja/Nein)","FCF positiv","fcf positiv","FCF positive","FCF Positive (Yes/No)"]
+  },
+  FCF_MARGIN_1Y: {
+    label: "FCF-Marge 1Y",
+    aliases: ["FCF-Marge 1Y","FCF Margin 1Y","FCF Margin","FCF Marge 1Y","FCF-Marge"]
+  },
+  FCF_YIELD_1Y: {
+    label: "FCF Yield 1Y",
+    aliases: ["FCF Yield 1Y","FCF Yield","Free Cash Flow Yield 1Y","Free Cash Flow Yield"]
+  },
+
+  // =====================
+  // BALANCE SHEET / DEBT / LIQUIDITY
+  // =====================
+  CASH_STI_1Y: {
+    label: "Cash & Short-Term Investments 1Y",
+    aliases: [
+      "Cash & Short-Term Investments 1Y","Cash & Short-Term Investments",
+      "Cash and Short-Term Investments 1Y","Cash and Short-Term Investments",
+      "Cash & Short Term Investments 1Y","Cash & Short Term Investments",
+      "Cash & Short Ter Investmentens 1Y","cash & short ter investmentens 1y"
+    ]
+  },
+  SHORT_TERM_INVESTMENTS_1Y: {
+    label: "Short-Term Investments 1Y",
+    aliases: ["Short-Term Investments 1Y","Short- Term Investments 1Y","Short Term Investments 1Y"]
+  },
+  TOTAL_DEBT_1Y: {
+    label: "Total Debt 1Y",
+    aliases: ["Total Debt 1Y","Total Debt (1Y)","Total Debt","Total Dept 1Y","Total Dept 1Y "]
+  },
+  NET_DEBT_1Y: {
+    label: "Net Debt 1Y",
+    aliases: ["Net Debt 1Y","Net Debt","net debt 1y"]
+  },
+  NET_DEBT_EBITDA_1Y: {
+    label: "Net Debt / EBITDA Ratio 1Y",
+    aliases: ["Net Debt / EBITDA Ratio 1Y","Net Debt/EBITDA 1Y","Net Debt/ EBITDA Ratio 1Y","Net Debt / EBITDA","Net Debt/ EBITDA Ratio 1Y"]
+  },
+  DEBT_EQUITY_RATIO_1Y: {
+    label: "Debt / Equity Ratio 1Y",
+    aliases: ["Debt / Equity Ratio 1Y","Debt / Equity Ratio","Debt/Equity Ratio","Debt / Equity","D/E Ratio","Debt / Equity Ratio 1Y"]
+  },
+  CURRENT_RATIO_1Y: {
+    label: "Current Ratio 1Y",
+    aliases: ["Current Ratio 1Y","Current Ratio (1Y)","Current Ratio"]
+  },
+  QUICK_RATIO_1Y: {
+    label: "Quick Ratio 1Y",
+    aliases: ["Quick Ratio 1Y","Quick Ratio (1Y)","Quick Ratio"]
+  },
+  INTEREST_COVERAGE_1Y: {
+    label: "Zinsdeckung 1Y (Interest Coverage)",
+    aliases: ["Zinsdeckung 1Y (Interest Coverage)","Interest Coverage 1Y","Interest Coverage","Zinsdeckung"]
+  },
+
+  BOOK_VALUE_PER_SHARE_1Y: {
+    label: "Book Value per share 1Y",
+    aliases: ["Book Value per share 1Y","Book Value per Share","Book Value Per Share","book value per share 1Y","Book Value per share 1Y"]
+  },
+
+  // =====================
+  // DIVIDENDS / SHAREHOLDER RETURN
+  // =====================
+  DIV_YIELD: {
+    label: "Dividenden Yield",
+    aliases: ["Div.-Rendite aktuell (%)","Dividend Yield","Dividend Yield (%)","Dividenden Yield","Dividenden Yield ","dividenden yield"]
+  },
+  DIV_FREQUENCY: {
+    label: "Dividenden Frequency",
+    aliases: ["Div.-Frequency","Dividend Frequency","Dividenden Frequency","dividenden frequency"]
+  },
+  DIV_GROWTH_YEARS: {
+    label: "Dividenden Growth Years",
+    aliases: ["Dividend Growth years","Dividend Growth Years","Dividenden Growth Years","Dividenden Growth years","dividenden growth years"]
+  },
+  DIVIDEND_DPS_CAGR_4Y: {
+    label: "Dividende (DPS) 4Y (CAGR)",
+    aliases: ["Dividende (DPS) 4Y (CAGR)","Dividenden 4Y (DPS CAGR)","Dividenden 4Y (DPS CAGR)","dividenden 4Y (DPS CAGR)","dividenden 4y dps cagr","DPS CAGR 4Y"]
+  },
+  PAYOUT_RATIO_1Y: {
+    label: "Payout Ratio 1Y",
+    aliases: ["Payout Ratio 1Y","Payout Ratio","Payout Ratio 1y","Payout Ratio"]
+  },
+  BUYBACK_YIELD: { label: "Buyback Yield", aliases: ["Buyback Yield"] },
+  SHAREHOLDER_YIELD: { label: "Shareholder Yield", aliases: ["Shareholder Yield"] },
+  DIV_GROWTH: { label: "Dividend Growth", aliases: ["Dividend Growth","Dividend Growth (YoY)"] }
 };
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1712,34 +1720,421 @@ const NUTZEN_HEADERS_BY_SECTOR = {
 
 banks: [
     
-  ],
+    // ===== Price & Risk =====
+  "Kurs aktuell",
+  "52-Week Range",
+  "Beta",
+  "Volatilität annualisiert (Std-Abw.) 1Y",
+  "Volatilität annualisiert (Std-Abw.) 5Y",
+  "Volatilität annualisiert (Std-Abw.) 10Y",
+
+  // ===== Valuation (Bank-specific) =====
+  "PE Ratio 1Y (KGV)",
+  "T/B (P/B)",
+  "P/TBV",
+  "Marktkapitalisierung",
+  "Fairer Preis",
+
+  // ===== Profitability / Earnings =====
+  "EPS (Diluted)",
+  "EPS Growth 4Y (CAGR)",
+  "Net Income 1Y",
+  "ROE 1Y",
+  "ROA 1Y",
+  "ROIC 1Y",
+  "Profit Margin 1Y",
+
+  // ===== Growth (Optional but useful for trend) =====
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+
+  // ===== Balance Sheet & Capital =====
+  "Cash & Short Term Investments 1Y",
+  "Total Debt 1Y",
+  "Shares outstanding 1Y (diluted)",
+  "Shares Change (YoY)",
+  "Book Value per Share",
+  "Tangible Book Value per Share",
+
+  // ===== Funding (Deposits) =====
+  "Total deposits",
+  "Interest bearing Deposits",
+  "Non interest bearing Deposits",
+
+  // ===== Loan Book / Credit Risk =====
+  "Gross loans",
+  "Net loans",
+  "Allowance for loan losses",
+
+  // ===== Shareholder Return =====
+  "Dividenden Yield",
+  "Dividenden Frequency",
+  "Dividenden Growth years",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Payout Ratio 1Y",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== Segments / Extra Deep Dive (only if available) =====
+  "Consumer Checking Accounts",
+  "Average deposits by segment",
+  "Average loans and leases by segment"
+],
 
 
     insurance: [
     
-  ],
+  "Kurs aktuell",
+  "52-Week Range",
+  "Beta",
+  "Marktkapitalisierung",
+  "PE Ratio 1Y (KGV)",
+
+  // ===== Statistics (Valuation / Margins / Balance Sheet Snapshots) =====
+  "PB Ratio 1Y (P/B)",
+  "P/TBV Ratio 1Y",
+  "Profit Margin 1Y",
+  "Operating Margin 1Y",
+  "Gross Margin 1Y",
+  "Cash & Cash Equivalents",
+  "Total Debt",
+  "Book Value Per Share",
+  "Dividend Yield",
+
+  // ===== Financials → Income Statement =====
+  "Total Revenue",
+  "Revenue Growth (YoY)",
+  "Net Income",
+  "Shares Outstanding (Diluted)",
+  "Shares Change (YoY)",
+  "EPS (Diluted)",
+  "EPS Growth",
+
+  // ===== Financials → Ratios =====
+  "Return on Equity (ROE)",
+  "Return on Assets (ROA)",
+  "Return on Invested Capital (ROIC)",
+  "Current Ratio",
+  "Quick Ratio",
+  "Debt / Equity Ratio",
+  "Interest Coverage",
+  "Payout Ratio",
+  "Buyback Yield / Dilution",
+  "Total Shareholder Return",
+  "FCF Yield",
+
+  // ===== Dividends =====
+  "Dividenden Frequency",
+  "Dividenden Growth years",
+  "Dividenden 4Y (DPS CAGR) (berechnet aus Dividend History)",
+
+  // ===== History / Chart (auf StockAnalysis, aber von dir berechnet) =====
+  "Volatilität annualisiert (aus Kurs-Historie berechnet)",
+  "Kurs 4Y (CAGR) (aus Kurs-Historie berechnet)",
+
+  // ===== Output =====
+  "Fairer Preis (berechnet)"
+],
+
 
 
 
   reits: [
+  "Kurs aktuell",
+  "52 Week Range",
+  "Beta",
+  "Marktkapitaliserung",
 
-  ],
+  // ===== STATISTICS =====
+  // --- Total Valuation ---
+  "Enterprise Value 1Y",
+
+  // --- Valuation Ratios ---
+  "Price/FFO Ratio",
+  "Price/AFFO Ratio",
+  "P/B",
+  "P/TBV",
+  "EV/EBITDA Ratio 1Y",
+
+  // --- Leverage / Financial Position ---
+  "Total Debt 1Y",
+  "Net Debt/ EBITDA Ratio 1Y",
+  "Debt/ Equity",
+  "Interest Coverage 1Y (Interest Coverage)",
+  "Cash & Short-Term Investments 1Y",
+
+  // --- Profitability / Margins ---
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+  "ROE 1Y",
+  "ROIC 1Y",
+
+  // ===== REIT OPERATING METRICS (falls verfügbar) =====
+  "Funds From Operations (FFO)",
+  "Adjusted Funds From Operations (AFFO)",
+  "FFO Payout Ratio",
+
+  // ===== DIVIDENDS =====
+  "Dividenden (p.a.)",
+  "Dividenden Yield",
+  "Dividenden Frequency",
+  "Dividenden growth Years",
+  "Dividenden 4Y (DPS CAGR)",
+  "Payout Ratio",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== HISTORY =====
+  "Volatilität annualisert",
+  "Kurs 4Y (CAGR)"
+],
+
 
 
   utilities: [
- 
+   "Kurs aktuell",
+  "52 Week Range",
+  "Beta",
+  "Markkapitaliserung",
+
+  // ===== RATIOS =====
+  "PE Ratio 1Y (KGV)",
+  "PB Ratio 1Y",
+  "P/ FCF Ratio  1Y",
+  "P/ OCF Ratio",
+  "EV/ Sales Ratio 1Y",
+  "EV/ EBITDA Ratio 1Y",
+  "Debt / Equity Ratio 1Y",
+  "Net Debt/ EBITDA Ratio 1Y",
+  "Quick Ratio 1Y",
+  "Current Ratio 1Y",
+  "ROE 1Y",
+  "ROCE 1Y",
+  "ROIC 1Y",
+
+  // ===== INCOME STATEMENTS =====
+  "Revenue 1Y",
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+  "Net Income 1Y",
+  "Share outstanding 1Y (diluted)",
+  "Shares Change (YoY)",
+  "EPS (diluted) 1Y",
+  "EPS Growth 4Y (CAGR)",
+  "FCF 1Y",
+  "FCF positiv",
+  "Dividenden 4Y (DPS CAGR)",
+  "Profit Margin 1Y",
+
+  // ===== BALANCE SHEET =====
+  "Short- Term Investments 1Y",
+  "Cash & Short Ter Investmentens 1Y",
+  "Total Debt 1Y",
+  "Net Debt 1Y",
+  "Book Value per share 1Y",
+
+  // ===== CASH FLOW =====
+  "Operating Cash Flow",
+  "Capital Expenditures (CapEx) 1Y",
+  "FCF Margin 1Y",
+
+  // ===== STATISTICS =====
+  "Interest Coverage",
+  "Gross Margin",
+  "Operating Margin",
+
+  // ===== DIVIDENDS =====
+  "Dividenden Yield",
+  "Dividenden Frequency",
+  "Dividenden Growth Years",
+  "Payout Ratio",
+  "Buyback Yield",
+  "Dividend Growth",
+  "Shareholder Yield",
+
+  // ===== HISTORY =====
+  "Volatilität",
+  "Kurs 4Y (CAGR)",
+
+  // ===== OUTPUT =====
+  "Farier Preis"
+
   ],
+
+
 
 
     brokers: [
 
-  ],
+    "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
+  "Beta",
+  "52-Week Range",
+  "Fairer Preis",
+
+  // ===== Größe / Pricing =====
+  "Marktkapitalisierung",
+  "Enterprise Value 1Y",
+
+  // ===== Wachstum & Earnings (Standard) =====
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+  "EPS (Diluted)",
+  "EPS Growth 4Y (CAGR)",
+  "Net Income 1Y",
+
+  // ===== Cashflow / Qualität =====
+  "Operating Cash Flow 1Y",
+  "Capital Expenditures 1Y",
+  "FCF 1Y",
+  "FCF-Marge 1Y",
+  "FCF Yield 1Y",
+  "FCF positiv (Ja/Nein)",
+
+  // ===== Margen =====
+  "Gross Margin 1Y",
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+
+  // ===== Bilanz / Stabilität =====
+  "Cash & Short-Term Investments 1Y",
+  "Total Debt 1Y",
+  "Net Debt / EBITDA Ratio 1Y",
+  "Zinsdeckung 1Y (Interest Coverage)",
+  "Current Ratio 1Y",
+
+  // ===== Kapitalrenditen =====
+  "ROE 1Y",
+  "ROIC 1Y",
+
+  // ===== Bewertung =====
+  "KGV (PE Ratio) 1Y",
+  "P/FCF Ratio 1Y",
+  "EV/EBITDA Ratio 1Y",
+
+  // ===== Shareholder Return =====
+  "Div.-Rendite aktuell (%)",
+  "Div.-Frequency",
+  "Dividend Growth years",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Payout Ratio 1Y",
+  "Buyback Yield",
+  "Shareholder Yield",
+
+  // ===== Verwässerung =====
+  "Shares Outstanding (diluted) 1Y",
+  "Shares Change (YoY)",
+
+  // ===== Asset-Manager spezifisch (StockAnalysis KPIs) =====
+  "Total AUM",
+  "Total AUM Growth",
+  "Equity AUM",
+  "Equity AUM Growth",
+  "Fixed Income AUM",
+  "Fixed Income AUM Growth",
+  "Multi-Asset Class AUM",
+  "Multi-Asset Class AUM Growth",
+  "Alternatives AUM",
+  "Alternatives AUM Growth",
+  "iShares / ETF AUM",
+  "iShares / ETF AUM Growth",
+  "Retail AUM Inflows",
+  "ETFs AUM Inflows",
+  "Institutional Inflows",
+  "Cash Management AUM Inflows",
+  "Performance Fee Revenue",
+  "Technology Services Revenue",
+  "Altman Z-Score",
+  "Piotroski F-Score",
+],
 
 
   
 commodities: [
 
-  ],
+    "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
+  "Fairer Preis",
+
+  // ===== Kurs / Risiko / Markt =====
+  "Kurs aktuell",
+  "Kurs 4Y (CAGR)",
+  "Beta",
+  "52-Week Range",
+  "52-Week Price Change",
+
+  // ===== Größe =====
+  "Marktkapitalisierung",
+  "Enterprise Value 1Y",
+
+  // ===== Wachstum (optional bei Rohstoffen, aber hilfreich) =====
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+  "EPS (Diluted)",
+  "EPS Growth 4Y (CAGR)",
+
+  // ===== Profitabilität / Effizienz =====
+  "Gross Margin 1Y",
+  "Operating Margin 1Y",
+  "Profit Margin 1Y",
+  "EBITDA Margin 1Y",
+  "FCF-Marge 1Y",
+  "ROE 1Y",
+  "ROIC 1Y",
+  "ROA 1Y",
+  "ROCE 1Y",
+  "Asset Turnover",
+  "Inventory Turnover",
+
+  // ===== Cashflow / Qualität =====
+  "Net Income 1Y",
+  "Operating Cash Flow 1Y",
+  "Capital Expenditures 1Y",
+  "FCF 1Y",
+  "FCF positiv (Ja/Nein)",
+  "FCF Yield 1Y",
+  "Operating Cash Flow Yield",
+  "FCF Conversion",
+
+  // ===== Bilanz / Downcycle-Resistenz =====
+  "Cash & Short-Term Investments 1Y",
+  "Total Debt 1Y",
+  "Net Debt / EBITDA Ratio 1Y",
+  "Debt / Equity Ratio",
+  "Debt / FCF Ratio",
+  "Net Debt / Equity Ratio",
+  "Net Debt / FCF Ratio",
+  "Current Ratio 1Y",
+  "Quick Ratio",
+  "Zinsdeckung 1Y (Interest Coverage)",
+  "Altman Z-Score",
+  "Piotroski F-Score",
+  "WACC",
+
+  // ===== Bewertung (Multiples) =====
+  "KGV (PE Ratio) 1Y",
+  "PS Ratio",
+  "P/B",
+  "P/TBV",
+  "P/FCF Ratio 1Y",
+  "P/OCF Ratio",
+  "EV/Sales Ratio",
+  "EV/EBITDA Ratio 1Y",
+  "EV/EBIT Ratio",
+  "EV/FCF Ratio",
+
+  // ===== Shareholder Return =====
+  "Div.-Rendite aktuell (%)",
+  "Div.-Frequency",
+  "Dividend Growth years",
+  "Dividende (DPS) 4Y (CAGR)",
+  "Payout Ratio 1Y",
+  "Buyback Yield",
+  "Shares Change (YoY)",
+  "Shares Outstanding (diluted) 1Y",
+  "Shareholder Yield"
+],
+
   };
 
 
@@ -1787,6 +2182,83 @@ const PASTE_ORDER_STANDARD = [
   "Kurs aktuell",
   "Volatilität annualisiert (Std-Abw.) 1Y/5Y/10Y",
   "Fairer Preis",
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const UTILITIES_HEADERS_FINAL = [
+
+  "Kurs aktuell",
+  "52 Week Range",
+  "Beta",
+  "Markkapitaliserung",
+  "PE Ratio 1Y (KGV)",
+  "PB Ratio 1Y",
+  "P/ FCF Ratio  1Y",
+  "P/ OCF Ratio",
+  "EV/ Sales Ratio 1Y",
+  "EV/ EBITDA Ratio 1Y",
+  "Debt / Equity Ratio 1Y",
+  "Net Debt/ EBITDA Ratio 1Y",
+  "Quick Ratio 1Y",
+  "Current Ratio 1Y",
+  "ROE 1Y",
+  "ROCE 1Y",
+  "ROIC 1Y",
+  "Revenue 1Y",
+  "Revenue Growth 1Y (YoY)",
+  "Revenue 4Y (CAGR)",
+  "Net Income 1Y",
+  "Share outstanding 1Y (diluted)",
+  "Shares Change (YoY)",
+  "EPS (diluted) 1Y",
+  "EPS Growth 4Y (CAGR)",
+  "FCF 1Y",
+  "FCF positiv",
+  "Dividenden 4Y (DPS CAGR)",
+  "Profit Margin 1Y",
+  "Short- Term Investments 1Y",
+  "Cash & Short Ter Investmentens 1Y",
+  "Total Debt 1Y",
+  "Net Debt 1Y",
+  "Book Value per share 1Y",
+  "Operating Cash Flow",
+  "Capital Expenditures (CapEx) 1Y", 
+  "FCF Margin 1Y",
+  "Interest Coverage",
+  "Gross Margin",
+  "Operating Margin",
+  "Dividenden Yield",
+  "Dividenden Frequency",
+  "Dividenden Growth Years",
+  "Payout Ratio",
+  "Buyback Yield",
+  "Dividend Growth",
+  "Shareholder Yield",
+  "Volatilität",
+  "Kurs 4Y (CAGR)",
+  "Farier Preis"
 ];
 
 
@@ -2042,6 +2514,47 @@ function wireDcfInputsOverlay(){
 
 
 
+ function formatIntDE(n){
+  if(!Number.isFinite(n)) return "";
+  return Math.round(n).toLocaleString("de-DE"); // 10000 -> "10.000"
+}
+
+function parseIntLooseDE(v){
+  // nimmt "10.000", "10000", "10 000", "10,000" -> 10000
+  if(v == null) return NaN;
+  let s = String(v).trim();
+  if(!s) return NaN;
+
+  // alles außer Ziffern entfernen
+  s = s.replace(/[^\d]/g, "");
+  if(!s) return NaN;
+
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+
+
+ function computeDividendYieldBest(ctx){
+  // 1) Berechnen (wenn möglich)
+  // Variante A: DPS p.a. / Kurs (wenn du DIVIDEND_ANNUAL_DPS hast)
+  const price = ctx.num("PRICE_NOW");
+  const dps = ctx.num("DIVIDEND_ANNUAL_DPS"); // nur falls du diese ID wirklich ergänzt hast
+  if(Number.isFinite(price) && price > 0 && Number.isFinite(dps) && dps >= 0){
+    return { y01: dps / price, source: "computed (DPS/Price)" };
+  }
+
+  // Variante B: falls Tabelle schon Dividend Yield hat
+  const yTable = ctx.pct("DIV_YIELD"); // 0..1
+  if(Number.isFinite(yTable) && yTable >= 0){
+    return { y01: yTable, source: "table (DIV_YIELD)" };
+  }
+
+  return { y01: NaN, source: "none" };
+}
+
+
+
  function trigIcon(t){
   if(t.missing) return "—";
   if(t.bad) return "❌";
@@ -2072,57 +2585,314 @@ function countBySev(trigs){
 
 
 
-
-function computeFairValueStandardDCF(ctx){
-  // ✅ rf/erp/gT/years aus UI + Preset
-  const cfg = readDcfSettingsFromUI(); // { rf, erp, gT, years } als Dezimalwerte
-
-  const fcf    = ctx.num("FCF_1Y");
-  const shares = ctx.num("SHARES_OUT_DILUTED_1Y");
-  const cash   = ctx.num("CASH_STI_1Y");
-  const debt   = ctx.num("TOTAL_DEBT_1Y");
-  const beta   = ctx.num("BETA");
-
-  // Mindestanforderungen
-  if(!Number.isFinite(fcf) || !Number.isFinite(shares) || shares <= 0) return NaN;
-
-  // ✅ g kommt NUR aus Revenue CAGR 4Y
-  const g = ctx.pct("REV_CAGR_4Y");
-  if(!Number.isFinite(g)) return NaN;
-
-  // Diskontsatz per CAPM
-  const b = Number.isFinite(beta) ? beta : 1.0;
-  const disc = cfg.rf + b * cfg.erp;
-
-  // Terminal Value Bedingung
-  if(!(disc > cfg.gT)) return NaN;
-
-  // PV der Jahre 1..N
-  let pv = 0;
-  for(let t=1; t<=cfg.years; t++){
-    const ft = fcf * Math.pow(1 + g, t);
-    pv += ft / Math.pow(1 + disc, t);
-  }
-
-  // Terminal Value (Gordon Growth)
-  const fN = fcf * Math.pow(1 + g, cfg.years);
-  const tv = (fN * (1 + cfg.gT)) / (disc - cfg.gT);
-  const pvTV = tv / Math.pow(1 + disc, cfg.years);
-
-  const enterpriseValue = pv + pvTV;
-
-  // Net Debt = Debt - Cash
-  let netDebt = NaN;
-  if(Number.isFinite(debt) && Number.isFinite(cash)){
-    netDebt = debt - cash;
-  }
-
-  const equityValue = Number.isFinite(netDebt)
-    ? (enterpriseValue - netDebt)
-    : enterpriseValue;
-
-  return equityValue / shares;
+function computeDividendYield(ctx){
+  const price = ctx.num("PRICE_NOW");
+  const dps   = ctx.num("DIVIDEND_ANNUAL_DPS"); // neu
+  if(!(Number.isFinite(price) && price > 0 && Number.isFinite(dps) && dps >= 0)) return NaN;
+  return dps / price; // 0..1
 }
+
+
+
+
+
+
+function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
+function medianFinite(arr){
+  const a = (arr || []).filter(Number.isFinite).sort((x,y)=>x-y);
+  if(a.length === 0) return NaN;
+  const m = Math.floor(a.length/2);
+  return a.length % 2 ? a[m] : (a[m-1] + a[m]) / 2;
+}
+
+
+
+
+// ==============================
+// FUNDAMENTAL FAIR VALUE (NO PRICE)
+// - liefert Range: low/base/high
+// - nutzt EPS, BVPS, optional FCF/Share (wenn Shares da)
+// - NIE "1" Fallback: wenn zu wenig Daten => ok:false
+// ==============================
+
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+function medianFinite(arr){
+  const a = (arr||[]).filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length) return NaN;
+  const m = Math.floor(a.length/2);
+  return a.length % 2 ? a[m] : (a[m-1]+a[m])/2;
+}
+
+function readValuationPresetFromUI(){
+  // nutzt dein bestehendes DCF UI (ovDcfPreset)
+  const cfg = (typeof readDcfSettingsFromUI === "function")
+    ? readDcfSettingsFromUI()
+    : { preset:"custom", erp:0.055 };
+
+  const preset = cfg?.preset || "custom";
+
+  // Grobe Defaults nach Preset (du kannst das später feintunen)
+  // Hinweis: eu/usa/middleeast/china übernehmen "normal" und passen nur Risiko leicht über ERP.
+  const base = (
+    preset === "defensive" ? { pe:14, pb:1.3, pfcf:12 } :
+    preset === "aggressive"? { pe:26, pb:2.4, pfcf:22 } :
+                             { pe:18, pb:1.7, pfcf:16 } // normal + region/custom fallback
+  );
+
+  // ERP-Risikoanpassung: höhere ERP => konservativer (Multiples runter)
+  const erp = Number.isFinite(cfg?.erp) ? clamp(cfg.erp, 0.03, 0.10) : 0.055;
+  const erpFactor = clamp(0.055 / erp, 0.70, 1.25); // erp hoch -> factor < 1
+  return { preset, base, erp, erpFactor };
+}
+
+function computeQualityRiskAdjust(ctx){
+  // optional: wenn Werte fehlen -> neutral
+  const roic = ctx.pct("ROIC_1Y");               // 0..1
+  const roe  = ctx.pct("ROE_1Y");                // 0..1
+  const pm   = ctx.pct("PROFIT_MARGIN_1Y");      // 0..1
+  const ndE  = ctx.num("NET_DEBT_EBITDA_1Y");    // ratio
+  const beta = ctx.num("BETA");                  // number
+
+  // Quality boost (0.85..1.20)
+  let q = 1.0;
+  if(Number.isFinite(roic)){
+    if(roic >= 0.15) q += 0.10;
+    else if(roic >= 0.10) q += 0.05;
+    else if(roic < 0.05) q -= 0.10;
+  }
+  if(Number.isFinite(roe)){
+    if(roe >= 0.18) q += 0.05;
+    else if(roe < 0.08) q -= 0.05;
+  }
+  if(Number.isFinite(pm)){
+    if(pm >= 0.15) q += 0.05;
+    else if(pm < 0.03) q -= 0.08;
+  }
+  q = clamp(q, 0.85, 1.20);
+
+  // Risk discount (0.75..1.00)
+  let r = 1.0;
+  if(Number.isFinite(beta)){
+    if(beta >= 1.5) r -= 0.15;
+    else if(beta >= 1.2) r -= 0.08;
+  }
+  if(Number.isFinite(ndE)){
+    if(ndE >= 5.0) r -= 0.15;
+    else if(ndE >= 3.5) r -= 0.08;
+  }
+  r = clamp(r, 0.75, 1.00);
+
+  return { qualityFactor:q, riskFactor:r, totalFactor: clamp(q*r, 0.70, 1.25) };
+}
+
+function makeBandMultiple(baseMultiple, band){
+  // band: "low"|"base"|"high"
+  // low: -20%, high: +20% (konservativ)
+  if(band === "low")  return baseMultiple * 0.80;
+  if(band === "high") return baseMultiple * 1.20;
+  return baseMultiple;
+}
+
+function computeFairValueFundamentalRangeBreakdown(ctx){
+  const notes = [];
+  const candidates = [];
+
+  // Inputs
+  const eps  = ctx.num("EPS_DILUTED_1Y");
+  const eps2 = ctx.num("EPS_DILUTED");
+  const bvps = ctx.num("BOOK_VALUE_PER_SHARE_1Y");
+
+  // Optional (nur wenn Shares vorhanden)
+  const shares = ctx.num("SHARES_OUT_DILUTED_1Y");
+  const fcf    = ctx.num("FCF_1Y");
+
+  // Preset
+  const p = readValuationPresetFromUI();
+  const adj = computeQualityRiskAdjust(ctx);
+
+  // Targets (base)
+  let targetPE   = p.base.pe   * p.erpFactor * adj.totalFactor;
+  let targetPB   = p.base.pb   * p.erpFactor * adj.totalFactor;
+  let targetPFCF = p.base.pfcf * p.erpFactor * adj.totalFactor;
+
+  targetPE   = clamp(targetPE,   6, 40);
+  targetPB   = clamp(targetPB, 0.3, 6);
+  targetPFCF = clamp(targetPFCF, 6, 30);
+
+  const useEPS = Number.isFinite(eps) ? eps : (Number.isFinite(eps2) ? eps2 : NaN);
+
+  // --- Candidate: EPS × PE (kursfrei) ---
+  if(Number.isFinite(useEPS) && useEPS > 0){
+    const low  = useEPS * makeBandMultiple(targetPE, "low");
+    const base = useEPS * makeBandMultiple(targetPE, "base");
+    const high = useEPS * makeBandMultiple(targetPE, "high");
+    candidates.push({ key:"EPS_PE", label:"EPS × PE", low, base, high, ok:true, meta:{ eps:useEPS, targetPE }});
+  } else if(Number.isFinite(useEPS) && useEPS <= 0){
+    notes.push("EPS ≤ 0 → EPS×PE übersprungen (würde sonst Unsinn/negativ werden).");
+  }
+
+  // --- Candidate: BVPS × PB (kursfrei) ---
+  if(Number.isFinite(bvps) && bvps > 0){
+    const low  = bvps * makeBandMultiple(targetPB, "low");
+    const base = bvps * makeBandMultiple(targetPB, "base");
+    const high = bvps * makeBandMultiple(targetPB, "high");
+    candidates.push({ key:"PB", label:"BVPS × PB", low, base, high, ok:true, meta:{ bvps, targetPB }});
+  }
+
+  // --- Optional: FCF/Share × P/FCF (nur wenn Shares da; FCF darf negativ sein, dann skip) ---
+  const hasShares = Number.isFinite(shares) && shares > 0;
+  if(hasShares && Number.isFinite(fcf)){
+    const fcfps = fcf / shares;
+    if(Number.isFinite(fcfps) && fcfps > 0){
+      const low  = fcfps * makeBandMultiple(targetPFCF, "low");
+      const base = fcfps * makeBandMultiple(targetPFCF, "base");
+      const high = fcfps * makeBandMultiple(targetPFCF, "high");
+      candidates.push({ key:"FCF_MULT", label:"FCF/Share × P/FCF", low, base, high, ok:true, meta:{ fcfps, targetPFCF }});
+    } else {
+      notes.push("FCF/Share ≤ 0 → FCF-Multiple übersprungen (Turnaround/negativ).");
+    }
+  }
+
+  const good = candidates.filter(c => c.ok && Number.isFinite(c.base) && c.base > 0);
+
+  if(good.length === 0){
+    return {
+      ok:false,
+      reason:"Zu wenig Daten für Fair Value ohne Kurs. Mindestens EPS>0 oder BVPS>0 nötig.",
+      notes,
+      inputs:{ eps:useEPS, bvps, shares, fcf },
+      targets:{ targetPE, targetPB, targetPFCF },
+      adjust: adj,
+      candidates
+    };
+  }
+
+  // Combine bands via median
+  const low  = medianFinite(good.map(x => x.low));
+  const base = medianFinite(good.map(x => x.base));
+  const high = medianFinite(good.map(x => x.high));
+
+  // Confidence (simple)
+  const confidence = good.length >= 2 ? "high" : "medium";
+
+  // Method used: nearest to base median
+  let methodUsed = good[0], bestDist = Infinity;
+  for(const c of good){
+    const d = Math.abs(c.base - base);
+    if(d < bestDist){ bestDist = d; methodUsed = c; }
+  }
+
+  return {
+    ok:true,
+    preset: p.preset,
+    confidence,
+    notes,
+    range:{ low, base, high },
+    targets:{ targetPE, targetPB, targetPFCF },
+    adjust: adj,
+    inputs:{ eps:useEPS, bvps, shares, fcf },
+    candidates,
+    methodUsed:{ key: methodUsed.key, label: methodUsed.label }
+  };
+}
+
+function computeFairValueFundamentalBase(ctx){
+  const r = computeFairValueFundamentalRangeBreakdown(ctx);
+  return r?.ok ? r.range.base : NaN;
+}
+
+
+
+
+
+function renderFairPage(){
+  const sum = el("fairSummary");
+  const exp = el("fairExplain");
+  if(!sum || !exp) return;
+
+  const m = tableToMap();
+  const ctx = buildNutzenCtxFromTableMap(m);
+
+  const price = ctx.num("PRICE_NOW");
+
+  // ✅ deine vorhandene Funktion nutzen
+  const fv = computeFairValueFundamentalRangeBreakdown(ctx);
+
+  const fmt2 = (n)=>Number.isFinite(n)?n.toLocaleString("de-DE",{maximumFractionDigits:2}):"–";
+  const fmtPct = (x)=>Number.isFinite(x)?(x*100).toLocaleString("de-DE",{maximumFractionDigits:1})+"%":"–";
+
+  if(!fv?.ok){
+    sum.innerHTML = `<div class="muted">Fair Value nicht möglich: ${fv?.reason || "–"}</div>`;
+    exp.innerHTML = `
+      <div class="muted">
+        Benötigt mindestens <b>EPS &gt; 0</b> oder <b>BVPS &gt; 0</b> (optional FCF/Share).
+      </div>
+      <div class="whyRoleBlock" style="margin-top:10px">
+        <div class="whyLine"><b>EPS:</b> ${fmt2(fv?.inputs?.eps)}</div>
+        <div class="whyLine"><b>BVPS:</b> ${fmt2(fv?.inputs?.bvps)}</div>
+        <div class="whyLine"><b>Shares:</b> ${fmt2(fv?.inputs?.shares)}</div>
+        <div class="whyLine"><b>FCF:</b> ${fmt2(fv?.inputs?.fcf)}</div>
+      </div>
+    `;
+    return;
+  }
+
+  const fair = fv.range.base;
+  const pf = (Number.isFinite(price) && Number.isFinite(fair) && fair > 0) ? (price / fair) : NaN;
+
+  let verdict = "–";
+  if(Number.isFinite(pf)){
+    if(pf < 0.90) verdict = "Unterbewertet";
+    else if(pf <= 1.10) verdict = "Fair bewertet";
+    else verdict = "Überbewertet";
+  }
+
+  // ✅ Ergebnis-Box
+  sum.innerHTML = `
+    <div class="whyRoleBlock" style="margin:0">
+      <div class="whyLine"><b>Fair Value (kurs-unabhängig):</b> ${fmt2(fair)}</div>
+      <div class="whyLine"><b>Range:</b> ${fmt2(fv.range.low)} – ${fmt2(fv.range.high)} (${fv.confidence || "–"})</div>
+      <div class="whyLine"><b>Kurs aktuell:</b> ${fmt2(price)}</div>
+      <div class="whyLine"><b>Price / Fair:</b> ${Number.isFinite(pf) ? pf.toFixed(2).replace(".", ",") : "–"} → <b>${verdict}</b></div>
+      <div class="whyLine muted">Regel: &lt;0,90 unterbewertet · 0,90–1,10 fair · &gt;1,10 überbewertet</div>
+    </div>
+  `;
+
+  // ✅ Breakdown-Box
+  const candHtml = (fv.candidates || []).map(c => `
+    <div class="whyLine">
+      <b>${c.label}:</b> low ${fmt2(c.low)} · base ${fmt2(c.base)} · high ${fmt2(c.high)}
+      <span class="muted">(${c.key})</span>
+    </div>
+  `).join("") || `<div class="muted">–</div>`;
+
+  exp.innerHTML = `
+    <div class="whyRoleBlock" style="margin:0">
+      <div class="whyLine"><b>Methode (auto):</b> ${fv.methodUsed?.label || "–"}</div>
+
+      <div class="whyLine"><b>Preset:</b> ${fv.preset || "–"}</div>
+      <div class="whyLine"><b>Targets:</b>
+        PE=${fmt2(fv.targets?.targetPE)} · PB=${fmt2(fv.targets?.targetPB)} · P/FCF=${fmt2(fv.targets?.targetPFCF)}
+      </div>
+      <div class="whyLine"><b>Quality/Risk-Adjust:</b>
+        Quality ${fmt2(fv.adjust?.qualityFactor)} · Risk ${fmt2(fv.adjust?.riskFactor)} · Total ${fmt2(fv.adjust?.totalFactor)}
+      </div>
+
+      <div class="whyLine" style="margin-top:10px"><b>Kandidaten:</b></div>
+      ${candHtml}
+
+      ${(fv.notes && fv.notes.length) ? `
+        <div class="whyLine" style="margin-top:10px"><b>Hinweise:</b></div>
+        ${fv.notes.map(n => `<div class="whyLine muted">• ${n}</div>`).join("")}
+      ` : ""}
+
+      <div class="whyLine muted" style="margin-top:10px">
+        Kurs wird nur für den Vergleich “Price/Fair” genutzt. Fair Value entsteht aus EPS/BVPS/(optional FCF/Share) und Multiples-Targets.
+      </div>
+    </div>
+  `;
+}
+
 
 
 
@@ -2157,6 +2927,177 @@ function syncOvFairDefaultFromData(m){
 function fmtDE(n){
   return Number.isFinite(n) ? n.toLocaleString("de-DE",{maximumFractionDigits:2}) : "–";
 }
+
+function fmtMoneyDE(n){
+  return Number.isFinite(n)
+    ? n.toLocaleString("de-DE", { maximumFractionDigits: 2 })
+    : "–";
+}
+function fmtPctDE01(x){
+  return Number.isFinite(x)
+    ? (x * 100).toLocaleString("de-DE", { maximumFractionDigits: 2 }) + "%"
+    : "–";
+}
+
+function computeDividendYield01(ctx){
+  const useManual = !!el("ovDivYieldUseManual")?.checked;
+  const manualPct = nzNumInput(el("ovDivYieldManual")?.value); // z.B. 3,5
+  if(useManual && Number.isFinite(manualPct) && manualPct >= 0){
+    return manualPct / 100;
+  }
+
+  // Auto aus Tabelle (DIV_YIELD wird bei dir als pct01Loose behandelt -> 0..1)
+  const y = ctx.pct("DIV_YIELD");
+  if(Number.isFinite(y) && y >= 0) return y;
+
+  // Fallback: wenn manuell gefüllt aber Toggle aus -> trotzdem nutzen (optional)
+  if(Number.isFinite(manualPct) && manualPct >= 0) return manualPct / 100;
+
+  return NaN;
+}
+
+
+
+
+
+
+// ================================
+// DIVIDEND OVERLAY (COMBINED)
+// - wireOverlayDividendControls(): UI Events (deins + meine UX)
+// - renderOverlayDividendBox(m):  Berechnung + Anzeige (deins)
+// Priorität (wenn manEl NICHT aktiv):
+//   1) computed, 2) table, 3) leer (optional manuell via Toggle/Tippen)
+// Manuell kann IMMER überschreiben (Toggle oder Tippen im Feld).
+// ================================
+
+function wireOverlayDividendControls(){
+  if(wireOverlayDividendControls._bound) return;
+  wireOverlayDividendControls._bound = true;
+
+  const capEl = el("ovCapital");
+  const yEl   = el("ovDivYield");
+  const clrEl = el("ovDivYieldClear");
+
+  if(!capEl || !yEl || !clrEl) return;
+
+  const onAny = () => runAllCalcs();
+
+  capEl.addEventListener("input", onAny);
+  yEl.addEventListener("input", onAny);
+
+  clrEl.addEventListener("click", () => {
+    yEl.value = "";      // Reset -> wieder auto aus Tabelle
+    runAllCalcs();
+  });
+}
+
+
+
+
+// DEIN Render bleibt der Single Source of Truth für Anzeige + Quelle + Annual Dividend
+function renderOverlayDividendBox(m){
+  const capEl = el("ovCapital");
+  const yEl   = el("ovDivYield");
+  const aEl   = el("ovDivAnnual");
+  if(!capEl || !yEl || !aEl) return;
+
+  const ctx = buildNutzenCtxFromTableMap(m);
+
+  // Kapital
+  const cap = parseIntLooseDE(capEl.value);
+
+  // Yield Priorität:
+  // 1) User-Override (ovDivYield) -> nimmt "3,5" oder "3,5%" oder "0,035"
+  // 2) Auto aus Tabelle: DIV_YIELD (0..1 via ctx.pct)
+  let y01 = NaN;
+
+  const manualRaw = nzStr(yEl.value).trim();
+  if(manualRaw){
+    // nzPct01 akzeptiert "3,5%" und "0,035"
+    y01 = nzPct01(manualRaw);
+  } else {
+    y01 = ctx.pct("DIV_YIELD"); // 0..1
+  }
+
+  // Wenn auto genutzt und Feld leer: optional anzeigen, was auto ist
+  if(!manualRaw && Number.isFinite(y01) && document.activeElement !== yEl){
+    yEl.value = (y01 * 100).toLocaleString("de-DE",{maximumFractionDigits:2}) + "%";
+  }
+
+  // Annual Dividend = Kapital * Yield
+  if(Number.isFinite(cap) && cap > 0 && Number.isFinite(y01) && y01 >= 0){
+    aEl.value = (cap * y01).toLocaleString("de-DE",{maximumFractionDigits:2});
+  } else {
+    aEl.value = "–";
+  }
+}
+
+
+function wireCapitalAutoFormat(){
+  const capEl = el("ovCapital");
+  if(!capEl) return;
+  if(wireCapitalAutoFormat._bound) return;
+  wireCapitalAutoFormat._bound = true;
+
+  // formatiert "10000" -> "10.000" (de-DE grouping), nur Integer
+  function formatDEIntFromDigits(digits){
+    if(!digits) return "";
+    // keine führenden Nullen (außer "0")
+    digits = digits.replace(/^0+(?=\d)/, "");
+    const n = Number(digits);
+    if(!Number.isFinite(n)) return "";
+    return n.toLocaleString("de-DE");
+  }
+
+  function onlyDigits(s){
+    return String(s || "").replace(/[^\d]/g, "");
+  }
+
+  function countDigitsLeftOfCaret(str, caretPos){
+    // wie viele Ziffern stehen links vom Cursor?
+    const left = str.slice(0, Math.max(0, caretPos));
+    return (left.match(/\d/g) || []).length;
+  }
+
+  function caretPosFromDigitsCount(formatted, digitsCount){
+    // setze Cursor so, dass links wieder digitsCount Ziffern sind
+    if(digitsCount <= 0) return 0;
+    let seen = 0;
+    for(let i=0; i<formatted.length; i++){
+      if(/\d/.test(formatted[i])) seen++;
+      if(seen >= digitsCount) return i + 1;
+    }
+    return formatted.length;
+  }
+
+  capEl.addEventListener("input", () => {
+    const raw = capEl.value;
+    const caret = capEl.selectionStart ?? raw.length;
+
+    const digitsLeft = countDigitsLeftOfCaret(raw, caret);
+    const digits = onlyDigits(raw);
+    const formatted = formatDEIntFromDigits(digits);
+
+    capEl.value = formatted;
+
+    // Cursor wieder “logisch” platzieren
+    const newPos = caretPosFromDigitsCount(formatted, digitsLeft);
+    capEl.setSelectionRange(newPos, newPos);
+
+    runAllCalcs();
+  });
+
+  // Optional: beim Fokus alles markieren (komfortabel)
+  capEl.addEventListener("focus", () => {
+    // capEl.select(); // wenn du willst
+  });
+}
+
+
+
+
+
+
 
 function renderAktuellerZustand({ roles, st, buy }){
   // ---- Stress Chip ----
@@ -2318,38 +3259,35 @@ function wireOverlayBuyInputs(){
   const ex = el("ovExpensiveMult");
   const reset = el("ovBuyReset");
 
-  if(!sb || !b || !h || !ex) return;
+  if(!sb || !b || !h || !ex || !reset) return;
 
-  // nur einmal binden
   if(wireOverlayBuyInputs._bound) return;
   wireOverlayBuyInputs._bound = true;
 
-  // manuelles Override markieren
-  ovFair?.addEventListener("input", () => {
-    ovFair.dataset.auto = "0";
-    runAllCalcs();
-  });
+  const DEFAULT = window.NUTZEN_DEFAULT_BANDS || { strongBuy:0.75, buy:0.90, hold:1.10, expensive:1.25 };
 
-  function syncInputsFromState(){
-    sb.value = String(NUTZEN_STATE.buyBands.strongBuy ?? 0.75);
-    b.value  = String(NUTZEN_STATE.buyBands.buy ?? 0.90);
-    h.value  = String(NUTZEN_STATE.buyBands.hold ?? 1.10);
-    ex.value = String(NUTZEN_STATE.buyBands.expensive ?? 1.25);
-  }
-  syncInputsFromState();
+  const clamp = (x,min,max)=>Math.max(min, Math.min(max, x));
 
   function normalizeBands(obj){
-    const clamp = (x,min,max)=>Math.max(min, Math.min(max, x));
     let strongBuy = clamp(obj.strongBuy, 0.10, 2.00);
     let buy       = clamp(obj.buy,       0.10, 2.50);
-    let hold      = clamp(obj.hold,       0.10, 3.00);
-    let expensive = clamp(obj.expensive,  0.10, 4.00);
+    let hold      = clamp(obj.hold,      0.10, 3.00);
+    let expensive = clamp(obj.expensive, 0.10, 4.00);
 
+    // Reihenfolge erzwingen
     buy = Math.max(buy, strongBuy);
     hold = Math.max(hold, buy);
     expensive = Math.max(expensive, hold);
 
     return { strongBuy, buy, hold, expensive };
+  }
+
+  function syncInputsFromState(){
+    const cur = NUTZEN_STATE.buyBands || DEFAULT;
+    sb.value = String(cur.strongBuy ?? DEFAULT.strongBuy).replace(".", ",");
+    b.value  = String(cur.buy       ?? DEFAULT.buy).replace(".", ",");
+    h.value  = String(cur.hold      ?? DEFAULT.hold).replace(".", ",");
+    ex.value = String(cur.expensive ?? DEFAULT.expensive).replace(".", ",");
   }
 
   function onAnyChange(){
@@ -2364,40 +3302,47 @@ function wireOverlayBuyInputs(){
 
     NUTZEN_STATE.buyBands = next;
 
-    sb.value = String(next.strongBuy);
-    b.value  = String(next.buy);
-    h.value  = String(next.hold);
-    ex.value = String(next.expensive);
+    // Inputs sauber “zurückschreiben” (z.B. wenn User Reihenfolge kaputt tippt)
+    sb.value = String(next.strongBuy).replace(".", ",");
+    b.value  = String(next.buy).replace(".", ",");
+    h.value  = String(next.hold).replace(".", ",");
+    ex.value = String(next.expensive).replace(".", ",");
 
     runAllCalcs();
   }
 
-  // Listener (input = live)
+  // Live listeners
   sb.addEventListener("input", onAnyChange);
   b.addEventListener("input",  onAnyChange);
   h.addEventListener("input",  onAnyChange);
   ex.addEventListener("input", onAnyChange);
 
-  // Reset Button
-  reset?.addEventListener("click", () => {
-    syncInputsFromState();
-    if(ovFair){
-      ovFair.value = "";
-      ovFair.dataset.auto = "1"; // zurück auf Auto
-    }
+  // Fair Override: sobald User tippt → auto aus
+  ovFair?.addEventListener("input", () => {
+    ovFair.dataset.auto = "0";
     runAllCalcs();
   });
+
+  // Reset: Defaults + Fair wieder Auto
+  reset.addEventListener("click", () => {
+    NUTZEN_STATE.buyBands = { ...DEFAULT };
+
+    syncInputsFromState();
+
+    if(ovFair){
+      ovFair.value = "";
+      ovFair.dataset.auto = "1";
+    }
+
+    runAllCalcs();
+  });
+
+  // initial
+  syncInputsFromState();
 }
 
 
 
-
-
-
-let NUTZEN_STATE = {
-  sector: "standard",
-  buyBands: { strongBuy:0.75, buy:0.90, hold:1.10, expensive:1.25 }
-};
 
 
 
@@ -3029,7 +3974,22 @@ function renderOverlayBuyFromMap(m, fairOverride){
     dEl.innerHTML = `<span class="dot ${dec.mode}"></span> Aktion: ${dec.label}`;
   }
 
+    // ===== Boxen befüllen =====
+  const setTxt = (id, txt) => { const x = el(id); if(x) x.textContent = txt; };
+  const fmt = (n) => Number.isFinite(n) ? n.toLocaleString("de-DE",{maximumFractionDigits:2}) : "–";
+
+  setTxt("ovBoxFair",   fmt(fair));
+  setTxt("ovBoxStrong", bands ? fmt(bands.strongBuyMax) : "–");
+  setTxt("ovBoxBuy",    bands ? fmt(bands.buyMax)       : "–");
+  setTxt("ovBoxHold",   bands ? fmt(bands.holdMax)      : "–");
+  setTxt("ovBoxExp",    bands ? fmt(bands.expensiveMax) : "–");
+
+      // Dividend Box (Kapital * DivYield)
+  renderOverlayDividendBox(m);
+
+
   return { fair, priceNow, bands };
+
 }
 
 
@@ -3087,11 +4047,22 @@ function initNutzenUI(){
   wireOverlayBuyInputs();
 
   wireDcfInputs();
-  
+  wireToolsFx();       
+  wireToolsCagr();
+  wireToolsVola();
+  wireOverlayDividendControls();
+  wireCapitalAutoFormat();
+
+
+  el("ovCapital")?.addEventListener("input", () => runAllCalcs());
 
   // optional initial
   runAllCalcs();
   wireTableAutoRecalc();
+
+    el("ovCapital")?.addEventListener("input", () => runAllCalcs());
+
+
 }
 
 document.addEventListener("DOMContentLoaded", initNutzenUI);
@@ -3178,7 +4149,7 @@ function buildNutzenCtxFromTableMap(m){
     "FCF_YIELD_1Y",
     "FCF_MARGIN_1Y",
     "GROSS_MARGIN_1Y",
-    "OP_MARGIN_1Y",
+    "OPERATING_MARGIN_1Y",
     "PROFIT_MARGIN_1Y",
     "ROIC_1Y",
     "ROE_1Y",
@@ -3206,18 +4177,191 @@ function buildNutzenCtxFromTableMap(m){
 
 
 
+
+
+
+// =============================
+// DEBUG: Missing IDs + Raw + Parse-Reason
+// =============================
+
+// Heuristik: welche IDs sind % / Bool / Range
+const DEBUG_PCT_IDS = new Set([
+  // exakt wie PCT_LOOSE_IDS + ggf. Ergänzungen
+  "VOL_1_5_10","DIV_YIELD","FCF_YIELD_1Y","FCF_MARGIN_1Y","GROSS_MARGIN_1Y",
+  "OPERATING_MARGIN_1Y","PROFIT_MARGIN_1Y","ROIC_1Y","ROE_1Y",
+  "REV_GROWTH_YOY_1Y","REV_CAGR_4Y","EPS_GROWTH_CAGR_4Y","DIVIDEND_DPS_CAGR_4Y",
+  "SHARES_CHANGE_YOY","PAYOUT_RATIO_1Y",
+]);
+
+const DEBUG_BOOL_IDS = new Set([
+  "FCF_POSITIVE_YN",
+]);
+
+const DEBUG_RANGE_IDS = new Set([
+  "RANGE_52W",
+]);
+
+function debugExpectedType(id){
+  if(DEBUG_BOOL_IDS.has(id)) return "bool";
+  if(DEBUG_RANGE_IDS.has(id)) return "range";
+  if(DEBUG_PCT_IDS.has(id)) return "pct";
+  return "num";
+}
+
+function debugParseOne(id, raw){
+  const expected = debugExpectedType(id);
+
+  const rawStr = nzStr(raw);
+  const rawTrim = rawStr.trim();
+
+  // 1) Missing token
+  if(isMissing(rawTrim)) {
+    return {
+      expected,
+      ok: false,
+      parsed: null,
+      reason: "missing-token (leer/–/n.a./k.a./null/...)"
+    };
+  }
+
+  // 2) Parse je Typ
+  if(expected === "bool"){
+    const b = nzBool(rawTrim);
+    if(b === true || b === false) {
+      return { expected, ok:true, parsed:b, reason:"ok" };
+    }
+    return {
+      expected,
+      ok:false,
+      parsed:null,
+      reason:"bool-parse-fail (erwartet: ja/nein | yes/no | true/false | 1/0)"
+    };
+  }
+
+  if(expected === "range"){
+    const r = parseRangeLowHigh(rawTrim);
+    if(r && Number.isFinite(r.low) && Number.isFinite(r.high)){
+      return { expected, ok:true, parsed:r, reason:"ok" };
+    }
+    return {
+      expected,
+      ok:false,
+      parsed:null,
+      reason:"range-parse-fail (Format z.B. '12.3 - 45.6')"
+    };
+  }
+
+  if(expected === "pct"){
+    // nutzt deine gleiche Logik wie ctx.pct: loose für bekannte IDs, sonst nzPct01
+    const p = DEBUG_PCT_IDS.has(id) ? pct01Loose(rawTrim) : nzPct01(rawTrim);
+    if(Number.isFinite(p)){
+      return { expected, ok:true, parsed:p, reason:"ok" };
+    }
+    return {
+      expected,
+      ok:false,
+      parsed:null,
+      reason:"pct-parse-fail (z.B. '12,5%' oder '0,125' erwartet)"
+    };
+  }
+
+  // expected === "num"
+  const n = nzNum(rawTrim);
+  if(Number.isFinite(n)){
+    return { expected, ok:true, parsed:n, reason:"ok" };
+  }
+
+  // Extra Diagnose für Zahlen
+  const hasDigit = /\d/.test(rawTrim);
+  const looksLikePct = rawTrim.includes("%");
+  const looksLikeRange = rawTrim.includes(" - ") || rawTrim.includes("-");
+  const looksLikeSuffix = /[kmbt]$/i.test(rawTrim.replace(/\s/g,""));
+
+  return {
+    expected,
+    ok:false,
+    parsed:null,
+    reason:
+      !hasDigit ? "num-parse-fail (keine Zahl erkannt)" :
+      looksLikePct ? "num-parse-fail (enthält %, ggf. als pct behandeln)" :
+      looksLikeRange ? "num-parse-fail (sieht aus wie Range, ggf. RANGE_52W)" :
+      looksLikeSuffix ? "num-parse-fail (Suffix K/M/B/T ok, aber Format passt nicht)" :
+      "num-parse-fail (DE/EN Format prüfen: 1.234,56 | 1234.56 | 6,075,302)"
+  };
+}
+
+function buildMissingDebugReport(){
+  const sector = NUTZEN_STATE?.sector || "standard";
+  const ids = (NUTZEN_CRITERIA_BY_SECTOR?.[sector] || []).slice();
+  const uniqIds = Array.from(new Set(ids.map(x => String(x||"").trim()).filter(Boolean)));
+
+  const m = tableToMap();
+  const rows = [];
+  let missingCount = 0;
+
+  for(const id of uniqIds){
+    const raw = mGet(m, id);
+    const label = critLabel(id);
+
+    const hasCriteria = !!CRITERIA?.[id];
+    const parse = debugParseOne(id, raw);
+
+    const isMissingNow = !parse.ok; // in Debug-Sinn: nicht verwertbar
+    if(isMissingNow) missingCount++;
+
+    rows.push({
+      id,
+      label,
+      hasCRITERIA: hasCriteria,
+      expected: parse.expected,
+      raw: nzStr(raw),
+      parsed: parse.ok ? parse.parsed : null,
+      reason: parse.reason,
+    });
+  }
+
+  // nur die „Probleme“ nach oben
+  rows.sort((a,b) => {
+    const ap = (a.reason !== "ok") ? 0 : 1;
+    const bp = (b.reason !== "ok") ? 0 : 1;
+    return ap - bp;
+  });
+
+  return {
+    sector,
+    totalIds: uniqIds.length,
+    missingOrUnparseable: missingCount,
+    issuesPreview: rows.filter(r => r.reason !== "ok").slice(0, 25),
+    // alles optional, wenn du alles sehen willst:
+    // rows
+  };
+}
+
+
+
+
+
+
+
 const ROLE_RULES_BANKS      = {};
+
 const ROLE_RULES_INSURANCE  = {};
+
 const ROLE_RULES_REITS      = {};
-const ROLE_RULES_UTILITIES  = {};
+
 const ROLE_RULES_BROKERS    = {};
+
 const ROLE_RULES_COMMODITIES= {};
 
+
 const STRESS_RULES_BANKS      = () => STRESS_RULES_STANDARD;
+
 const STRESS_RULES_INSURANCE  = () => STRESS_RULES_STANDARD;
+
 const STRESS_RULES_REITS      = () => STRESS_RULES_STANDARD;
-const STRESS_RULES_UTILITIES  = () => STRESS_RULES_STANDARD;
+
 const STRESS_RULES_BROKERS    = () => STRESS_RULES_STANDARD;
+
 const STRESS_RULES_COMMODITIES= () => STRESS_RULES_STANDARD;
 
 
@@ -3232,6 +4376,20 @@ const STRESS_RULES_COMMODITIES= () => STRESS_RULES_STANDARD;
     default:            return ROLE_RULES_STANDARD;
   }
 }
+
+
+function pickStressRulesBySector(sector){
+  switch(sector){
+    case "utilities":   return STRESS_RULES_UTILITIES?.() || STRESS_RULES_STANDARD;
+    case "banks":       return STRESS_RULES_BANKS?.() || STRESS_RULES_STANDARD;
+    case "insurance":   return STRESS_RULES_INSURANCE?.() || STRESS_RULES_STANDARD;
+    case "reits":       return STRESS_RULES_REITS?.() || STRESS_RULES_STANDARD;
+    case "brokers":     return STRESS_RULES_BROKERS?.() || STRESS_RULES_STANDARD;
+    case "commodities": return STRESS_RULES_COMMODITIES?.() || STRESS_RULES_STANDARD;
+    default:            return STRESS_RULES_STANDARD;
+  }
+}
+
 
 
 
@@ -3450,7 +4608,8 @@ function runAllCalcs(){
   const fairFromInput   = nzNum(el("nutzenFairValue")?.value);
   const fairFromOverlay = nzNumInput(el("ovFair")?.value);
 
-  const fairAuto = computeFairValueStandardDCF(ctx);
+  const fv = computeFairValueFundamentalRangeBreakdown(ctx);
+  const fairAuto = fv?.ok ? fv.range.base : NaN;
 
   const ov = el("ovFair");
   const overlayIsManual = !!(ov && ov.dataset.auto === "0");
@@ -3502,14 +4661,24 @@ function runAllCalcs(){
 
   const pre = el("nutzenDebug");
   if(pre){
-    pre.textContent = JSON.stringify({
+    const fvDbg = {
       sector: NUTZEN_STATE.sector,
-      fair,
-      fairAuto,
-      fairTableNow: fair2FromTable,
-      stress: stressLabel
+      preset: fv?.preset,
+      range: fv?.ok ? fv.range : null,
+      confidence: fv?.confidence,
+      notes: fv?.notes || []
+    };
+
+    const missDbg = buildMissingDebugReport();
+
+    pre.textContent = JSON.stringify({
+      fairValue: fvDbg,
+      parsing: missDbg
     }, null, 2);
   }
+
+  renderFairPage();
+
 }
 
 
@@ -3549,7 +4718,8 @@ if(values.length === 0){
 }
 
 // ✅ Standard: nach deiner Excel-Master-Reihenfolge mappen
-const mapped = buildMapFromValuesByOrder(values, PASTE_ORDER_STANDARD);
+const orderIds = (NUTZEN_CRITERIA_BY_SECTOR[NUTZEN_STATE.sector] || NUTZEN_CRITERIA_BY_SECTOR.standard);
+const mapped = new Map(orderIds.map((id, i) => [id, values[i]]).filter(([,v]) => v !== undefined));
 fillTableByMap(mapped);
     }
 
@@ -3670,6 +4840,522 @@ function wireYearSelects(){
     });
   }
 }
+
+
+function wireToolsFx(){
+  const mode = el("fxMode");
+  const rate = el("fxRate");
+  const amt  = el("fxAmount");
+  const lab  = el("fxAmountLabel");
+  const out  = el("fxOut");
+  const btn  = el("btnFxConvert");
+  const refresh = el("btnFxRefresh");
+
+  if(!mode || !rate || !amt || !lab || !out || !btn) return;
+  if(wireToolsFx._bound) return;
+  wireToolsFx._bound = true;
+
+  const fmt2 = (n) => Number.isFinite(n)
+    ? n.toLocaleString("de-DE", { maximumFractionDigits: 6 })
+    : "–";
+
+  function syncLabels(){
+    if(mode.value === "USD_EUR"){
+      lab.textContent = "Betrag (USD)";
+      if(out.textContent === "–") out.textContent = "EUR: –";
+    } else {
+      lab.textContent = "Betrag (EUR)";
+      if(out.textContent === "–") out.textContent = "USD: –";
+    }
+  }
+
+  function convert(){
+    const a = nzNumInput(amt.value);
+    const r = nzNumInput(rate.value);
+    if(!Number.isFinite(a) || !Number.isFinite(r)){
+      out.textContent = "–";
+      return;
+    }
+    const res = a * r;
+    out.textContent = (mode.value === "USD_EUR")
+      ? `EUR: ${fmt2(res)}`
+      : `USD: ${fmt2(res)}`;
+  }
+
+  async function refreshRate(){
+    if(!refresh || !rate) return;
+
+    // Frankfurt API (EZB Referenzkurse): https://www.frankfurter.app/
+    const from = (mode.value === "USD_EUR") ? "USD" : "EUR";
+    const to   = (mode.value === "USD_EUR") ? "EUR" : "USD";
+
+    refresh.disabled = true;
+    const oldTxt = refresh.textContent;
+    refresh.textContent = "Lade…";
+
+    try{
+      const url = `https://api.frankfurter.app/latest?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+      const resp = await fetch(url, { cache: "no-store" });
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      const data = await resp.json();
+      const r = data?.rates?.[to];
+
+      if(!Number.isFinite(r)) throw new Error("Rate missing");
+
+      // ins Input schreiben (DE Komma)
+      rate.value = String(r).replace(".", ",");
+
+      // optional: Output direkt aktualisieren, falls Betrag schon drin ist
+      if(nzStr(amt.value).trim().length > 0) convert();
+
+      // optional: kleines Feedback
+      refresh.textContent = `Aktualisiert (${data?.date || "–"})`;
+      setTimeout(() => { refresh.textContent = oldTxt; }, 1200);
+
+    } catch(e){
+      console.warn("FX refresh failed:", e);
+      refresh.textContent = "Fehler";
+      setTimeout(() => { refresh.textContent = oldTxt; }, 1200);
+    } finally{
+      refresh.disabled = false;
+    }
+  }
+
+  mode.addEventListener("change", () => {
+    out.textContent = "–";
+    syncLabels();
+  });
+
+  btn.addEventListener("click", convert);
+  refresh?.addEventListener("click", refreshRate);
+
+  // Enter → Umrechnen
+  amt.addEventListener("keydown", (e) => { if(e.key === "Enter") convert(); });
+  rate.addEventListener("keydown", (e) => { if(e.key === "Enter") convert(); });
+
+  syncLabels();
+}
+
+
+
+// CAGR Rechner 
+function wireToolsCagr(){
+  const modeEl = el("cagrMode");         // revenue/eps/dps
+  const calcEl = el("cagrCalcMode");     // rate/end/start
+
+  const sEl = el("cagrStart");
+  const eEl = el("cagrEnd");
+  const yEl = el("cagrYears");
+  const rEl = el("cagrRate");
+
+  const sLab = el("cagrStartLabel");
+  const eLab = el("cagrEndLabel");
+  const rLab = el("cagrRateLabel");
+
+  const out = el("cagrOut");
+  const meta = el("cagrMeta");
+  const btn = el("btnCagrCalc");
+
+  if(!modeEl || !calcEl || !sEl || !eEl || !yEl || !rEl || !sLab || !eLab || !rLab || !out || !meta || !btn) return;
+  if(wireToolsCagr._bound) return;
+  wireToolsCagr._bound = true;
+
+  const labelByMode = (m) => {
+    if(m === "eps") return { noun:"EPS", hint:"z.B. Gewinn je Aktie" };
+    if(m === "dps") return { noun:"DPS", hint:"Dividend je Aktie" };
+    return { noun:"Revenue", hint:"Umsatz (z.B. in Mio/Mrd)" };
+  };
+
+  const fmtNum = (n) => Number.isFinite(n)
+    ? n.toLocaleString("de-DE", { maximumFractionDigits: 4 })
+    : "–";
+
+  const fmtPct = (x) => Number.isFinite(x)
+    ? (x * 100).toLocaleString("de-DE", { maximumFractionDigits: 2 }) + "%"
+    : "–";
+
+  function syncUI(){
+    const m = modeEl.value;
+    const { noun } = labelByMode(m);
+    sLab.textContent = `Startwert (${noun})`;
+    eLab.textContent = `Endwert (${noun})`;
+    rLab.textContent = `CAGR (${noun}) %`;
+
+    // je nach Berechnung: benötigte Felder aktivieren
+    const calc = calcEl.value;
+
+    // Standard: alles an, dann gezielt deaktivieren
+    sEl.disabled = false;
+    eEl.disabled = false;
+    rEl.disabled = false;
+
+    if(calc === "rate"){
+      // Start+Ende+Jahre -> Rate (Rate wird ausgegeben, Eingabe optional)
+      rEl.disabled = true;
+      rEl.value = "";
+    } else if(calc === "end"){
+      // Start + Rate + Jahre -> Ende
+      eEl.disabled = true;
+      eEl.value = "";
+    } else if(calc === "start"){
+      // Ende + Rate + Jahre -> Start
+      sEl.disabled = true;
+      sEl.value = "";
+    }
+  }
+
+  function calc(){
+    const calcMode = calcEl.value;
+    const years = nzNumInput(yEl.value);
+
+    if(!(Number.isFinite(years) && years > 0)){
+      out.textContent = "–";
+      meta.textContent = "Bitte Jahre > 0 eingeben.";
+      return;
+    }
+
+    // Rate als 0..1 (akzeptiert 12,5% oder 0,125)
+    const rate01 = nzPct01(rEl.value);
+
+    const start = nzNumInput(sEl.value);
+    const end   = nzNumInput(eEl.value);
+
+    if(calcMode === "rate"){
+      if(!(Number.isFinite(start) && start > 0 && Number.isFinite(end) && end > 0)){
+        out.textContent = "–";
+        meta.textContent = "Für CAGR brauchst du Start > 0 und Ende > 0.";
+        return;
+      }
+      const cagr = Math.pow(end / start, 1 / years) - 1;
+      out.textContent = `CAGR: ${fmtPct(cagr)}`;
+      meta.textContent = `Formel: (Ende/Start)^(1/Jahre) − 1 · Start=${fmtNum(start)} · Ende=${fmtNum(end)} · Jahre=${fmtNum(years)}`;
+      return;
+    }
+
+    if(!(Number.isFinite(rate01))){
+      out.textContent = "–";
+      meta.textContent = "Bitte CAGR (%) eingeben (z.B. 12,5%).";
+      return;
+    }
+
+    if(calcMode === "end"){
+      if(!(Number.isFinite(start) && start > 0)){
+        out.textContent = "–";
+        meta.textContent = "Für Ende brauchst du Start > 0.";
+        return;
+      }
+      const endVal = start * Math.pow(1 + rate01, years);
+      out.textContent = `Endwert: ${fmtNum(endVal)}  (bei ${fmtPct(rate01)} p.a.)`;
+      meta.textContent = `Formel: Ende = Start × (1+CAGR)^Jahre`;
+      return;
+    }
+
+    if(calcMode === "start"){
+      if(!(Number.isFinite(end) && end > 0)){
+        out.textContent = "–";
+        meta.textContent = "Für Start brauchst du Ende > 0.";
+        return;
+      }
+      const startVal = end / Math.pow(1 + rate01, years);
+      out.textContent = `Startwert: ${fmtNum(startVal)}  (bei ${fmtPct(rate01)} p.a.)`;
+      meta.textContent = `Formel: Start = Ende ÷ (1+CAGR)^Jahre`;
+      return;
+    }
+  }
+
+  modeEl.addEventListener("change", syncUI);
+  calcEl.addEventListener("change", syncUI);
+  btn.addEventListener("click", calc);
+
+  // Enter = berechnen (in allen Inputs)
+  for(const inp of [sEl,eEl,yEl,rEl]){
+    inp.addEventListener("keydown", (ev) => { if(ev.key === "Enter") calc(); });
+  }
+
+  syncUI();
+}
+
+
+
+
+function wireToolsVola(){
+  const modeEl = el("volMode");       // 1/5/10
+  const freqEl = el("volFreq");       // daily/weekly/monthly
+  const typeEl = el("volInputType");  // prices/returns
+  const dataEl = el("volData");
+  const outEl  = el("volOut");
+  const metaEl = el("volMeta");
+  const btn    = el("btnVolCalc");
+
+  if(!modeEl || !freqEl || !typeEl || !dataEl || !outEl || !metaEl || !btn) return;
+  if(wireToolsVola._bound) return;
+  wireToolsVola._bound = true;
+
+  const ppyByFreq = { daily:252, weekly:52, monthly:12 };
+
+  function parseLines(raw){
+    const s = String(raw || "").replace(/\r/g, "").trim();
+    if(!s) return [];
+    return s.split("\n").map(l => l.trim()).filter(Boolean);
+  }
+
+  // TAB bevorzugt. Fallback: 2+ spaces (nicht 1-space, sonst zerreißt "Feb 27, 2026")
+  function splitRow(line){
+    if(line.includes("\t")) return line.split("\t").map(x => x.trim());
+    return line.split(/\s{2,}/).map(x => x.trim());
+  }
+
+  function normTok(x){
+    return String(x||"").toLowerCase().replace(/\./g,"").replace(/\s+/g,"").trim();
+  }
+
+  // ✅ erkennt Header überall (auch "Adj. Close" etc.)
+  function isHeader(parts){
+    if(!parts || parts.length < 2) return false;
+    const t0 = normTok(parts[0]);
+    const hasDate = (t0 === "date");
+    const hasClose = parts.some(p => normTok(p) === "close" || normTok(p) === "adjclose");
+    const hasOpen  = parts.some(p => normTok(p) === "open");
+    return hasDate && hasClose && hasOpen;
+  }
+
+  // ✅ robustes Zahlenparsing: 25.60, 25,60, 6,075,302, 6.075.302
+  function parseNumAny(v){
+    let s = String(v ?? "").trim();
+    if(!s || s === "-" || s.toLowerCase() === "n/a") return NaN;
+
+    // Entferne Spaces
+    s = s.replace(/\s+/g, "");
+
+    // Wenn sowohl , als auch . vorkommen -> meistens: , Tausender, . Dezimal
+    if(s.includes(",") && s.includes(".")){
+      s = s.replace(/,/g, "");
+    } else {
+      // nur Komma -> Dezimal-Komma
+      if(s.includes(",") && !s.includes(".")) s = s.replace(",", ".");
+      // nur Punkt -> ok
+      // nur Tausender-Punkt (6.075.302) -> wenn mehr als 1 Punkt und kein Komma: remove all dots
+      if(!s.includes(",") && (s.match(/\./g)||[]).length > 1) s = s.replace(/\./g, "");
+    }
+
+    // alles außer Zahl/Minus/Punkt entfernen
+    s = s.replace(/[^0-9.\-]/g, "");
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  // ✅ "3.14%" / "-1,94%" / "0.0314" -> 0..1 (oder negativ)
+  function parsePct01Any(v){
+    let s = String(v ?? "").trim();
+    if(!s || s === "-" || s.toLowerCase() === "n/a") return NaN;
+
+    const hasPct = s.includes("%");
+    // mache aus "3,14%" -> "3.14%"
+    s = s.replace(/\s+/g, "");
+    if(s.includes(",") && !s.includes(".")) s = s.replace(",", ".");
+    // entferne tausender-commas falls jemand "1,234.56%" schreibt
+    if(s.includes(",") && s.includes(".")) s = s.replace(/,/g, "");
+    s = s.replace(/%/g, "");
+    s = s.replace(/[^0-9.\-]/g, "");
+
+    const n = Number(s);
+    if(!Number.isFinite(n)) return NaN;
+    return hasPct ? (n/100) : n; // ohne %: schon dezimal erwartet
+  }
+
+  // ✅ Datum/Year erkennen um Reihenfolge zu prüfen
+  const monthMap = {
+    jan:0, january:0,
+    feb:1, february:1,
+    mar:2, march:2,
+    apr:3, april:3,
+    may:4,
+    jun:5, june:5,
+    jul:6, july:6,
+    aug:7, august:7,
+    sep:8, sept:8, september:8,
+    oct:9, october:9,
+    nov:10, november:10,
+    dec:11, december:11,
+  };
+
+  function parseDateKey(dateStr){
+    const s = String(dateStr||"").trim();
+    if(!s) return NaN;
+
+    // Year-only: "2026"
+    if(/^\d{4}$/.test(s)) return Date.UTC(Number(s), 0, 1);
+
+    // "Feb 27, 2026"
+    const m = s.match(/^([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})$/);
+    if(m){
+      const mon = monthMap[m[1].toLowerCase()];
+      if(mon == null) return NaN;
+      const day = Number(m[2]);
+      const year = Number(m[3]);
+      return Date.UTC(year, mon, day);
+    }
+
+    // "2026-02-27" (falls mal so)
+    const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(iso){
+      return Date.UTC(Number(iso[1]), Number(iso[2])-1, Number(iso[3]));
+    }
+
+    return NaN;
+  }
+
+  // ✅ nimm AdjClose wenn numerisch, sonst Close
+  function pickAdjOrClose(parts){
+    // Date=0 Open=1 High=2 Low=3 Close=4 AdjClose=5 Change=6 Volume=7
+    if(parts.length >= 6){
+      const adj = parseNumAny(parts[5]);
+      if(Number.isFinite(adj)) return adj;
+    }
+    if(parts.length >= 5) return parseNumAny(parts[4]);
+    return parseNumAny(parts[parts.length - 1]);
+  }
+
+  function pickChange(parts){
+    if(parts.length >= 7) return parsePct01Any(parts[6]);
+    return parsePct01Any(parts[parts.length - 1]);
+  }
+
+  function stdSample(arr){
+    const a = arr.filter(Number.isFinite);
+    const n = a.length;
+    if(n < 2) return NaN;
+    const mean = a.reduce((p,c)=>p+c,0) / n;
+    let ss = 0;
+    for(const x of a) ss += (x - mean) * (x - mean);
+    return Math.sqrt(ss / (n - 1));
+  }
+
+  function fmtPct01(x){
+    return Number.isFinite(x)
+      ? (x * 100).toLocaleString("de-DE", { maximumFractionDigits: 2 }) + "%"
+      : "–";
+  }
+
+  function calc(){
+    const years = Number(modeEl.value) || 1;
+    const freq  = freqEl.value || "daily";
+    const ppy   = ppyByFreq[freq] || 252;
+    const inputType = typeEl.value || "prices";
+
+    let lines = parseLines(dataEl.value);
+    if(lines.length < 2){
+      outEl.textContent = "Volatilität: –";
+      metaEl.textContent = "Bitte Daten einfügen (mind. 2 Zeilen).";
+      return;
+    }
+
+    // ✅ 1) Alles rauswerfen, was Header/Headline/Quatsch ist
+    //    (Headline = Zeile ohne brauchbare Zahlen im Close/AdjClose/Change)
+    const rows = [];
+    for(const line of lines){
+      const parts = splitRow(line);
+
+      if(isHeader(parts)) continue;
+
+      // versuche Date key (optional), aber nicht zwingend
+      const dateKey = parseDateKey(parts[0]);
+
+      // versuche numerische Felder
+      const price = pickAdjOrClose(parts);
+      const chg   = pickChange(parts);
+
+      const hasUseful =
+        Number.isFinite(price) || Number.isFinite(chg);
+
+      // Wenn gar nichts numerisch ist -> das ist eine Überschrift/Noise -> ignorieren
+      if(!hasUseful) continue;
+
+      rows.push({ line, parts, dateKey, price, chg });
+    }
+
+    if(rows.length < 3){
+      outEl.textContent = "Volatilität: –";
+      metaEl.textContent = "Zu wenig gültige Datenzeilen (Hinweis: Header/Headlines werden ignoriert).";
+      return;
+    }
+
+    // ✅ 2) Reihenfolge automatisch: wenn Datum erkennbar -> sortiere chronologisch
+    //       sonst: falls vermutlich neueste oben -> reverse (heuristik)
+    const withDates = rows.filter(r => Number.isFinite(r.dateKey));
+    if(withDates.length >= 2){
+      // sortiere nach dateKey, und nimm nur Zeilen mit Datum + den Rest hinten dran
+      rows.sort((a,b) => {
+        const ak = a.dateKey, bk = b.dateKey;
+        const aOk = Number.isFinite(ak), bOk = Number.isFinite(bk);
+        if(aOk && bOk) return ak - bk;
+        if(aOk && !bOk) return -1;
+        if(!aOk && bOk) return 1;
+        return 0;
+      });
+    } else {
+      // Heuristik: neueste oben ist häufig → umdrehen
+      rows.reverse();
+    }
+
+    // ✅ 3) Renditen bauen
+    let rets = [];
+
+    if(inputType === "returns"){
+      // primär: Change%
+      const chgs = rows.map(r => r.chg).filter(Number.isFinite);
+      if(chgs.length >= 2){
+        rets = chgs;
+      } else {
+        // fallback: aus Preisen log-returns
+        const prices = rows.map(r => r.price).filter(Number.isFinite);
+        for(let i=1;i<prices.length;i++){
+          const p0 = prices[i-1], p1 = prices[i];
+          if(!(p0 > 0 && p1 > 0)) continue;
+          rets.push(Math.log(p1 / p0));
+        }
+      }
+    } else {
+      // prices -> aus Preisen log-returns
+      const prices = rows.map(r => r.price).filter(Number.isFinite);
+      if(prices.length < 2){
+        outEl.textContent = "Volatilität: –";
+        metaEl.textContent = "Konnte keine Close/Adj. Close Werte lesen (TAB/Spalten prüfen).";
+        return;
+      }
+      for(let i=1;i<prices.length;i++){
+        const p0 = prices[i-1], p1 = prices[i];
+        if(!(p0 > 0 && p1 > 0)) continue;
+        rets.push(Math.log(p1 / p0));
+      }
+    }
+
+    if(rets.length < 2){
+      outEl.textContent = "Volatilität: –";
+      metaEl.textContent = "Zu wenig gültige Renditen für die Berechnung.";
+      return;
+    }
+
+    // ✅ 4) Fenster (years * ppy) – wenn weniger Daten da sind, nimm alles
+    const need = Math.round(years * ppy);
+    const used = (rets.length >= need) ? rets.slice(-need) : rets.slice();
+
+    const sd = stdSample(used);
+    const vol = sd * Math.sqrt(ppy);
+
+    outEl.textContent = `Volatilität: ${fmtPct01(vol)}`;
+    metaEl.textContent =
+      `Zeilen erkannt: ${rows.length} · Renditen: ${rets.length} · genutzt: ${used.length}/${need} · ` +
+      `Zeitraum: ${years}Y · Frequency: ${freq} (${ppy}/Jahr) · Art: ${inputType === "prices" ? "Kurs→log-Renditen" : "Renditen (Change% / Fallback)"}`;
+  }
+
+  btn.addEventListener("click", calc);
+  dataEl.addEventListener("keydown", (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key === "Enter") calc();
+  });
+}
+
 
 
 
@@ -4169,6 +5855,7 @@ health: (ctx) => [
 
        // Regeln für Rollen Banks
 
+
   
            // Regeln für Rollen Versicherer 
         
@@ -4182,6 +5869,419 @@ health: (ctx) => [
 
 
                    // Regeln für Rollen Versorger
+
+
+
+// =======================================================
+// ROLE_RULES_UTILITIES  (Base + Health)
+// Nutzt deine Utilities-HEADERS (über IDs aus CRITERIA)
+// Voraussetzung: du hast die IDs in CRITERIA so gemappt:
+// PRICE_NOW, RANGE_52W, BETA, MARKET_CAP, FAIR_VALUE,
+// PE_1Y, PB_RATIO_1Y, P_FCF_1Y, P_OCF_1Y, EV_SALES_1Y, EV_EBITDA_1Y,
+// DEBT_EQUITY_RATIO_1Y, NET_DEBT_EBITDA_1Y, QUICK_RATIO_1Y, CURRENT_RATIO_1Y,
+// ROE_1Y, ROCE_1Y, ROIC_1Y,
+// REVENUE_1Y, REV_GROWTH_YOY_1Y, REV_CAGR_4Y, NET_INCOME_1Y,
+// SHARES_OUT_DILUTED_1Y, SHARES_CHANGE_YOY,
+// EPS_DILUTED_1Y, EPS_GROWTH_CAGR_4Y,
+// FCF_1Y, FCF_POSITIVE_YN, FCF_MARGIN_1Y,
+// CASH_STI_1Y, SHORT_TERM_INVESTMENTS_1Y, TOTAL_DEBT_1Y, NET_DEBT_1Y, BOOK_VALUE_PER_SHARE_1Y,
+// OCF_1Y, CAPEX_1Y,
+// INTEREST_COVERAGE_1Y, GROSS_MARGIN_1Y, OP_MARGIN_1Y, PROFIT_MARGIN_1Y,
+// DIV_YIELD, DIV_FREQUENCY, DIV_GROWTH_YEARS, DIVIDEND_DPS_CAGR_4Y,
+// PAYOUT_RATIO_1Y, BUYBACK_YIELD, DIV_GROWTH, SHAREHOLDER_YIELD,
+// VOL_1_5_10, CAGR_4Y
+// =======================================================
+
+ROLE_RULES_UTILITIES = (() => {
+  const isFin = Number.isFinite;
+  const abs = Math.abs;
+
+  const N = (ctx, id) => ctx.num(id);
+  const P = (ctx, id) => ctx.pct(id);
+  const B = (ctx, id) => ctx.boo(id);
+
+  function chkNum(ctx, label, id, pred){
+    const v = N(ctx,id);
+    const missing = !isFin(v);
+    return ctx.chk(label, !missing && !!pred(v), missing);
+  }
+  function chkPct(ctx, label, id, pred){
+    const v = P(ctx,id);
+    const missing = !isFin(v);
+    return ctx.chk(label, !missing && !!pred(v), missing);
+  }
+  function chkBool(ctx, label, id, pred){
+    const v = B(ctx,id);
+    const missing = (v !== true && v !== false);
+    return ctx.chk(label, !missing && !!pred(v), missing);
+  }
+
+  // ---------- helpers ----------
+  function capBucket(ctx){
+    const mc = N(ctx,"MARKET_CAP");
+    if(!isFin(mc) || mc <= 0) return null;
+    if(mc < 2e9) return "small";
+    if(mc < 1e10) return "mid";
+    if(mc < 2e11) return "large";
+    return "mega";
+  }
+
+  function priceToFair(ctx){
+    const price = N(ctx,"PRICE_NOW");
+    const fair  = N(ctx,"FAIR_VALUE");
+    if(!isFin(price) || !isFin(fair) || fair <= 0) return NaN;
+    return price / fair; // <1 günstig
+  }
+
+  function cashToDebt(ctx){
+    const cash = N(ctx,"CASH_STI_1Y");
+    const debt = N(ctx,"TOTAL_DEBT_1Y");
+    if(!isFin(cash) || !isFin(debt) || debt <= 0) return NaN;
+    return cash / debt;
+  }
+
+  function payoutSafe(ctx, max=0.90){
+    return chkPct(ctx, `Payout Ratio ≤ ${(max*100).toFixed(0)}%`, "PAYOUT_RATIO_1Y", p => p > 0 && p <= max);
+  }
+  function payoutDanger(ctx){
+    return chkPct(ctx, "Payout Ratio ≤ 100% (Warnung wenn >100%)", "PAYOUT_RATIO_1Y", p => p <= 1.00);
+  }
+  function payoutSafeIfDividend(ctx, max=1.00){
+    const y = P(ctx,"DIV_YIELD");
+    const p = P(ctx,"PAYOUT_RATIO_1Y");
+    const missing = !isFin(y) || !isFin(p);
+    if(missing) return ctx.chk("Payout Ratio (nur falls Dividende)", false, true);
+    if(y <= 0) return ctx.chk("Payout Ratio (keine Dividende → neutral)", true, false);
+    return ctx.chk(`Payout Ratio ≤ ${(max*100).toFixed(0)}%`, p <= max, false);
+  }
+
+  function dilutionHealth(ctx){
+    const chg = P(ctx,"SHARES_CHANGE_YOY");
+    const missing = !isFin(chg);
+    if(missing) return ctx.chk("Dilution: Shares Change (YoY) verfügbar", false, true);
+    return ctx.chk(`Dilution (YoY) ≤ +2% (aktuell: ${(chg*100).toFixed(2)}%)`, chg <= 0.02, false);
+  }
+  function dilutionBad(ctx){
+    const chg = P(ctx,"SHARES_CHANGE_YOY");
+    const missing = !isFin(chg);
+    if(missing) return ctx.chk("Starke Verwässerung (YoY) ≤ +5%", false, true);
+    return ctx.chk(`Starke Verwässerung (YoY) ≤ +5% (aktuell: ${(chg*100).toFixed(2)}%)`, chg <= 0.05, false);
+  }
+
+  function qualityCoreBase(ctx){
+    return [
+      chkPct(ctx, "ROIC ≥ 8%",  "ROIC_1Y", x => x >= 0.08),
+      chkPct(ctx, "ROE ≥ 10%",  "ROE_1Y",  x => x >= 0.10),
+      chkPct(ctx, "Operating Margin ≥ 10%", "OP_MARGIN_1Y", x => x >= 0.10),
+      chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+      chkPct(ctx, "FCF-Marge ≥ 5%", "FCF_MARGIN_1Y", x => x >= 0.05),
+    ];
+  }
+
+  function balanceSheetStrongBase(ctx){
+    return [
+      chkNum(ctx, "Net Debt/EBITDA ≤ 3.5", "NET_DEBT_EBITDA_1Y", x => x <= 3.5),
+      chkNum(ctx, "Zinsdeckung ≥ 3",       "INTEREST_COVERAGE_1Y", x => x >= 3),
+      chkNum(ctx, "Current Ratio ≥ 1.0",   "CURRENT_RATIO_1Y", x => x >= 1.0),
+      ctx.chk("Cash/Total Debt ≥ 0.15", (() => {
+        const r = cashToDebt(ctx);
+        return isFin(r) ? r >= 0.15 : false;
+      })(), !isFin(cashToDebt(ctx))),
+    ];
+  }
+
+  function leveragedBase(ctx){
+    return [
+      chkNum(ctx, "Net Debt/EBITDA ≥ 4.5", "NET_DEBT_EBITDA_1Y", x => x >= 4.5),
+      chkNum(ctx, "Zinsdeckung < 2.5",     "INTEREST_COVERAGE_1Y", x => x < 2.5),
+      chkNum(ctx, "Current Ratio < 1.0",   "CURRENT_RATIO_1Y", x => x < 1.0),
+      chkNum(ctx, "Debt/Equity ≥ 2.0",     "DEBT_EQUITY_RATIO_1Y", x => x >= 2.0),
+    ];
+  }
+
+  return {
+    // =========================
+    // Dividend Roles
+    // =========================
+    "Dividenden Aristokrat": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "Dividenden Growth Years ≥ 10", "DIV_GROWTH_YEARS", y => y >= 10),
+        chkPct(ctx, "Dividenden Yield ≥ 3%",        "DIV_YIELD", y => y >= 0.03),
+        chkPct(ctx, "DPS CAGR 4Y ≥ 2%",             "DIVIDEND_DPS_CAGR_4Y", g => g >= 0.02),
+        chkPct(ctx, "Payout Ratio ≤ 80%",           "PAYOUT_RATIO_1Y", p => p > 0 && p <= 0.80),
+      ],
+      health: (ctx) => [
+        chkBool(ctx, "FCF positiv (Deckung)", "FCF_POSITIVE_YN", x => x === true),
+        payoutSafe(ctx, 0.90),
+        payoutDanger(ctx),
+        dilutionHealth(ctx),
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.0", "NET_DEBT_EBITDA_1Y", x => x <= 4.0),
+        chkNum(ctx, "Zinsdeckung ≥ 3",       "INTEREST_COVERAGE_1Y", x => x >= 3),
+      ],
+    },
+
+    "Dividendenwachstum": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "Dividenden Growth Years ≥ 5", "DIV_GROWTH_YEARS", y => y >= 5),
+        chkPct(ctx, "DPS CAGR 4Y ≥ 5%",            "DIVIDEND_DPS_CAGR_4Y", g => g >= 0.05),
+        chkPct(ctx, "Payout 20–90%",               "PAYOUT_RATIO_1Y", p => p >= 0.20 && p <= 0.90),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+      ],
+      health: (ctx) => [
+        payoutSafe(ctx, 0.95),
+        payoutDanger(ctx),
+        dilutionHealth(ctx),
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.0", "NET_DEBT_EBITDA_1Y", x => x <= 4.0),
+      ],
+    },
+
+    // =========================
+    // Value / Growth / GARP
+    // =========================
+    "Value": {
+      minPct: 0.60,
+      base: (ctx) => [
+        ctx.chk("Preis ≤ Fairer Preis", (() => {
+          const r = priceToFair(ctx);
+          return isFin(r) ? r <= 1.0 : false;
+        })(), !isFin(priceToFair(ctx))),
+
+        chkNum(ctx, "KGV ≤ 16",          "PE_1Y", x => x > 0 && x <= 16),
+        chkNum(ctx, "EV/EBITDA ≤ 12",    "EV_EBITDA_1Y", x => x > 0 && x <= 12),
+        chkNum(ctx, "P/FCF ≤ 18",        "P_FCF_1Y", x => x > 0 && x <= 18),
+        chkPct(ctx, "FCF-Marge ≥ 5%",    "FCF_MARGIN_1Y", x => x >= 0.05),
+      ],
+      health: (ctx) => [
+        chkBool(ctx, "FCF positiv", "FCF_POSITIVE_YN", x => x === true),
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.5", "NET_DEBT_EBITDA_1Y", x => x <= 4.5),
+        payoutSafeIfDividend(ctx, 1.00),
+      ],
+    },
+
+    "Wachstum": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkPct(ctx, "Revenue Growth YoY ≥ 6%", "REV_GROWTH_YOY_1Y", x => x >= 0.06),
+        chkPct(ctx, "Revenue CAGR 4Y ≥ 6%",   "REV_CAGR_4Y", x => x >= 0.06),
+        chkPct(ctx, "EPS CAGR 4Y ≥ 8%",       "EPS_GROWTH_CAGR_4Y", x => x >= 0.08),
+        chkPct(ctx, "Operating Margin ≥ 10%", "OP_MARGIN_1Y", x => x >= 0.10),
+      ],
+      health: (ctx) => [
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkPct(ctx, "FCF-Marge ≥ 5%", "FCF_MARGIN_1Y", x => x >= 0.05),
+      ],
+    },
+
+    "GARP": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkPct(ctx, "EPS CAGR 4Y ≥ 7%",        "EPS_GROWTH_CAGR_4Y", x => x >= 0.07),
+        chkPct(ctx, "Revenue CAGR 4Y ≥ 5%",    "REV_CAGR_4Y", x => x >= 0.05),
+        chkNum(ctx, "KGV ≤ 22",                "PE_1Y", x => x > 0 && x <= 22),
+        chkNum(ctx, "EV/EBITDA ≤ 16",          "EV_EBITDA_1Y", x => x > 0 && x <= 16),
+        chkPct(ctx, "ROIC ≥ 8%",               "ROIC_1Y", x => x >= 0.08),
+      ],
+      health: (ctx) => [
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.0", "NET_DEBT_EBITDA_1Y", x => x <= 4.0),
+      ],
+    },
+
+    // =========================
+    // Quality / Pricing Power / Defensive / Healthy
+    // =========================
+    "Quality": {
+      minPct: 0.60,
+      base: (ctx) => qualityCoreBase(ctx),
+      health: (ctx) => [
+        ...balanceSheetStrongBase(ctx),
+        chkPct(ctx, "Profit Margin ≥ 6%", "PROFIT_MARGIN_1Y", x => x >= 0.06),
+      ],
+    },
+
+    "Pricing Power": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkPct(ctx, "Gross Margin ≥ 25%",     "GROSS_MARGIN_1Y", x => x >= 0.25),
+        chkPct(ctx, "Operating Margin ≥ 12%","OP_MARGIN_1Y", x => x >= 0.12),
+        chkPct(ctx, "ROIC ≥ 10%",             "ROIC_1Y", x => x >= 0.10),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.0", "NET_DEBT_EBITDA_1Y", x => x <= 4.0),
+      ],
+    },
+
+    "Turnaround": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkPct(ctx, "Revenue Growth > 0", "REV_GROWTH_YOY_1Y", x => x > 0),
+        chkPct(ctx, "Profit Margin > 0",  "PROFIT_MARGIN_1Y", x => x > 0),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkPct(ctx, "EPS CAGR 4Y > 0",    "EPS_GROWTH_CAGR_4Y", x => x > 0),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA < 6.0", "NET_DEBT_EBITDA_1Y", x => x < 6.0),
+        chkNum(ctx, "Zinsdeckung ≥ 2",       "INTEREST_COVERAGE_1Y", x => x >= 2),
+      ],
+    },
+
+    "Zykliker": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "Beta ≥ 1.2", "BETA", x => x >= 1.2),
+        chkPct(ctx, "Revenue YoY |≥10%| (Proxy)", "REV_GROWTH_YOY_1Y", x => abs(x) >= 0.10),
+        chkPct(ctx, "Profit Margin < 6% (Proxy)",  "PROFIT_MARGIN_1Y", x => x < 0.06),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA ≤ 5.0", "NET_DEBT_EBITDA_1Y", x => x <= 5.0),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+      ],
+    },
+
+    "Spekulation": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "KGV ≥ 40 oder negativ", "PE_1Y", x => x >= 40 || x <= 0),
+        chkNum(ctx, "P/FCF ≥ 35 oder negativ", "P_FCF_1Y", x => x >= 35 || x <= 0),
+        chkPct(ctx, "Profit Margin ≤ 0%", "PROFIT_MARGIN_1Y", x => x <= 0),
+      ],
+      health: (ctx) => [
+        chkBool(ctx, "FCF nicht positiv", "FCF_POSITIVE_YN", x => x === false),
+        chkNum(ctx, "Net Debt/EBITDA ≥ 5.0", "NET_DEBT_EBITDA_1Y", x => x >= 5.0),
+        chkNum(ctx, "Zinsdeckung < 2.5",     "INTEREST_COVERAGE_1Y", x => x < 2.5),
+      ],
+    },
+
+    "Krisenfall": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkBool(ctx, "FCF nicht positiv", "FCF_POSITIVE_YN", x => x === false),
+        chkPct(ctx, "Profit Margin ≤ 0%", "PROFIT_MARGIN_1Y", x => x <= 0),
+        chkNum(ctx, "Zinsdeckung < 2", "INTEREST_COVERAGE_1Y", x => x < 2),
+        chkNum(ctx, "Current Ratio < 1.0", "CURRENT_RATIO_1Y", x => x < 1.0),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA ≥ 6.0", "NET_DEBT_EBITDA_1Y", x => x >= 6.0),
+        chkPct(ctx, "Revenue Growth negativ", "REV_GROWTH_YOY_1Y", x => x < 0),
+        payoutDanger(ctx),
+        dilutionBad(ctx),
+      ],
+    },
+
+    "Defensiv": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "Beta ≤ 1.0", "BETA", x => x <= 1.0),
+        chkPct(ctx, "Profit Margin ≥ 4%", "PROFIT_MARGIN_1Y", x => x >= 0.04),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkPct(ctx, "Dividenden Yield ≥ 2.5%", "DIV_YIELD", x => x >= 0.025),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.5", "NET_DEBT_EBITDA_1Y", x => x <= 4.5),
+        chkNum(ctx, "Zinsdeckung ≥ 3",       "INTEREST_COVERAGE_1Y", x => x >= 3),
+        payoutSafe(ctx, 0.95),
+        dilutionHealth(ctx),
+      ],
+    },
+
+    "stabil Defensiv": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkNum(ctx, "Beta ≤ 0.9", "BETA", x => x <= 0.9),
+        chkPct(ctx, "ROIC ≥ 8%",  "ROIC_1Y", x => x >= 0.08),
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkPct(ctx, "FCF-Marge ≥ 6%", "FCF_MARGIN_1Y", x => x >= 0.06),
+      ],
+      health: (ctx) => [
+        ...balanceSheetStrongBase(ctx),
+        payoutSafe(ctx, 0.90),
+        dilutionHealth(ctx),
+      ],
+    },
+
+    "Gesund": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+        chkPct(ctx, "Profit Margin ≥ 4%", "PROFIT_MARGIN_1Y", x => x >= 0.04),
+        chkPct(ctx, "ROE ≥ 8%",           "ROE_1Y", x => x >= 0.08),
+        chkNum(ctx, "Current Ratio ≥ 1.0","CURRENT_RATIO_1Y", x => x >= 1.0),
+      ],
+      health: (ctx) => [
+        chkNum(ctx, "Net Debt/EBITDA ≤ 4.0", "NET_DEBT_EBITDA_1Y", x => x <= 4.0),
+        chkNum(ctx, "Zinsdeckung ≥ 3",       "INTEREST_COVERAGE_1Y", x => x >= 3),
+        dilutionHealth(ctx),
+        ctx.chk("Cash/Total Debt ≥ 0.15", (() => {
+          const r = cashToDebt(ctx);
+          return isFin(r) ? r >= 0.15 : false;
+        })(), !isFin(cashToDebt(ctx))),
+      ],
+    },
+
+    "Balance Sheet Strong": {
+      minPct: 0.60,
+      base: (ctx) => balanceSheetStrongBase(ctx),
+      health: (ctx) => [
+        chkBool(ctx,"FCF positiv (Puffer)","FCF_POSITIVE_YN", x => x === true),
+        payoutSafe(ctx, 0.95),
+        dilutionHealth(ctx),
+      ],
+    },
+
+    "Schuldenlastig/ Leveraged": {
+      minPct: 0.60,
+      base: (ctx) => leveragedBase(ctx),
+      health: (ctx) => [
+        chkBool(ctx, "FCF nicht positiv", "FCF_POSITIVE_YN", x => x === false),
+        ctx.chk("Cash/Total Debt < 0.10", (() => {
+          const r = cashToDebt(ctx);
+          return isFin(r) ? r < 0.10 : false;
+        })(), !isFin(cashToDebt(ctx))),
+      ],
+    },
+
+    // Proxy (bei Utilities meist nicht erfüllt – bewusst streng)
+    "Abo Modell/ Recurring Revenue": {
+      minPct: 0.60,
+      base: (ctx) => [
+        chkPct(ctx, "Gross Margin ≥ 60% (Proxy)", "GROSS_MARGIN_1Y", x => x >= 0.60),
+        chkPct(ctx, "Revenue CAGR 4Y ≥ 10%", "REV_CAGR_4Y", x => x >= 0.10),
+        chkPct(ctx, "ROIC ≥ 10%", "ROIC_1Y", x => x >= 0.10),
+      ],
+      health: (ctx) => [
+        chkBool(ctx,"FCF positiv","FCF_POSITIVE_YN", x => x === true),
+      ],
+    },
+
+    // =========================
+    // Size Roles
+    // =========================
+    "Small Cap": {
+      minPct: 1.0,
+      base: (ctx) => [ ctx.chk("Market Cap < $2B", capBucket(ctx) === "small", capBucket(ctx) === null) ],
+      health: (ctx) => [],
+    },
+    "Mid Cap": {
+      minPct: 1.0,
+      base: (ctx) => [ ctx.chk("$2B ≤ Market Cap < $10B", capBucket(ctx) === "mid", capBucket(ctx) === null) ],
+      health: (ctx) => [],
+    },
+    "Large Cap": {
+      minPct: 1.0,
+      base: (ctx) => [ ctx.chk("$10B ≤ Market Cap < $200B", capBucket(ctx) === "large", capBucket(ctx) === null) ],
+      health: (ctx) => [],
+    },
+    "Mega Cap": {
+      minPct: 1.0,
+      base: (ctx) => [ ctx.chk("Market Cap ≥ $200B", capBucket(ctx) === "mega", capBucket(ctx) === null) ],
+      health: (ctx) => [],
+    },
+  };
+})();
+
    
 
 
@@ -4287,18 +6387,6 @@ function t(label, bad, missing){
 
 
 
-
-function pickStressRulesBySector(sector){
-  switch(sector){
-    case "utilities":   return STRESS_RULES_UTILITIES;
-    case "brokers":     return STRESS_RULES_BROKERS;
-    case "commodities": return STRESS_RULES_COMMODITIES;
-    case "banks":       return STRESS_RULES_BANKS;
-    case "insurance":   return STRESS_RULES_INSURANCE;
-    case "reits":       return STRESS_RULES_REITS;
-    default:            return STRESS_RULES_STANDARD;
-  }
-}
 
 function evalStressForCurrentSector(){
   const m   = tableToMap();
@@ -4789,6 +6877,8 @@ health: (ctx) => {
         // Regeln für Stress Flag/ Banks
 
   
+
+
             // Regeln für Stress Flag/ Versicherer 
         
   
@@ -4801,6 +6891,132 @@ health: (ctx) => {
 
 
                     // Regeln für Stress Flag/ Versorger
+
+
+                    // =======================================================
+// STRESS_RULES_UTILITIES (Versorger) – Base + Health
+// Ziel: grün/gelb/rot/dunkelrot über deine bestehenden
+// countTriggers() + stressColorFromCounts() Schwellen.
+// =======================================================
+
+const STRESS_RULES_UTILITIES_DEF = (() => {
+
+  let STRESS_RULES_UTILITIES = () => STRESS_RULES_STANDARD;
+
+  const isFin = Number.isFinite;
+  const N = (ctx, id) => ctx.num(id);
+  const P = (ctx, id) => ctx.pct(id);
+  const B = (ctx, id) => ctx.boo(id);
+
+  function trigNum(ctx, label, id, badPred, sev="warn"){
+    const v = N(ctx,id);
+    const missing = !isFin(v);
+    return { label, sev, bad: !missing && !!badPred(v), missing };
+  }
+  function trigPct(ctx, label, id, badPred, sev="warn"){
+    const v = P(ctx,id);
+    const missing = !isFin(v);
+    return { label, sev, bad: !missing && !!badPred(v), missing };
+  }
+  function trigBool(ctx, label, id, badPred, sev="warn"){
+    const v = B(ctx,id);
+    const missing = (v !== true && v !== false);
+    return { label, sev, bad: !missing && !!badPred(v), missing };
+  }
+
+  // Nur wenn Dividende tatsächlich vorhanden ist
+  function hasDividend(ctx){
+    const y = P(ctx,"DIV_YIELD");
+    return isFin(y) && y > 0;
+  }
+
+  return {
+    // =====================
+    // BASE = harte Red Flags
+    // =====================
+    base: (ctx) => [
+      // Cashflow / Rentabilität
+      trigBool(ctx, "FCF negativ", "FCF_POSITIVE_YN", x => x === false, "critical"),
+      trigPct(ctx,  "Profit Margin ≤ 0%", "PROFIT_MARGIN_1Y", x => x <= 0, "critical"),
+
+      // Leverage / Coverage (Utilities: etwas toleranter, aber klar markieren)
+      trigNum(ctx, "Net Debt/EBITDA ≥ 5.0", "NET_DEBT_EBITDA_1Y", x => x >= 5.0, "critical"),
+      trigNum(ctx, "Zinsdeckung < 2.0", "INTEREST_COVERAGE_1Y", x => x < 2.0, "critical"),
+
+      // Liquidität
+      trigNum(ctx, "Current Ratio < 0.9", "CURRENT_RATIO_1Y", x => x < 0.9, "warn"),
+
+      // Verwässerung
+      trigPct(ctx, "Starke Verwässerung (Shares YoY ≥ +5%)", "SHARES_CHANGE_YOY", x => x >= 0.05, "warn"),
+
+      // Ausschüttung (nur wenn Dividende)
+      {
+        label: "Payout > 100% (nur relevant bei Dividend-Case)",
+        sev: "warn",
+        missing: !(isFin(P(ctx,"PAYOUT_RATIO_1Y")) && isFin(P(ctx,"DIV_YIELD"))),
+        bad: hasDividend(ctx) && isFin(P(ctx,"PAYOUT_RATIO_1Y")) && P(ctx,"PAYOUT_RATIO_1Y") > 1.00
+      },
+      {
+        label: "Payout > 130% (kritisch, nur Dividend-Case)",
+        sev: "critical",
+        missing: !(isFin(P(ctx,"PAYOUT_RATIO_1Y")) && isFin(P(ctx,"DIV_YIELD"))),
+        bad: hasDividend(ctx) && isFin(P(ctx,"PAYOUT_RATIO_1Y")) && P(ctx,"PAYOUT_RATIO_1Y") > 1.30
+      },
+
+      // Fair Value (wenn vorhanden) – teuer = Warnsignal
+      trigNum(ctx, "Kurs > Fairer Preis (überbewertet)", "PRICE_NOW", x => {
+        const fair = N(ctx,"FAIR_VALUE");
+        return isFin(fair) && fair > 0 && x > fair * 1.25;
+      }, "warn"),
+    ],
+
+    // =====================
+    // HEALTH = weiche Checks / Qualität / Risiko
+    // =====================
+    health: (ctx) => [
+      // Margen-Qualität (Utilities moderat)
+      trigPct(ctx, "Operating Margin < 8%", "OP_MARGIN_1Y", x => x < 0.08, "warn"),
+      trigPct(ctx, "Gross Margin < 15%", "GROSS_MARGIN_1Y", x => x < 0.15, "warn"),
+
+      // Returns
+      trigPct(ctx, "ROIC < 5%", "ROIC_1Y", x => x < 0.05, "warn"),
+      trigPct(ctx, "ROE < 6%", "ROE_1Y", x => x < 0.06, "warn"),
+
+      // Wachstum (Utilities oft low – nur bei klar negativ warnen)
+      trigPct(ctx, "Revenue Growth YoY < 0%", "REV_GROWTH_YOY_1Y", x => x < 0, "warn"),
+      trigPct(ctx, "EPS CAGR 4Y < 0%", "EPS_GROWTH_CAGR_4Y", x => x < 0, "warn"),
+
+      // Leverage “frühe Warnung”
+      trigNum(ctx, "Net Debt/EBITDA ≥ 4.0 (Warnzone)", "NET_DEBT_EBITDA_1Y", x => x >= 4.0, "warn"),
+      trigNum(ctx, "Debt/Equity ≥ 2.0", "DEBT_EQUITY_RATIO_1Y", x => x >= 2.0, "warn"),
+
+      // Risiko (Beta / Volatilität)
+      trigNum(ctx, "Beta ≥ 1.3", "BETA", x => x >= 1.3, "warn"),
+      trigPct(ctx, "Volatilität ≥ 50%", "VOL_1_5_10", x => x >= 0.50, "warn"),
+
+      // Cash-Puffer (wenn Daten da)
+      {
+        label: "Cash/Total Debt < 0.10",
+        sev: "warn",
+        missing: !(isFin(N(ctx,"CASH_STI_1Y")) && isFin(N(ctx,"TOTAL_DEBT_1Y")) && N(ctx,"TOTAL_DEBT_1Y") > 0),
+        bad: (() => {
+          const cash = N(ctx,"CASH_STI_1Y");
+          const debt = N(ctx,"TOTAL_DEBT_1Y");
+          if(!(isFin(cash) && isFin(debt) && debt > 0)) return false;
+          return (cash / debt) < 0.10;
+        })()
+      },
+
+      // Buybacks/Verwässerung (leicht)
+      trigPct(ctx, "Leichte Verwässerung (Shares YoY ≥ +2%)", "SHARES_CHANGE_YOY", x => x >= 0.02, "warn"),
+    ],
+  };
+})();
+
+// ✅ Einhängen (dein Selector nutzt STRESS_RULES_UTILITIES())
+const STRESS_RULES_UTILITIES = () => STRESS_RULES_UTILITIES_DEF;
+
+
    
 
 
